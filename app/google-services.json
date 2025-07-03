@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "990089078225",
+    "project_id": "everydaytasks-14783",
+    "storage_bucket": "everydaytasks-14783.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990089078225:android:799421f240b0dfdf2d6cf0",
+        "android_client_info": {
+          "package_name": "com.example.everydaytasks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAe1J2bx8gTYe2fkHLSUUgdIgd1NdiK5Zs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
