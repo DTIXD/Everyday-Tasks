@@ -44,6 +44,9 @@ fun LoginPage(
     val email = remember{
         mutableStateOf("")
     }
+    val password = remember{
+        mutableStateOf("")
+    }
 
     Image(
         painterResource(
@@ -64,10 +67,11 @@ fun LoginPage(
             modifier = Modifier
                 .fillMaxWidth(.95f)
                 .padding(bottom = 25.dp)
-                .offset(y = (-70).dp)
+                .offset(y = (-60).dp)
+                .height(275.dp)
                 .background(
-                    color = Color.LightGray,
-                    shape = RoundedCornerShape(10.dp)
+                    color = AlmostWhite,
+                    shape = RoundedCornerShape(15.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -87,7 +91,7 @@ fun LoginPage(
                         focusedIndicatorColor = Color.Transparent,
                     ),
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(.90f)
                         .height(50.dp),
                     label = {
                         Text(
@@ -95,6 +99,36 @@ fun LoginPage(
                             color = TextFieldLabelColor
                         )
                     }
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(12.dp)
+                )
+                TextField(
+                    value = password.value,
+                    onValueChange = {
+                        password.value = it
+                    },
+                    shape = RoundedCornerShape(7.dp),
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = TextFieldColor,
+                        focusedContainerColor = TextFieldColor,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(.90f)
+                        .height(50.dp),
+                    label = {
+                        Text(
+                            text = "Password",
+                            color = TextFieldLabelColor
+                        )
+                    }
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(19.dp)
                 )
                 Box(
                     modifier = Modifier

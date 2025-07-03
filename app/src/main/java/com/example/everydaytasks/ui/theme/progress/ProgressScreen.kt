@@ -108,7 +108,7 @@ fun ProgressPage(
 
                     if (
                         today.toString()
-                        != progressScreenDataObject.lastAdded
+                        > progressScreenDataObject.lastAdded
                         && progressScreenDataObject.category
                         == "EveryDay"
                         && progressScreenDataObject.wasAdded
@@ -119,13 +119,13 @@ fun ProgressPage(
                             .set(
                                 ProgressScreenDataObject(
                                     progressScreenDataObject.newTask,
-                                    isCompleted.value,
+                                    progressScreenDataObject.isCompleted,
                                     progressScreenDataObject.key,
                                     progressScreenDataObject.dayAdded,
                                     progressScreenDataObject.daySelected,
                                     progressScreenDataObject.category,
                                     false,
-                                    today.toString()
+                                    lastAdded = today.toString()
                                 )
                             )
                     }
@@ -223,7 +223,7 @@ fun ProgressPage(
                                         progressScreenDataObject.daySelected,
                                         progressScreenDataObject.category,
                                         true,
-                                        progressScreenDataObject.lastAdded
+                                        today.toString()
                                     )
                                 )
                             val key = fs.collection("tasks")
@@ -234,7 +234,7 @@ fun ProgressPage(
                                         progressScreenDataObject.newTask,
                                         progressScreenDataObject.isCompleted,
                                         key,
-                                        today.toString(),
+                                        progressScreenDataObject.daySelected,
                                         progressScreenDataObject.daySelected,
                                         "Today",
                                         true,
