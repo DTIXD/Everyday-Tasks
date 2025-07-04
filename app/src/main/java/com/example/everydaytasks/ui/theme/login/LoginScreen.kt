@@ -149,6 +149,11 @@ fun LoginPage(
                         )
                         .background(LoginButtonColor)
                         .clickable {
+                            login(
+                                auth,
+                                email.value,
+                                password.value
+                            )
                             onNavigationToProgressPage(
                                 ProgressScreenDataObject()
                             )
@@ -212,6 +217,24 @@ private fun signUp(
     password: String
 ) {
     auth.createUserWithEmailAndPassword(
+        email,
+        password
+    )
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+
+            } else {
+
+            }
+        }
+}
+
+private fun login(
+    auth: FirebaseAuth,
+    email: String,
+    password: String
+) {
+    auth.signInWithEmailAndPassword(
         email,
         password
     )
