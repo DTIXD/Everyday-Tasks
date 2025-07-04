@@ -36,6 +36,9 @@ import com.example.everydaytasks.ui.theme.TextColor
 import com.example.everydaytasks.ui.theme.TextFieldColor
 import com.example.everydaytasks.ui.theme.TextFieldLabelColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.ktx.auth
 
 @Composable
 fun LoginPage(
@@ -47,6 +50,8 @@ fun LoginPage(
     val password = remember{
         mutableStateOf("")
     }
+
+    val auth = Firebase.auth
 
     Image(
         painterResource(
@@ -67,8 +72,8 @@ fun LoginPage(
             modifier = Modifier
                 .fillMaxWidth(.95f)
                 .padding(bottom = 25.dp)
-                .offset(y = (-60).dp)
-                .height(275.dp)
+                .offset(y = (-30).dp)
+                .height(300.dp)
                 .background(
                     color = AlmostWhite,
                     shape = RoundedCornerShape(15.dp)
@@ -145,9 +150,7 @@ fun LoginPage(
                         .background(LoginButtonColor)
                         .clickable {
                             onNavigationToProgressPage(
-                                ProgressScreenDataObject(
-                                    "Press '+' to add task"
-                                )
+                                ProgressScreenDataObject()
                             )
                         },
                     contentAlignment = Alignment.Center
@@ -162,6 +165,37 @@ fun LoginPage(
                     modifier = Modifier
                         .height(7.dp)
                 )
+                Box(
+                    modifier = Modifier
+                        .height(54.dp)
+                        .width(340.dp)
+                        .clip(
+                            RoundedCornerShape(10.dp)
+                        )
+                        .border(
+                            1.dp,
+                            Biruz,
+                            RoundedCornerShape(10.dp)
+                        )
+                        .background(LoginButtonColor)
+                        .clickable{
+                            signUp(
+                                auth,
+                                email.value,
+                                password.value
+                            )
+                            onNavigationToProgressPage(
+                                ProgressScreenDataObject()
+                            )
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Sign up",
+                        color = AlmostWhite,
+                        fontSize = 26.sp
+                    )
+                }
                 Text(
                     text = "Forgot password?",
                     color = TextColor,
@@ -170,4 +204,22 @@ fun LoginPage(
             }
         }
     }
+}
+
+private fun signUp(
+    auth: FirebaseAuth,
+    email: String,
+    password: String
+) {
+    auth.createUserWithEmailAndPassword(
+        email,
+        password
+    )
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+
+            } else {
+
+            }
+        }
 }

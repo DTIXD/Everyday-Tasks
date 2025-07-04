@@ -83,7 +83,7 @@ fun AddingPage(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(.95f)
                 .padding(bottom = 25.dp)
                 .offset(y = (-70).dp)
                 .background(
