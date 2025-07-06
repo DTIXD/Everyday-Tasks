@@ -222,9 +222,9 @@ private fun signUp(
     )
         .addOnCompleteListener {
             if (it.isSuccessful) {
-
+                null
             } else {
-
+                null
             }
         }
 }
@@ -240,9 +240,9 @@ private fun login(
     )
         .addOnCompleteListener {
             if (it.isSuccessful) {
-
+                null
             } else {
-
+                null
             }
         }
 }

@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import com.example.everydaytasks.ui.theme.AlmostWhite
 import com.example.everydaytasks.ui.theme.Biruz
 import com.example.everydaytasks.ui.theme.DarkerThanAlmostWhite
-import com.example.everydaytasks.ui.theme.TextFieldColor
 import com.example.everydaytasks.ui.theme.TextFieldLabelColor
 import java.time.LocalDate
 
