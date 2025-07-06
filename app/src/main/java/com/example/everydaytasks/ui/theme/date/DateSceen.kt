@@ -55,7 +55,9 @@ fun DatePage(
         )
     }
     var selectedDate by remember {
-        mutableStateOf<LocalDate?>(LocalDate.now())
+        mutableStateOf<LocalDate?>(
+            LocalDate.now()
+        )
     }
 
     Column(
@@ -69,14 +71,19 @@ fun DatePage(
                 input = it
                 val parts = it.split("/")
                 if (parts.size == 2) {
-                    val month = parts[0].toIntOrNull()
-                    val year = parts[1].toIntOrNull()
+                    val month = parts[0]
+                        .toIntOrNull()
+                    val year = parts[1]
+                        .toIntOrNull()
                     if (
                         month != null
                         && year != null
                         && month in 1..12
                     ) {
-                        selectedYearMonth = YearMonth.of(year, month)
+                        selectedYearMonth = YearMonth.of(
+                            year,
+                            month
+                        )
                     }
                 }
             },
@@ -89,7 +96,8 @@ fun DatePage(
         )
 
         Spacer(
-            modifier = Modifier.height(16.dp)
+            modifier = Modifier
+                .height(16.dp)
         )
 
         Row(
@@ -112,11 +120,15 @@ fun DatePage(
                 .height(8.dp)
         )
 
-        val firstDayOfMonth = selectedYearMonth.atDay(1)
-        val totalDays = selectedYearMonth.lengthOfMonth()
-        val startOffset = firstDayOfMonth.dayOfWeek.value % 7
+        val firstDayOfMonth = selectedYearMonth
+            .atDay(1)
+        val totalDays = selectedYearMonth
+            .lengthOfMonth()
+        val startOffset = firstDayOfMonth
+            .dayOfWeek.value % 7
 
-        val days = List(startOffset) { null } + (1..totalDays).map { it }
+        val days = List(startOffset) { null } +
+                (1..totalDays).map { it }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
@@ -127,7 +139,10 @@ fun DatePage(
             items(days.size) { index ->
                 val day = days[index]
                 val dayDate = day?.let {
-                    LocalDate.of(selectedYearMonth.year, selectedYearMonth.monthValue, it)
+                    LocalDate.of(
+                        selectedYearMonth.year,
+                        selectedYearMonth.monthValue, it
+                    )
                 }
                 Box(
                     modifier = Modifier
@@ -172,11 +187,14 @@ fun DatePage(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 45.dp),
+            .padding(
+                bottom = 45.dp
+            ),
         contentAlignment = Alignment.BottomCenter
     ) {
         selectedDate?.let { date ->
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd")
             val day = "Selected date: ${date.format(formatter)}"
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally

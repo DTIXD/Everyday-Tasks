@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.sp
 import com.example.everydaytasks.ui.theme.AlmostWhite
 import com.example.everydaytasks.ui.theme.Biruz
 import com.example.everydaytasks.ui.theme.DarkerThanAlmostWhite
+import com.example.everydaytasks.ui.theme.TextFieldColor
+import com.example.everydaytasks.ui.theme.TextFieldLabelColor
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -71,6 +73,9 @@ fun AddingPage(
         LocalDate.now()
     }
 
+    val dayadding = remember {
+        mutableStateOf("")
+    }
     val addForToday = remember {
         mutableStateOf(true)
     }
@@ -173,10 +178,30 @@ fun AddingPage(
                         .fillMaxWidth()
                         .padding(15.dp)
                 ) {
-                    Text(
-                        text = "ADD TASK",
-                        color = Biruz
-                    )
+                    if (addForToday.value) {
+                        TextField(
+                            value = dayadding.value,
+                            onValueChange = {
+                                dayadding.value = it
+                            },
+                            shape = RoundedCornerShape(7.dp),
+                            colors = TextFieldDefaults.colors(
+                                unfocusedContainerColor = DarkerThanAlmostWhite,
+                                focusedContainerColor = DarkerThanAlmostWhite,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            label = {
+                                Text(
+                                    text = "YYYY-MM-DD",
+                                    color = TextFieldLabelColor
+                                )
+                            }
+                        )
+                    }
                     Spacer(
                         modifier = Modifier
                             .height(20.dp)
@@ -195,7 +220,13 @@ fun AddingPage(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(50.dp),
+                        label = {
+                            Text(
+                                text = "Task",
+                                color = TextFieldLabelColor
+                            )
+                        }
                     )
                     Spacer(
                         modifier = Modifier
@@ -216,7 +247,7 @@ fun AddingPage(
                                             newTask = newTask.value,
                                             isCompleted = false,
                                             key = key,
-                                            dayAdded = today.toString(),
+                                            dayAdded = dayadding.value,
                                             daySelected = today.toString(),
                                             category = if (addForToday.value) "Today"
                                             else "EveryDay",
@@ -230,7 +261,7 @@ fun AddingPage(
                                                 newTask = newTask.value,
                                                 isCompleted = false,
                                                 key = key,
-                                                dayAdded = today.toString(),
+                                                dayAdded = dayadding.value,
                                                 daySelected = today.toString(),
                                                 category = if (addForToday.value) "Today"
                                                 else "EveryDay",
@@ -265,7 +296,9 @@ fun AddingPage(
                                     contentScale = ContentScale.Crop
                                 )
                                 Text(
-                                    text = "Add Just For Today",
+                                    text =
+                                        if (addForToday.value) "Add Date"
+                                        else "Add For Every Day",
                                     color = Biruz
                                 )
                             }
