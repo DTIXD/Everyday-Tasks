@@ -27,6 +27,10 @@ import com.example.everydaytasks.ui.theme.login.LoginPage
 import com.example.everydaytasks.ui.theme.login.LoginScreenObject
 import com.example.everydaytasks.ui.theme.progress.ProgressPage
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
+import com.example.everydaytasks.ui.theme.review.ReviewPage
+import com.example.everydaytasks.ui.theme.review.ReviewScreenDataObject
+import com.example.everydaytasks.ui.theme.search.SearchPage
+import com.example.everydaytasks.ui.theme.search.SearchScreenDataObject
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -51,10 +55,24 @@ class MainActivity : ComponentActivity() {
                         if (isBottomMenuVisible.value) {
                             BottomMenu(
                                 onTodayClick = {
-                                    navController.navigate(ProgressScreenDataObject())
+                                    navController.navigate(
+                                        ProgressScreenDataObject()
+                                    )
                                 },
                                 onUpcomingClick = {
-                                    navController.navigate(DateScreenDataObject())
+                                    navController.navigate(
+                                        DateScreenDataObject()
+                                    )
+                                },
+                                onSearchClick = {
+                                    navController.navigate(
+                                        SearchScreenDataObject
+                                    )
+                                },
+                                onReviewClick = {
+                                    navController.navigate(
+                                        ReviewScreenDataObject
+                                    )
                                 }
                             )
                         }
@@ -65,20 +83,14 @@ class MainActivity : ComponentActivity() {
                         startDestination = LoginScreenObject
                     ) {
                         composable<LoginScreenObject> {
-                            LoginPage{navData ->
+                            LoginPage {navData ->
                                 navController.navigate(navData)
                                 isBottomMenuVisible.value = true
                             }
                         }
                         composable<ProgressScreenDataObject> {navEntry ->
                             val navData = navEntry.toRoute<ProgressScreenDataObject>()
-                            ProgressPage(
-                                onSelectButtonClick = {navData ->
-                                    navController.navigate(
-                                        navData
-                                    )
-                                }
-                            ){navData ->
+                            ProgressPage {navData ->
                                 navController.navigate(navData)
                             }
                         }
@@ -89,9 +101,15 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable<DateScreenDataObject> {
-                            DatePage{navData ->
+                            DatePage {navData ->
                                 navController.navigate(navData)
                             }
+                        }
+                        composable<SearchScreenDataObject> {
+                            SearchPage()
+                        }
+                        composable<ReviewScreenDataObject> {
+                            ReviewPage()
                         }
                     }
                 }

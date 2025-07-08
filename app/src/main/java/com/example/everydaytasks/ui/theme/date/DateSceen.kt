@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.everydaytasks.ui.theme.BGColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -59,7 +61,15 @@ fun DatePage(
             LocalDate.now()
         )
     }
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                color = BGColor
+            )
+    ) {
+        null
+    }
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -188,7 +198,7 @@ fun DatePage(
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                bottom = 45.dp
+                bottom = 100.dp
             ),
         contentAlignment = Alignment.BottomCenter
     ) {
@@ -223,9 +233,16 @@ fun DatePage(
                                 daySelected = day
                             )
                         )
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = BGColor
+                    )
                 ) {
-                    Text("Select")
+                    Text(
+                        "Select",
+                        color = Color.White
+                    )
                 }
             }
         }

@@ -17,3 +17,6 @@ val LoginButtonColor = Color(0xFF52AB9F)
 val TextColor = Color(0xFF6AAD94)
 val TextFieldColor = Color(0xFFEEF4CE)
 val TextFieldLabelColor = Color(0xFFABAE7A)
+
+val BGColor = Color(0xFF1E1E1E)
+val BottomMenuColor = Color(0xFF262626)

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,21 +34,16 @@ import com.google.firebase.ktx.Firebase
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import com.example.everydaytasks.ui.theme.Biruz
-import com.example.everydaytasks.ui.theme.bottommenu.BottomMenu
-import com.example.everydaytasks.ui.theme.date.DateScreenDataObject
 import java.time.LocalDate
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProgressPage(
-    onSelectButtonClick: (DateScreenDataObject) -> Unit,
     onNavigationToAddingPage: (AddingScreenDataObject) -> Unit
 ) {
     val fs = Firebase.firestore
@@ -272,29 +266,6 @@ fun ProgressPage(
                     contentDescription = ""
                 )
             }
-            IconButton(
-                onClick = {
-                    onSelectButtonClick(
-                        DateScreenDataObject()
-                    )
-                }
-            ) {
-                Icon(
-                    Icons.Default.DateRange,
-                    contentDescription = ""
-                )
-            }
         }
-    }
-    Scaffold(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(.1f)
-            .offset(y = 825.dp),
-        bottomBar = {
-            BottomMenu()
-        }
-    ) {
-
     }
 }
