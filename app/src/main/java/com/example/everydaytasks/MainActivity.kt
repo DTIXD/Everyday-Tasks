@@ -8,15 +8,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -40,61 +37,62 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-            val isNotOnLoginScreen = remember {
+            val isBottomMenuVisible = remember {
                 mutableStateOf(false)
             }
-
-            NavHost(
-                navController = navController,
-                startDestination = LoginScreenObject
-            ) {
-                composable<LoginScreenObject> {
-                    LoginPage{navData ->
-                        navController.navigate(navData)
-                        isNotOnLoginScreen.value = true
-                    }
-                }
-                composable<ProgressScreenDataObject> {navEntry ->
-                    val navData = navEntry.toRoute<ProgressScreenDataObject>()
-                    ProgressPage(
-                        onSelectButtonClick = {navData ->
-                            navController.navigate(navData)
-                        }
-                    ){navData ->
-                        navController.navigate(navData)
-                    }
-                }
-                composable<AddingScreenDataObject> {navEntry ->
-                    val navData = navEntry.toRoute<AddingScreenDataObject>()
-                    AddingPage{navData ->
-                        navController.navigate(navData)
-                    }
-                }
-                composable<DateScreenDataObject> {
-                    DatePage{navData ->
-                        navController.navigate(navData)
-                    }
-                }
-            }
-            if (
-                isNotOnLoginScreen.value
-                == true
-            ) {
-                Box(
-                    modifier = Modifier
+            Box(
+                modifier = Modifier
                         .fillMaxSize(),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    Scaffold(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(.1f),
-                        bottomBar = {
-                            BottomMenu()
-                        },
-                        containerColor = Color.LightGray
-                    ) {
+                contentAlignment = Alignment.BottomCenter
+            ) {
 
+                Scaffold(
+                    bottomBar = {
+                        if (isBottomMenuVisible.value) {
+                            BottomMenu(
+                                onTodayClick = {
+                                    navController.navigate(ProgressScreenDataObject())
+                                },
+                                onUpcomingClick = {
+                                    navController.navigate(DateScreenDataObject())
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = LoginScreenObject
+                    ) {
+                        composable<LoginScreenObject> {
+                            LoginPage{navData ->
+                                navController.navigate(navData)
+                                isBottomMenuVisible.value = true
+                            }
+                        }
+                        composable<ProgressScreenDataObject> {navEntry ->
+                            val navData = navEntry.toRoute<ProgressScreenDataObject>()
+                            ProgressPage(
+                                onSelectButtonClick = {navData ->
+                                    navController.navigate(
+                                        navData
+                                    )
+                                }
+                            ){navData ->
+                                navController.navigate(navData)
+                            }
+                        }
+                        composable<AddingScreenDataObject> {navEntry ->
+                            val navData = navEntry.toRoute<AddingScreenDataObject>()
+                            AddingPage{navData ->
+                                navController.navigate(navData)
+                            }
+                        }
+                        composable<DateScreenDataObject> {
+                            DatePage{navData ->
+                                navController.navigate(navData)
+                            }
+                        }
                     }
                 }
             }

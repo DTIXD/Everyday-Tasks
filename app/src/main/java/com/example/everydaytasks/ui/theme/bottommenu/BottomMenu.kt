@@ -13,7 +13,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun BottomMenu() {
+fun BottomMenu(
+    onTodayClick: () -> Unit = {},
+    onUpcomingClick: () -> Unit = {}
+) {
     val items = listOf(
         BottomMenuBar.Today,
         BottomMenuBar.Month,
@@ -30,6 +33,10 @@ fun BottomMenu() {
             NavigationBarItem(
                 selected = (selectedItem.value == item.title),
                 onClick = {
+                    when (item.title) {
+                        "Today" -> onTodayClick()
+                        "Upcoming" -> onUpcomingClick()
+                    }
                     selectedItem.value = item.title
                 },
                 icon = {
