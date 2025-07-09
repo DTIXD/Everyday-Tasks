@@ -18,13 +18,15 @@ fun SearchPage() {
         modifier = Modifier
             .fillMaxSize()
             .background(color = BGColor)
+            .padding(5.dp)
+            .padding(top = 15.dp)
     ) {
         Text(
             modifier = Modifier
                 .padding(5.dp),
             text = "Search",
             color = Color.White,
-            fontSize = 50.sp
+            fontSize = 25.sp
         )
     }
 }

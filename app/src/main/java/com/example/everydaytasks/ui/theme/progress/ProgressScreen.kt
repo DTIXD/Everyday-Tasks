@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,12 +33,15 @@ import com.example.everydaytasks.ui.theme.adding.AddingScreenDataObject
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import com.example.everydaytasks.ui.theme.Biruz
+import androidx.compose.ui.graphics.Color
+import com.example.everydaytasks.ui.theme.AddButtonBGColor
+import com.example.everydaytasks.ui.theme.BGColor
 import java.time.LocalDate
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -61,14 +65,12 @@ fun ProgressPage(
         LocalDate.now()
     }
 
-    Image(
-        painterResource(
-            id = R.drawable.progressscreenbg
-        ),
-        contentDescription = null,
-        Modifier
-            .fillMaxSize(),
-        contentScale = ContentScale.Crop
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                color = BGColor
+            )
     )
 
     Box(
@@ -79,13 +81,14 @@ fun ProgressPage(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
         ) {
             Text(
-                text = "Tasks",
-                color = Biruz,
-                fontSize = 40.sp
+                modifier = Modifier
+                    .padding(5.dp),
+                text = "Today",
+                color = Color.White,
+                fontSize = 25.sp,
             )
             Spacer(
                 modifier = Modifier
@@ -252,19 +255,28 @@ fun ProgressPage(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.End
         ) {
-            IconButton(
-                onClick = {
-                    onNavigationToAddingPage(
-                        AddingScreenDataObject(
-                            "IS303"
+            Box(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .background(
+                        shape = RoundedCornerShape(15.dp),
+                        color = AddButtonBGColor
+                    )
+            ) {
+                IconButton(
+                    onClick = {
+                        onNavigationToAddingPage(
+                            AddingScreenDataObject(
+                                "IS303"
+                            )
                         )
+                    }
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = ""
                     )
                 }
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = ""
-                )
             }
         }
     }

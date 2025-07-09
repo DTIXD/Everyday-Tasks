@@ -18,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.adding.AddingPage
 import com.example.everydaytasks.ui.theme.adding.AddingScreenDataObject
 import com.example.everydaytasks.ui.theme.bottommenu.BottomMenu
@@ -76,7 +77,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                    }
+                    },
+                    containerColor = BottomMenuColor
                 ) {
                     NavHost(
                         navController = navController,

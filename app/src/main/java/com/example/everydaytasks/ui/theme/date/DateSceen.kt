@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.everydaytasks.ui.theme.BGColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
 import com.google.firebase.firestore.ktx.firestore
@@ -67,14 +68,24 @@ fun DatePage(
             .background(
                 color = BGColor
             )
-    ) {
-        null
-    }
+    )
+
     Column(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(5.dp)
             .padding(top = 15.dp)
     ) {
+        Text(
+            modifier = Modifier
+                .padding(5.dp),
+            text = "Upcoming",
+            color = Color.White,
+            fontSize = 25.sp
+        )
+        Spacer(
+            modifier = Modifier
+                .height(10.dp)
+        )
         OutlinedTextField(
             value = input,
             onValueChange = {

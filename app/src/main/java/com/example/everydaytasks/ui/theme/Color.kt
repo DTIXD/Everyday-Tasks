@@ -20,3 +20,8 @@ val TextFieldLabelColor = Color(0xFFABAE7A)
 
 val BGColor = Color(0xFF1E1E1E)
 val BottomMenuColor = Color(0xFF262626)
+val CaptionTextColor = Color(0xFFBFBFBF)
+val AddButtonBGColor = Color(0xFFDD4C49)
+val SelectedItemColor = Color(0xFFDD4C49)
+val UnSelectedItemColor = Color(0xFFD0D0D0)
+val SelectedItemBGColor = Color(0xFF482424)
