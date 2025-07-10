@@ -21,14 +21,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.example.everydaytasks.ui.theme.AddButtonBGColor
 import com.example.everydaytasks.ui.theme.BGColor
 import com.example.everydaytasks.ui.theme.BottomMenuColor
@@ -126,8 +124,7 @@ class MainActivity : ComponentActivity() {
                         composable<ProgressScreenDataObject> {
                             ProgressPage()
                         }
-                        composable<AddingScreenDataObject> { navEntry ->
-                            val navData = navEntry.toRoute<AddingScreenDataObject>()
+                        composable<AddingScreenDataObject> {
                             AddingPage(
                                 onNavigationToProgressPage = { navData ->
                                     navController.navigate(navData)

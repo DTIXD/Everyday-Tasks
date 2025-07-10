@@ -23,6 +23,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,13 +37,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.everydaytasks.ui.theme.BGColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -58,11 +65,45 @@ fun DatePage(
             YearMonth.now()
         )
     }
-    var selectedDate by remember {
-        mutableStateOf<LocalDate?>(
-            LocalDate.now()
-        )
+
+    val currentDate = LocalDate.now()
+    var selectedDate by remember { mutableStateOf(currentDate) }
+    var lastCheckedDate by remember { mutableStateOf(currentDate) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val now = LocalDate.now()
+                if (now != lastCheckedDate) {
+                    selectedDate = now
+                    lastCheckedDate = now
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            val nowMillis = System.currentTimeMillis()
+            val midnightMillis = LocalDate.now()
+                .plusDays(1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+            val delayMillis = midnightMillis - nowMillis
+
+            delay(delayMillis)
+
+            selectedDate = LocalDate.now()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
