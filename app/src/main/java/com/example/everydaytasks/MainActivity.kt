@@ -7,17 +7,30 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.everydaytasks.ui.theme.AddButtonBGColor
+import com.example.everydaytasks.ui.theme.BGColor
 import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.adding.AddingPage
 import com.example.everydaytasks.ui.theme.adding.AddingScreenDataObject
@@ -47,65 +60,86 @@ class MainActivity : ComponentActivity() {
             }
             Box(
                 modifier = Modifier
-                        .fillMaxSize(),
-                contentAlignment = Alignment.BottomCenter
+                    .fillMaxSize()
             ) {
-
                 Scaffold(
-                    bottomBar = {
+                    floatingActionButton = {
                         if (isBottomMenuVisible.value) {
-                            BottomMenu(
-                                onTodayClick = {
+                            FloatingActionButton(
+                                onClick = {
                                     navController.navigate(
-                                        ProgressScreenDataObject()
+                                        AddingScreenDataObject(
+                                            "IS303"
+                                        )
                                     )
                                 },
-                                onUpcomingClick = {
-                                    navController.navigate(
-                                        DateScreenDataObject()
-                                    )
-                                },
-                                onSearchClick = {
-                                    navController.navigate(
-                                        SearchScreenDataObject
-                                    )
-                                },
-                                onReviewClick = {
-                                    navController.navigate(
-                                        ReviewScreenDataObject
-                                    )
-                                }
-                            )
+                                containerColor = AddButtonBGColor,
+                                modifier = Modifier
+                                    .offset(y = (-16).dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add",
+                                    tint = Color.White
+                                )
+                            }
                         }
                     },
-                    containerColor = BottomMenuColor
-                ) {
+                    floatingActionButtonPosition = FabPosition.End,
+                    containerColor = BGColor,
+                    bottomBar = {
+                        if (isBottomMenuVisible.value) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(BottomMenuColor)
+                                    .padding(vertical = 10.dp)
+                            ) {
+                                BottomMenu(
+                                    onTodayClick = {
+                                        navController.navigate(ProgressScreenDataObject())
+                                    },
+                                    onUpcomingClick = {
+                                        navController.navigate(DateScreenDataObject())
+                                    },
+                                    onSearchClick = {
+                                        navController.navigate(SearchScreenDataObject)
+                                    },
+                                    onReviewClick = {
+                                        navController.navigate(ReviewScreenDataObject)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                ) { innerPadding ->
                     NavHost(
                         navController = navController,
                         startDestination = LoginScreenObject
                     ) {
                         composable<LoginScreenObject> {
-                            LoginPage {navData ->
+                            LoginPage { navData ->
                                 navController.navigate(navData)
                                 isBottomMenuVisible.value = true
                             }
                         }
-                        composable<ProgressScreenDataObject> {navEntry ->
-                            val navData = navEntry.toRoute<ProgressScreenDataObject>()
-                            ProgressPage {navData ->
-                                navController.navigate(navData)
-                            }
+                        composable<ProgressScreenDataObject> {
+                            ProgressPage()
                         }
-                        composable<AddingScreenDataObject> {navEntry ->
+                        composable<AddingScreenDataObject> { navEntry ->
                             val navData = navEntry.toRoute<AddingScreenDataObject>()
-                            AddingPage{navData ->
-                                navController.navigate(navData)
-                            }
+                            AddingPage(
+                                onNavigationToProgressPage = { navData ->
+                                    navController.navigate(navData)
+                                }
+                            )
                         }
                         composable<DateScreenDataObject> {
-                            DatePage {navData ->
-                                navController.navigate(navData)
-                            }
+                            DatePage(
+                                onNavigationToProgressPage = { navData ->
+                                    navController.navigate(navData)
+                                }
+                            )
                         }
                         composable<SearchScreenDataObject> {
                             SearchPage()

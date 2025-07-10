@@ -50,7 +50,8 @@ import java.time.LocalDate
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddingPage(
-    onNavigationToProgressPage: (ProgressScreenDataObject) -> Unit
+    onNavigationToProgressPage: (ProgressScreenDataObject) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val newTask = remember {
         mutableStateOf("")
@@ -79,15 +80,8 @@ fun AddingPage(
         mutableStateOf(true)
     }
 
-    Image(
-        painterResource(id = R.drawable.addingscreenbg),
-        contentDescription = null,
-        Modifier
-            .fillMaxSize(),
-        contentScale = ContentScale.Crop
-    )
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(top = 25.dp)
     ) {

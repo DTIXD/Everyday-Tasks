@@ -47,7 +47,8 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DatePage(
-    onNavigationToProgressPage: (ProgressScreenDataObject) -> Unit
+    onNavigationToProgressPage: (ProgressScreenDataObject) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var input by remember {
         mutableStateOf("")
@@ -71,13 +72,10 @@ fun DatePage(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(5.dp)
-            .padding(top = 15.dp)
     ) {
         Text(
-            modifier = Modifier
-                .padding(5.dp),
             text = "Upcoming",
             color = Color.White,
             fontSize = 25.sp

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -33,12 +31,13 @@ import com.example.everydaytasks.ui.theme.adding.AddingScreenDataObject
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.ui.graphics.Color
 import com.example.everydaytasks.ui.theme.AddButtonBGColor
 import com.example.everydaytasks.ui.theme.BGColor
@@ -48,7 +47,7 @@ import java.time.LocalDate
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProgressPage(
-    onNavigationToAddingPage: (AddingScreenDataObject) -> Unit
+    modifier: Modifier = Modifier
 ) {
     val fs = Firebase.firestore
     val list = remember {
@@ -58,67 +57,154 @@ fun ProgressPage(
     }
 
     fs.collection("tasks").addSnapshotListener{snapshot, exception ->
-        list.value = snapshot?.toObjects(ProgressScreenDataObject::class.java) ?: emptyList()
+        list.value = snapshot?.toObjects(
+            ProgressScreenDataObject::class.java
+        ) ?: emptyList()
     }
 
     val today = remember {
         LocalDate.now()
     }
 
-    Box(
-        modifier = Modifier
+    Column(
+        modifier = modifier
             .fillMaxSize()
             .background(
                 color = BGColor
             )
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 15.dp)
-            .padding(5.dp)
+            .padding(horizontal = 8.dp, vertical = 12.dp)
     ) {
-        Column(
+        Text(
+            text = "Today",
+            color = Color.White,
+            fontSize = 25.sp,
+        )
+        Spacer(
+            modifier = Modifier
+                .height(10.dp)
+        )
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Text(
-                modifier = Modifier
-                    .padding(5.dp),
-                text = "Today",
-                color = Color.White,
-                fontSize = 25.sp,
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(10.dp)
-            )
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                items(list.value) { progressScreenDataObject ->
-                    val isCompleted = remember {
-                        mutableStateOf(
-                            progressScreenDataObject.isCompleted
-                        )
-                    }
-                    val isExtended = remember {
-                        mutableStateOf(false)
-                    }
+            items(list.value) { progressScreenDataObject ->
+                val isCompleted = remember {
+                    mutableStateOf(
+                        progressScreenDataObject.isCompleted
+                    )
+                }
+                val isExtended = remember {
+                    mutableStateOf(false)
+                }
 
+                if (
+                    today.toString()
+                    > progressScreenDataObject.lastAdded
+                    && progressScreenDataObject.category
+                    == "EveryDay"
+                    && progressScreenDataObject.wasAdded
+                    == true
+                ) {
+                    fs.collection("tasks")
+                        .document(progressScreenDataObject.key)
+                        .set(
+                            ProgressScreenDataObject(
+                                progressScreenDataObject.newTask,
+                                progressScreenDataObject.isCompleted,
+                                progressScreenDataObject.key,
+                                progressScreenDataObject.dayAdded,
+                                progressScreenDataObject.daySelected,
+                                progressScreenDataObject.category,
+                                false,
+                                lastAdded = today.toString()
+                            )
+                        )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     if (
-                        today.toString()
-                        > progressScreenDataObject.lastAdded
+                        progressScreenDataObject.daySelected
+                        == progressScreenDataObject.dayAdded
                         && progressScreenDataObject.category
-                        == "EveryDay"
+                        == "Today"
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(5.dp)
+                        ) {
+                            Image(
+                                painterResource(
+                                    id =
+                                        if (isCompleted.value) R.drawable.completed
+                                        else R.drawable.notcompleted
+                                ),
+                                contentDescription = null,
+                                Modifier
+                                    .padding(5.dp)
+                                    .size(30.dp)
+                                    .clickable {
+                                        isCompleted.value = !isCompleted.value
+                                        fs.collection("tasks")
+                                            .document(progressScreenDataObject.key)
+                                            .set(
+                                                ProgressScreenDataObject(
+                                                    progressScreenDataObject.newTask,
+                                                    isCompleted.value,
+                                                    progressScreenDataObject.key,
+                                                    progressScreenDataObject.dayAdded,
+                                                    progressScreenDataObject.daySelected,
+                                                    progressScreenDataObject.category,
+                                                    progressScreenDataObject.wasAdded,
+                                                    progressScreenDataObject.lastAdded
+                                                )
+                                            )
+                                    },
+                                contentScale = ContentScale.Crop
+                            )
+                            Text(
+                                text = progressScreenDataObject.newTask,
+                                modifier = Modifier
+                                    .padding(
+                                        top = 10.dp,
+                                        end = 40.dp
+                                    )
+                                    .clickable {
+                                        isExtended.value = !isExtended.value
+                                    },
+                                fontSize = 20.sp,
+                                maxLines =
+                                    if (isExtended.value) 100
+                                    else 1
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    fs.collection("tasks")
+                                        .document(progressScreenDataObject.key)
+                                        .delete()
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = ""
+                                )
+                            }
+                        }
+                    } else if (
+                        progressScreenDataObject.daySelected
+                        >= progressScreenDataObject.dayAdded
                         && progressScreenDataObject.wasAdded
-                        == true
+                        == false
                     ) {
                         fs.collection("tasks")
-                            .document(progressScreenDataObject.key)
-                            .set(
+                            .document(progressScreenDataObject.key).set(
                                 ProgressScreenDataObject(
                                     progressScreenDataObject.newTask,
                                     progressScreenDataObject.isCompleted,
@@ -126,156 +212,26 @@ fun ProgressPage(
                                     progressScreenDataObject.dayAdded,
                                     progressScreenDataObject.daySelected,
                                     progressScreenDataObject.category,
-                                    false,
-                                    lastAdded = today.toString()
+                                    true,
+                                    today.toString()
+                                )
+                            )
+                        val key = fs.collection("tasks")
+                            .document().id
+                        fs.collection("tasks")
+                            .document(key).set(
+                                ProgressScreenDataObject(
+                                    progressScreenDataObject.newTask,
+                                    progressScreenDataObject.isCompleted,
+                                    key,
+                                    progressScreenDataObject.daySelected,
+                                    progressScreenDataObject.daySelected,
+                                    "Today",
+                                    true,
+                                    progressScreenDataObject.lastAdded
                                 )
                             )
                     }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        if (
-                            progressScreenDataObject.daySelected
-                            == progressScreenDataObject.dayAdded
-                            && progressScreenDataObject.category
-                            == "Today"
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .padding(5.dp)
-                            ) {
-                                Image(
-                                    painterResource(
-                                        id =
-                                            if (isCompleted.value) R.drawable.completed
-                                            else R.drawable.notcompleted
-                                    ),
-                                    contentDescription = null,
-                                    Modifier
-                                        .padding(5.dp)
-                                        .size(30.dp)
-                                        .clickable {
-                                            isCompleted.value = !isCompleted.value
-                                            fs.collection("tasks")
-                                                .document(progressScreenDataObject.key)
-                                                .set(
-                                                    ProgressScreenDataObject(
-                                                        progressScreenDataObject.newTask,
-                                                        isCompleted.value,
-                                                        progressScreenDataObject.key,
-                                                        progressScreenDataObject.dayAdded,
-                                                        progressScreenDataObject.daySelected,
-                                                        progressScreenDataObject.category,
-                                                        progressScreenDataObject.wasAdded,
-                                                        progressScreenDataObject.lastAdded
-                                                    )
-                                                )
-                                        },
-                                    contentScale = ContentScale.Crop
-                                )
-                                Text(
-                                    text = progressScreenDataObject.newTask,
-                                    modifier = Modifier
-                                        .padding(
-                                            top = 10.dp,
-                                            end = 40.dp
-                                        )
-                                        .clickable {
-                                            isExtended.value = !isExtended.value
-                                        },
-                                    fontSize = 20.sp,
-                                    maxLines =
-                                        if (isExtended.value) 100
-                                        else 1
-                                )
-                            }
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        fs.collection("tasks")
-                                            .document(progressScreenDataObject.key)
-                                            .delete()
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = ""
-                                    )
-                                }
-                            }
-                        } else if (
-                            progressScreenDataObject.daySelected
-                            >= progressScreenDataObject.dayAdded
-                            && progressScreenDataObject.wasAdded
-                            == false
-                        ) {
-                            fs.collection("tasks")
-                                .document(progressScreenDataObject.key).set(
-                                    ProgressScreenDataObject(
-                                        progressScreenDataObject.newTask,
-                                        progressScreenDataObject.isCompleted,
-                                        progressScreenDataObject.key,
-                                        progressScreenDataObject.dayAdded,
-                                        progressScreenDataObject.daySelected,
-                                        progressScreenDataObject.category,
-                                        true,
-                                        today.toString()
-                                    )
-                                )
-                            val key = fs.collection("tasks")
-                                .document().id
-                            fs.collection("tasks")
-                                .document(key).set(
-                                    ProgressScreenDataObject(
-                                        progressScreenDataObject.newTask,
-                                        progressScreenDataObject.isCompleted,
-                                        key,
-                                        progressScreenDataObject.daySelected,
-                                        progressScreenDataObject.daySelected,
-                                        "Today",
-                                        true,
-                                        progressScreenDataObject.lastAdded
-                                    )
-                                )
-                        }
-                    }
-                }
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(0.98f)
-                .fillMaxHeight(0.9f)
-                .padding(bottom = 10.dp),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.End
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(5.dp)
-                    .background(
-                        shape = RoundedCornerShape(15.dp),
-                        color = AddButtonBGColor
-                    )
-            ) {
-                IconButton(
-                    onClick = {
-                        onNavigationToAddingPage(
-                            AddingScreenDataObject(
-                                "IS303"
-                            )
-                        )
-                    }
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = ""
-                    )
                 }
             }
         }
