@@ -189,7 +189,7 @@ fun AddingPage(
                                 .height(50.dp),
                             label = {
                                 Text(
-                                    text = "YYYY-MM-DD",
+                                    text = "YYYY-DD-MM",
                                     color = TextFieldLabelColor
                                 )
                             }
@@ -236,17 +236,7 @@ fun AddingPage(
                                 .padding(5.dp)
                                 .clickable {
                                     onNavigationToProgressPage(
-                                        ProgressScreenDataObject(
-                                            newTask = newTask.value,
-                                            isCompleted = false,
-                                            key = key,
-                                            dayAdded = dayadding.value,
-                                            daySelected = today.toString(),
-                                            category = if (addForToday.value) "Today"
-                                            else "EveryDay",
-                                            wasAdded = addForToday.value,
-                                            lastAdded = today.toString()
-                                        )
+                                        ProgressScreenDataObject()
                                     )
                                     fs.collection("tasks")
                                         .document(key).set(
@@ -254,10 +244,11 @@ fun AddingPage(
                                                 newTask = newTask.value,
                                                 isCompleted = false,
                                                 key = key,
-                                                dayAdded = dayadding.value,
+                                                dayAdded = if (addForToday.value) dayadding.value
+                                                    else today.toString(),
                                                 daySelected = today.toString(),
                                                 category = if (addForToday.value) "Today"
-                                                else "EveryDay",
+                                                    else "EveryDay",
                                                 wasAdded = addForToday.value,
                                                 lastAdded = today.toString()
                                             )
@@ -275,8 +266,7 @@ fun AddingPage(
                             ) {
                                 Image(
                                     painterResource(
-                                        id =
-                                            if (addForToday.value) R.drawable.completed
+                                        id = if (addForToday.value) R.drawable.completed 
                                             else R.drawable.notcompleted
                                     ),
                                     contentDescription = null,

@@ -36,7 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import com.example.everydaytasks.ui.theme.BGColor
-import com.example.everydaytasks.ui.theme.BottomMenuColor
+import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
 import java.time.LocalDate
 
@@ -77,7 +77,8 @@ fun ProgressPage(
                     .padding(
                         top = 5.dp,
                         start = 5.dp,
-                        end = 5.dp),
+                        end = 5.dp
+                    ),
                 text = "Today",
                 color = Color.White,
                 fontSize = 25.sp,
@@ -91,9 +92,18 @@ fun ProgressPage(
                         end = 5.dp
                     ),
                 text =
-                    if (list.value.isEmpty()) "You've done everything today"
-                    else "${list.value.count {it.category == "Today"} } task(s)",
-                color = Color.LightGray,
+                    if (
+                        list.value.count {
+                            it.category == "Today"
+                        }
+                        == 0
+                    ) "You've done everything today"
+                    else "${
+                        list.value.count {
+                            it.category == "Today" 
+                        } 
+                    } task(s)",
+                color = CaptionTextColor,
                 fontSize = 15.sp
             )
         }
@@ -152,6 +162,14 @@ fun ProgressPage(
                             modifier = Modifier
                                 .height(10.dp)
                         )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(
+                                    color = IntervalColor
+                                )
+                        ) {}
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -227,19 +245,6 @@ fun ProgressPage(
                                 }
                             }
                         }
-
-                        Spacer(
-                            modifier = Modifier
-                                .height(5.dp)
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(
-                                    color = IntervalColor
-                                )
-                        ) {}
                     }
                 } else if (
                     progressScreenDataObject.daySelected

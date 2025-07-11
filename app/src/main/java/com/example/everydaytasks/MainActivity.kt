@@ -132,11 +132,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable<DateScreenDataObject> {
-                            DatePage(
-                                onNavigationToProgressPage = { navData ->
-                                    navController.navigate(navData)
-                                }
-                            )
+                            DatePage()
                         }
                         composable<SearchScreenDataObject> {
                             SearchPage()
