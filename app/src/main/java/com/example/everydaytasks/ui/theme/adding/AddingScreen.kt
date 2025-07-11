@@ -73,7 +73,7 @@ fun AddingPage(
         LocalDate.now()
     }
 
-    val dayadding = remember {
+    val dayAdding = remember {
         mutableStateOf("")
     }
     val addForToday = remember {
@@ -173,9 +173,9 @@ fun AddingPage(
                 ) {
                     if (addForToday.value) {
                         TextField(
-                            value = dayadding.value,
+                            value = dayAdding.value,
                             onValueChange = {
-                                dayadding.value = it
+                                dayAdding.value = it
                             },
                             shape = RoundedCornerShape(7.dp),
                             colors = TextFieldDefaults.colors(
@@ -244,13 +244,14 @@ fun AddingPage(
                                                 newTask = newTask.value,
                                                 isCompleted = false,
                                                 key = key,
-                                                dayAdded = if (addForToday.value) dayadding.value
+                                                dayAdded = if (addForToday.value) dayAdding.value
                                                     else today.toString(),
                                                 daySelected = today.toString(),
                                                 category = if (addForToday.value) "Today"
                                                     else "EveryDay",
                                                 wasAdded = addForToday.value,
-                                                lastAdded = today.toString()
+                                                lastAdded = today.minusDays(1).toString(),
+                                                firstAdd = 1
                                             )
                                         )
                                 },
@@ -259,7 +260,7 @@ fun AddingPage(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally

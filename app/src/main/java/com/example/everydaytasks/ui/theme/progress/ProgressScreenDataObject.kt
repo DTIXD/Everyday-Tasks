@@ -13,5 +13,6 @@ data class ProgressScreenDataObject(
     val daySelected: String = "",
     val category: String = "",
     val wasAdded: Boolean = false,
-    val lastAdded: String = ""
+    val lastAdded: String = "",
+    val firstAdd: Int = 1
 )

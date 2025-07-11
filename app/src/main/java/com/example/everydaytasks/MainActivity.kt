@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 containerColor = AddButtonBGColor,
                                 modifier = Modifier
-                                    .offset(y = (-16).dp)
+                                    .offset(y = (-8).dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
@@ -91,7 +91,6 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(BottomMenuColor)
-                                    .padding(vertical = 10.dp)
                             ) {
                                 BottomMenu(
                                     onTodayClick = {

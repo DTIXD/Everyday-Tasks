@@ -94,13 +94,14 @@ fun ProgressPage(
                 text =
                     if (
                         list.value.count {
-                            it.category == "Today"
+                            it.category == "Today" &&
+                            it.dayAdded == today.toString()
                         }
                         == 0
                     ) "You've done everything today"
                     else "${
                         list.value.count {
-                            it.category == "Today" 
+                            it.category == "Today"
                         } 
                     } task(s)",
                 color = CaptionTextColor,
@@ -144,7 +145,8 @@ fun ProgressPage(
                                 progressScreenDataObject.daySelected,
                                 progressScreenDataObject.category,
                                 false,
-                                lastAdded = today.toString()
+                                progressScreenDataObject.lastAdded,
+                                progressScreenDataObject.firstAdd
                             )
                         )
                 }
@@ -200,7 +202,8 @@ fun ProgressPage(
                                                         progressScreenDataObject.daySelected,
                                                         progressScreenDataObject.category,
                                                         progressScreenDataObject.wasAdded,
-                                                        progressScreenDataObject.lastAdded
+                                                        progressScreenDataObject.lastAdded,
+                                                        progressScreenDataObject.firstAdd
                                                     )
                                                 )
                                         },
@@ -247,10 +250,12 @@ fun ProgressPage(
                         }
                     }
                 } else if (
-                    progressScreenDataObject.daySelected
-                    >= progressScreenDataObject.dayAdded
+                    progressScreenDataObject.lastAdded
+                    < today.toString()
                     && progressScreenDataObject.wasAdded
                     == false
+                    && progressScreenDataObject.category
+                    == "EveryDay"
                 ) {
                     fs.collection("tasks")
                         .document(progressScreenDataObject.key).set(
@@ -262,7 +267,8 @@ fun ProgressPage(
                                 progressScreenDataObject.daySelected,
                                 progressScreenDataObject.category,
                                 true,
-                                today.toString()
+                                today.toString(),
+                                progressScreenDataObject.firstAdd + 1
                             )
                         )
                     val key = fs.collection("tasks")
@@ -273,11 +279,15 @@ fun ProgressPage(
                                 progressScreenDataObject.newTask,
                                 progressScreenDataObject.isCompleted,
                                 key,
-                                progressScreenDataObject.daySelected,
+                                LocalDate.now().plusDays(
+                                    if (progressScreenDataObject.firstAdd == 1) 0
+                                    else 1
+                                ).toString(),
                                 progressScreenDataObject.daySelected,
                                 "Today",
                                 true,
-                                progressScreenDataObject.lastAdded
+                                progressScreenDataObject.lastAdded,
+                                progressScreenDataObject.firstAdd
                             )
                         )
 
