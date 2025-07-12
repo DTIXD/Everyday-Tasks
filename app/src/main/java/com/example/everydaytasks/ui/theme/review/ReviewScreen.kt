@@ -18,12 +18,19 @@ fun ReviewPage() {
         modifier = Modifier
             .fillMaxSize()
             .background(color = BGColor)
-            .padding(5.dp)
-            .padding(top = 15.dp)
+            .padding(
+                horizontal = 8.dp,
+                vertical = 12.dp
+            )
     ) {
         Text(
             modifier = Modifier
-                .padding(5.dp),
+                .padding(
+                    top = 25.dp,
+                    bottom = 5.dp,
+                    start = 5.dp,
+                    end = 5.dp
+                ),
             text = "Review",
             color = Color.White,
             fontSize = 25.sp

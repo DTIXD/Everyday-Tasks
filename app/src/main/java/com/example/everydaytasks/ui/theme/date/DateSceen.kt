@@ -17,10 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +39,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.everydaytasks.ui.theme.BGColor
+import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.SelectedItemColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
 import com.google.firebase.firestore.ktx.firestore
@@ -58,9 +56,6 @@ import java.time.format.DateTimeFormatter
 fun DatePage(
     modifier: Modifier = Modifier
 ) {
-    var input by remember {
-        mutableStateOf("")
-    }
     var selectedYearMonth by remember {
         mutableStateOf(
             YearMonth.now()
@@ -111,14 +106,16 @@ fun DatePage(
             .background(
                 color = BGColor
             )
-            .padding(horizontal = 8.dp, vertical = 12.dp)
-
+            .padding(
+                horizontal = 8.dp,
+                vertical = 12.dp
+            )
     ) {
         Column {
             Text(
                 modifier = Modifier
                     .padding(
-                        top = 5.dp,
+                        top = 25.dp,
                         start = 5.dp,
                         end = 5.dp
                     ),
@@ -130,41 +127,6 @@ fun DatePage(
                 modifier = Modifier
                     .height(10.dp)
             )
-            OutlinedTextField(
-                value = input,
-                onValueChange = {
-                    input = it
-                    val parts = it.split("/")
-                    if (parts.size == 2) {
-                        val month = parts[0]
-                            .toIntOrNull()
-                        val year = parts[1]
-                            .toIntOrNull()
-                        if (
-                            month != null
-                            && year != null
-                            && month in 1..12
-                        ) {
-                            selectedYearMonth = YearMonth.of(
-                                year,
-                                month
-                            )
-                        }
-                    }
-                },
-                label = {
-                    Text("Enter Month/Year (e.g. 06/2025)")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text
-                )
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .height(16.dp)
-            )
-
             Row(
                 Modifier
                     .fillMaxWidth(),
@@ -175,7 +137,8 @@ fun DatePage(
                         text = it.name.take(3),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = CaptionTextColor
                     )
                 }
             }
@@ -216,12 +179,23 @@ fun DatePage(
                 items(days.size) { index ->
                     val day = days[index]
                     val dayDate = day
+
+                    val isFirstDay = day?.dayOfMonth == 1
+
                     Box(
                         modifier = Modifier
-                            .padding(15.dp)
-                            .aspectRatio(1f)
-                            .clip(
-                                RoundedCornerShape(26.dp)
+                            .padding(10.dp)
+                            .then(
+                                if (isFirstDay) Modifier
+                                    .aspectRatio(1f)
+                                    .clip(
+                                        RoundedCornerShape(4.dp)
+                                    )
+                                else Modifier
+                                    .aspectRatio(1f)
+                                    .clip(
+                                        RoundedCornerShape(26.dp)
+                                    )
                             )
                             .background(
                                 when {
@@ -237,10 +211,29 @@ fun DatePage(
                         contentAlignment = Alignment.Center
                     ) {
                         days[index]?.let {
-                            Text(
-                                text = it.dayOfMonth.toString(),
-                                color = Color.White
-                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                if (it.dayOfMonth == 1) {
+                                    Text(
+                                        text = it.month
+                                            .name.take(3)
+                                            .lowercase()
+                                            .replaceFirstChar {
+                                                c -> c.uppercase()
+                                            },
+                                        fontSize = 10.sp,
+                                        color = CaptionTextColor
+                                    )
+                                }
+                                Text(
+                                    text = it.dayOfMonth
+                                        .toString(),
+                                    color = Color.White,
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
                     }
                 }

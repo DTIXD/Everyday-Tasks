@@ -69,13 +69,16 @@ fun ProgressPage(
             .background(
                 color = BGColor
             )
-            .padding(horizontal = 8.dp, vertical = 12.dp)
+            .padding(
+                horizontal = 8.dp,
+                vertical = 12.dp
+            )
     ) {
         Column {
             Text(
                 modifier = Modifier
                     .padding(
-                        top = 5.dp,
+                        top = 25.dp,
                         start = 5.dp,
                         end = 5.dp
                     ),
@@ -101,7 +104,8 @@ fun ProgressPage(
                     ) "You've done everything today"
                     else "${
                         list.value.count {
-                            it.category == "Today"
+                            it.category == "Today" && 
+                            it.dayAdded == today.toString()
                         } 
                     } task(s)",
                 color = CaptionTextColor,
