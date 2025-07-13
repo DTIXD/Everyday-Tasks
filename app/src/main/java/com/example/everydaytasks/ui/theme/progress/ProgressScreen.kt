@@ -283,10 +283,9 @@ fun ProgressPage(
                                 progressScreenDataObject.newTask,
                                 progressScreenDataObject.isCompleted,
                                 key,
-                                LocalDate.now().plusDays(
-                                    if (progressScreenDataObject.firstAdd == 1) 0
-                                    else 1
-                                ).toString(),
+                                LocalDate.parse(
+                                    progressScreenDataObject.lastAdded
+                                ).plusDays(1).toString(),
                                 progressScreenDataObject.daySelected,
                                 "Today",
                                 true,
@@ -294,7 +293,6 @@ fun ProgressPage(
                                 progressScreenDataObject.firstAdd
                             )
                         )
-
                 }
             }
         }

@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -45,9 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.everydaytasks.ui.theme.AddButtonBGColor
 import com.example.everydaytasks.ui.theme.BGColor
-import com.example.everydaytasks.ui.theme.Biruz
 import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.bottommenu.BottomMenu
 import com.example.everydaytasks.ui.theme.date.DatePage
@@ -69,9 +69,11 @@ import androidx.compose.material3.*
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
+import com.example.everydaytasks.ui.theme.ButtonBGColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
-import com.example.everydaytasks.ui.theme.SendButtonBGColor
+import com.example.everydaytasks.ui.theme.GreyButtonBGColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -108,7 +110,7 @@ class MainActivity : ComponentActivity() {
                                         sheetState.show()
                                     }
                                 },
-                                containerColor = AddButtonBGColor,
+                                containerColor = ButtonBGColor,
                                 modifier = Modifier
                                     .offset(y = (-8).dp)
                             ) {
@@ -211,55 +213,21 @@ class MainActivity : ComponentActivity() {
                             Box(
                                 modifier = Modifier
                                     .wrapContentHeight()
+                                    .fillMaxWidth()
                                     .padding(
-                                        innerPadding
-                                    )
+                                        horizontal = 16.dp
+                                    ),
+                                contentAlignment = Alignment.TopCenter
                             ) {
-                                Box(
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(
-                                            top = 15.dp
-                                        ),
-                                    contentAlignment = Alignment.TopCenter
                                 ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(15.dp)
-                                    ) {
-                                        if (addForToday.value) {
-                                            TextField(
-                                                value = dayAdding.value,
-                                                onValueChange = {
-                                                    dayAdding.value = it
-                                                },
-                                                shape = RoundedCornerShape(7.dp),
-                                                colors = TextFieldDefaults.colors(
-                                                    unfocusedContainerColor = BGColor,
-                                                    focusedContainerColor = BGColor,
-                                                    unfocusedIndicatorColor = Color.Transparent,
-                                                    focusedIndicatorColor = Color.Transparent,
-                                                ),
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(50.dp),
-                                                label = {
-                                                    Text(
-                                                        text = "YYYY-DD-MM",
-                                                        color = CaptionTextColor
-                                                    )
-                                                }
-                                            )
-                                        }
-                                        Spacer(
-                                            modifier = Modifier
-                                                .height(20.dp)
-                                        )
+                                    if (addForToday.value) {
                                         TextField(
-                                            value = newTask.value,
+                                            value = dayAdding.value,
                                             onValueChange = {
-                                                newTask.value = it
+                                                dayAdding.value = it
                                             },
                                             shape = RoundedCornerShape(7.dp),
                                             colors = TextFieldDefaults.colors(
@@ -273,83 +241,146 @@ class MainActivity : ComponentActivity() {
                                                 .height(50.dp),
                                             label = {
                                                 Text(
-                                                    text = "Task",
+                                                    text = "YYYY-DD-MM",
                                                     color = CaptionTextColor
                                                 )
                                             }
                                         )
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(20.dp)
+                                    )
+                                    TextField(
+                                        value = newTask.value,
+                                        onValueChange = {
+                                            newTask.value = it
+                                        },
+                                        shape = RoundedCornerShape(7.dp),
+                                        colors = TextFieldDefaults.colors(
+                                            unfocusedContainerColor = BGColor,
+                                            focusedContainerColor = BGColor,
+                                            unfocusedIndicatorColor = Color.Transparent,
+                                            focusedIndicatorColor = Color.Transparent,
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(50.dp),
+                                        label = {
+                                            Text(
+                                                text = "Task",
+                                                color = CaptionTextColor
+                                            )
+                                        }
+                                    )
+                                    Row(
+                                        modifier = Modifier
+                                            .background(
+                                                color = BGColor
+                                            )
+                                            .padding(5.dp)
+                                            .clip(
+                                                RoundedCornerShape(5.dp)
+                                            )
+                                            .border(
+                                                3.dp,
+                                                shape = RoundedCornerShape(5.dp),
+                                                color = BottomMenuColor
+                                            ),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
                                         Spacer(
                                             modifier = Modifier
-                                                .height(17.dp)
+                                                .width(2.dp)
                                         )
-                                        Row(
+                                        Icon(
+                                            Icons.Default.DateRange,
+                                            contentDescription = "",
+                                            tint = Color.Green,
                                             modifier = Modifier
-                                                .fillMaxWidth()
+                                                .size(25.dp)
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(2.dp)
+                                        )
+                                        Text(
+                                            text = "Today",
+                                            color = Color.Green,
+                                            fontSize = 15.sp
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(2.dp)
+                                        )
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(17.dp)
+                                    )
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(5.dp),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        Image(
+                                            painterResource(
+                                                id = if (addForToday.value) R.drawable.completed
+                                                else R.drawable.notcompleted
+                                            ),
+                                            contentDescription = null,
+                                            Modifier
+                                                .padding(5.dp)
+                                                .size(30.dp)
+                                                .clickable {
+                                                    addForToday.value =
+                                                        !addForToday.value
+                                                },
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(5.dp)
+                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(
+                                                    RoundedCornerShape(8.dp)
+                                                )
+                                                .background(
+                                                    color = GreyButtonBGColor
+                                                )
                                         ) {
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.End
-                                            ) {
-                                                Image(
-                                                    painterResource(
-                                                        id = if (addForToday.value) R.drawable.completed
-                                                        else R.drawable.notcompleted
-                                                    ),
-                                                    contentDescription = null,
-                                                    Modifier
-                                                        .padding(5.dp)
-                                                        .size(30.dp)
-                                                        .clickable {
-                                                            addForToday.value =
-                                                                !addForToday.value
-                                                        },
-                                                    contentScale = ContentScale.Crop
-                                                )
-                                                Spacer(
-                                                    modifier = Modifier
-                                                        .width(5.dp)
-                                                )
-                                                Box(
-                                                    modifier = Modifier
-                                                        .clip(
-                                                            RoundedCornerShape(5.dp)
-                                                        )
-                                                        .background(
-                                                            color = SendButtonBGColor
-                                                        )
-                                                ) {
-                                                    Image(
-                                                        painterResource(id = R.drawable.addbutton),
-                                                        contentDescription = null,
-                                                        Modifier
-                                                            .padding(5.dp)
-                                                            .clickable {
-                                                                fs.collection("tasks")
-                                                                    .document(key).set(
-                                                                        ProgressScreenDataObject(
-                                                                            newTask = newTask.value,
-                                                                            isCompleted = false,
-                                                                            key = key,
-                                                                            dayAdded =
-                                                                                if (addForToday.value) dayAdding.value
-                                                                                else today.toString(),
-                                                                            daySelected = today.toString(),
-                                                                            category =
-                                                                                if (addForToday.value) "Today"
-                                                                                else "EveryDay",
-                                                                            wasAdded = addForToday.value,
-                                                                            lastAdded = today.minusDays(
-                                                                                1
-                                                                            ).toString(),
-                                                                            firstAdd = 1
-                                                                        )
-                                                                    )
-                                                            },
-                                                        contentScale = ContentScale.Crop
-                                                    )
-                                                }
-                                            }
+                                            Image(
+                                                painterResource(id = R.drawable.addbutton),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .padding(5.dp)
+                                                    .clickable {
+                                                        fs.collection("tasks")
+                                                            .document(key).set(
+                                                                ProgressScreenDataObject(
+                                                                    newTask = newTask.value,
+                                                                    isCompleted = false,
+                                                                    key = key,
+                                                                    dayAdded =
+                                                                        if (addForToday.value) dayAdding.value
+                                                                        else today.toString(),
+                                                                    daySelected = today.toString(),
+                                                                    category =
+                                                                        if (addForToday.value) "Today"
+                                                                        else "EveryDay",
+                                                                    wasAdded = addForToday.value,
+                                                                    lastAdded = today.minusDays(
+                                                                        1
+                                                                    ).toString(),
+                                                                    firstAdd = 1
+                                                                )
+                                                            )
+                                                    },
+                                                contentScale = ContentScale.Crop
+                                            )
                                         }
                                     }
                                 }

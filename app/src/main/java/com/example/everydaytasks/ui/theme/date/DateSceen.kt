@@ -39,6 +39,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.everydaytasks.ui.theme.BGColor
+import com.example.everydaytasks.ui.theme.ButtonBGColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.SelectedItemColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
@@ -224,7 +225,9 @@ fun DatePage(
                                                 c -> c.uppercase()
                                             },
                                         fontSize = 10.sp,
-                                        color = CaptionTextColor
+                                        color =
+                                            if (dayDate == selectedDate) CaptionTextColor
+                                            else SelectedItemColor
                                     )
                                 }
                                 Text(
@@ -267,7 +270,10 @@ fun DatePage(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = day)
+                    Text(
+                        text = day,
+                        color = CaptionTextColor
+                    )
                     Button(
                         onClick = {
                             list.value.forEach { progressScreenDataObject ->
@@ -288,13 +294,13 @@ fun DatePage(
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White,
+                            containerColor = ButtonBGColor,
                             contentColor = BGColor
                         )
                     ) {
                         Text(
                             "Select",
-                            color = Color.White
+                            color = CaptionTextColor
                         )
                     }
                 }
