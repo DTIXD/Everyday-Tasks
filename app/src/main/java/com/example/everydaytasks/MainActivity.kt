@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -71,9 +72,12 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
+import com.example.everydaytasks.ui.theme.BorderColor
 import com.example.everydaytasks.ui.theme.ButtonBGColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.GreyButtonBGColor
+import com.example.everydaytasks.ui.theme.TodayColor
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -199,6 +203,10 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf(true)
                     }
 
+                    val filters = listOf(
+                        "Today"
+                    )
+
                     if (sheetState.isVisible) {
                         ModalBottomSheet(
                             onDismissRequest = {
@@ -258,6 +266,8 @@ class MainActivity : ComponentActivity() {
                                         },
                                         shape = RoundedCornerShape(7.dp),
                                         colors = TextFieldDefaults.colors(
+                                            unfocusedTextColor = Color.White,
+                                            focusedTextColor = Color.White,
                                             unfocusedContainerColor = BGColor,
                                             focusedContainerColor = BGColor,
                                             unfocusedIndicatorColor = Color.Transparent,
@@ -273,46 +283,202 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                     )
-                                    Row(
+                                    LazyRow(
                                         modifier = Modifier
-                                            .background(
-                                                color = BGColor
-                                            )
-                                            .padding(5.dp)
-                                            .clip(
-                                                RoundedCornerShape(5.dp)
-                                            )
-                                            .border(
-                                                3.dp,
-                                                shape = RoundedCornerShape(5.dp),
-                                                color = BottomMenuColor
-                                            ),
-                                        verticalAlignment = Alignment.CenterVertically
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp)
                                     ) {
-                                        Spacer(
-                                            modifier = Modifier
-                                                .width(2.dp)
-                                        )
-                                        Icon(
-                                            Icons.Default.DateRange,
-                                            contentDescription = "",
-                                            tint = Color.Green,
-                                            modifier = Modifier
-                                                .size(25.dp)
-                                        )
-                                        Spacer(
-                                            modifier = Modifier
-                                                .width(2.dp)
-                                        )
-                                        Text(
-                                            text = "Today",
-                                            color = Color.Green,
-                                            fontSize = 15.sp
-                                        )
-                                        Spacer(
-                                            modifier = Modifier
-                                                .width(2.dp)
-                                        )
+                                        items(filters) { label ->
+                                            Row(
+                                                modifier = Modifier
+                                                    .background(
+                                                        color = BGColor
+                                                    )
+                                                    .padding(10.dp)
+                                                    .clip(
+                                                        RoundedCornerShape(10.dp)
+                                                    )
+                                                    .border(
+                                                        1.dp,
+                                                        shape = RoundedCornerShape(10.dp),
+                                                        color = BorderColor
+                                                    )
+                                                    .clickable {
+
+                                                    },
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(10.dp)
+                                                )
+                                                Icon(
+                                                    Icons.Default.DateRange,
+                                                    contentDescription = "",
+                                                    tint = TodayColor,
+                                                    modifier = Modifier
+                                                        .size(20.dp)
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(8.dp)
+                                                )
+                                                Text(
+                                                    text = "Today",
+                                                    color = TodayColor,
+                                                    fontSize = 15.sp
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(10.dp)
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .height(40.dp)
+                                                )
+                                            }
+                                            Row(
+                                                modifier = Modifier
+                                                    .background(
+                                                        color = BGColor
+                                                    )
+                                                    .padding(10.dp)
+                                                    .clip(
+                                                        RoundedCornerShape(10.dp)
+                                                    )
+                                                    .border(
+                                                        1.dp,
+                                                        shape = RoundedCornerShape(10.dp),
+                                                        color = BorderColor
+                                                    )
+                                                    .clickable {
+
+                                                    },
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(10.dp)
+                                                )
+                                                Image(
+                                                    painterResource(
+                                                        id = R.drawable.ic_priority
+                                                    ),
+                                                    contentDescription = null,
+                                                    Modifier
+                                                        .size(20.dp),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(8.dp)
+                                                )
+                                                Text(
+                                                    text = "Priority",
+                                                    color = Color.White,
+                                                    fontSize = 15.sp
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(10.dp)
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .height(40.dp)
+                                                )
+                                            }
+                                            Row(
+                                                modifier = Modifier
+                                                    .background(
+                                                        color = BGColor
+                                                    )
+                                                    .padding(10.dp)
+                                                    .clip(
+                                                        RoundedCornerShape(10.dp)
+                                                    )
+                                                    .border(
+                                                        1.dp,
+                                                        shape = RoundedCornerShape(10.dp),
+                                                        color = BorderColor
+                                                    )
+                                                    .clickable {
+
+                                                    },
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(10.dp)
+                                                )
+                                                Image(
+                                                    painterResource(
+                                                        id = R.drawable.ic_reminder
+                                                    ),
+                                                    contentDescription = null,
+                                                    Modifier
+                                                        .size(20.dp),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(8.dp)
+                                                )
+                                                Text(
+                                                    text = "Reminder",
+                                                    color = Color.White,
+                                                    fontSize = 15.sp
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(10.dp)
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .height(40.dp)
+                                                )
+                                            }
+                                            Row(
+                                                modifier = Modifier
+                                                    .background(
+                                                        color = BGColor
+                                                    )
+                                                    .padding(10.dp)
+                                                    .clip(
+                                                        RoundedCornerShape(10.dp)
+                                                    )
+                                                    .border(
+                                                        1.dp,
+                                                        shape = RoundedCornerShape(10.dp),
+                                                        color = BorderColor
+                                                    )
+                                                    .clickable {
+
+                                                    },
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(10.dp)
+                                                )
+                                                Image(
+                                                    painterResource(
+                                                        id = R.drawable.ic_edit
+                                                    ),
+                                                    contentDescription = null,
+                                                    Modifier
+                                                        .size(20.dp),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(10.dp)
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .height(40.dp)
+                                                )
+                                            }
+                                        }
                                     }
                                     Spacer(
                                         modifier = Modifier
