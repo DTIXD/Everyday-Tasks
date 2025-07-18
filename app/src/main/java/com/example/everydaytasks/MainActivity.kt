@@ -78,6 +78,7 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.GreyButtonBGColor
 import com.example.everydaytasks.ui.theme.TodayColor
 import androidx.compose.foundation.lazy.items
+import kotlin.text.replaceFirstChar
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -96,9 +97,12 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(false)
             }
 
-            val sheetState = rememberModalBottomSheetState(
-                skipPartiallyExpanded = true
-            )
+            val sheet1State = remember {
+                mutableStateOf(false)
+            }
+            val sheet2State = remember {
+                mutableStateOf(false)
+            }
             val scope = rememberCoroutineScope()
 
             Box(
@@ -111,7 +115,7 @@ class MainActivity : ComponentActivity() {
                             FloatingActionButton(
                                 onClick = {
                                     scope.launch {
-                                        sheetState.show()
+                                        sheet1State.value = true
                                     }
                                 },
                                 containerColor = ButtonBGColor,
@@ -207,14 +211,16 @@ class MainActivity : ComponentActivity() {
                         "Today"
                     )
 
-                    if (sheetState.isVisible) {
+                    if (sheet1State.value == true) {
                         ModalBottomSheet(
                             onDismissRequest = {
                                 scope.launch {
-                                    sheetState.hide()
+                                    sheet1State.value = false
                                 }
                             },
-                            sheetState = sheetState,
+                            sheetState = rememberModalBottomSheetState(
+                                skipPartiallyExpanded = true
+                            ),
                             containerColor = BGColor,
                             shape = RoundedCornerShape(16.dp)
                         ) {
@@ -304,7 +310,8 @@ class MainActivity : ComponentActivity() {
                                                         color = BorderColor
                                                     )
                                                     .clickable {
-
+                                                        sheet1State.value = false
+                                                        sheet2State.value = true
                                                     },
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
@@ -548,6 +555,76 @@ class MainActivity : ComponentActivity() {
                                                 contentScale = ContentScale.Crop
                                             )
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (sheet2State.value == true) {
+                        ModalBottomSheet(
+                            onDismissRequest = {
+                                scope.launch {
+                                    sheet2State.value = false
+                                }
+                            },
+                            sheetState = rememberModalBottomSheetState(
+                                skipPartiallyExpanded = true
+                            ),
+                            containerColor = BGColor,
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .fillMaxWidth()
+                                    .padding(
+                                        horizontal = 16.dp
+                                    ),
+                                contentAlignment = Alignment.TopCenter
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            start = 15.dp,
+                                            end = 15.dp
+                                        )
+                                ) {
+                                    Text(
+                                        text = "Date",
+                                        fontSize = 25.sp,
+                                        color = Color.White
+                                    )
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(20.dp)
+                                    )
+                                    Row{
+                                        Image(
+                                            painterResource(
+                                                id = R.drawable.edit
+                                            ),
+                                            contentDescription = null,
+                                            Modifier
+                                                .size(20.dp),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(15.dp)
+                                        )
+                                        Text(
+                                            text = "${
+                                                today.dayOfMonth
+                                            } ${
+                                                today.month.name.take(3).lowercase()
+                                                    .replaceFirstChar {
+                                                        c -> c.uppercase()
+                                                    }
+                                            }.",
+                                            color = Color.White,
+                                            fontSize = 15.sp
+                                        )
                                     }
                                 }
                             }
