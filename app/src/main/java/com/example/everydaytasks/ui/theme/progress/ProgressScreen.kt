@@ -107,7 +107,15 @@ fun ProgressPage(
                             it.category == "Today" && 
                             it.dayAdded == today.toString()
                         } 
-                    } task(s)",
+                    } ${
+                        if (
+                            list.value.count {
+                                it.category == "Today" &&
+                                        it.dayAdded == today.toString()
+                            } == 1
+                        ) "Task"
+                        else "Tasks"
+                    }",
                 color = CaptionTextColor,
                 fontSize = 15.sp
             )

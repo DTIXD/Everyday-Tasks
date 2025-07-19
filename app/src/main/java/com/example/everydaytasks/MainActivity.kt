@@ -78,6 +78,10 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.GreyButtonBGColor
 import com.example.everydaytasks.ui.theme.TodayColor
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import com.example.everydaytasks.ui.theme.IntervalColor
+import java.time.DayOfWeek
 import kotlin.text.replaceFirstChar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -624,6 +628,80 @@ class MainActivity : ComponentActivity() {
                                             }.",
                                             color = Color.White,
                                             fontSize = 15.sp
+                                        )
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(20.dp)
+                                    )
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(
+                                                color = IntervalColor
+                                            )
+                                    ) {}
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(20.dp)
+                                    )
+                                    Row(
+                                        Modifier
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        DayOfWeek.entries.forEach {
+                                            Text(
+                                                text = it.name.take(3),
+                                                textAlign = TextAlign.Center,
+                                                fontWeight = FontWeight.Bold,
+                                                color = CaptionTextColor
+                                            )
+                                        }
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(5.dp)
+                                    )
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(
+                                            text = "${
+                                                today.dayOfWeek
+                                                    .name.take(3)
+                                                    .lowercase()
+                                                    .replaceFirstChar {
+                                                            c -> c.uppercase()
+                                                    }
+                                            } ${
+                                                today.dayOfMonth
+                                            } ${
+                                                today.month
+                                                    .name.take(3)
+                                                    .lowercase()
+                                                    .replaceFirstChar {
+                                                            c -> c.uppercase()
+                                                    }
+                                            } * ${
+                                                list.value.count {
+                                                    it.category == "Today" && 
+                                                    it.dayAdded == today.toString()
+                                                }
+                                            } ${
+                                                if (
+                                                    list.value.count {
+                                                        it.category == "Today" &&
+                                                        it.dayAdded == today.toString() 
+                                                    } == 1
+                                                ) "Task" 
+                                                else "Tasks"
+                                            }",
+                                            fontSize = 15.sp,
+                                            color = CaptionTextColor
                                         )
                                     }
                                 }
