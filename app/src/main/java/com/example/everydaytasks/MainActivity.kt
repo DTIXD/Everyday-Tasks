@@ -671,7 +671,7 @@ class MainActivity : ComponentActivity() {
                                             ),
                                             contentDescription = null,
                                             Modifier
-                                                .size(20.dp),
+                                                .size(30.dp),
                                             contentScale = ContentScale.Crop
                                         )
                                         Spacer(
@@ -688,7 +688,7 @@ class MainActivity : ComponentActivity() {
                                                     }
                                             }.",
                                             color = Color.White,
-                                            fontSize = 15.sp
+                                            fontSize = 20.sp
                                         )
                                     }
                                     Spacer(
@@ -888,10 +888,42 @@ class MainActivity : ComponentActivity() {
                                                 color = IntervalColor
                                             )
                                     ) {}
-                                    Spacer(
+                                    Row(
                                         modifier = Modifier
-                                            .height(100.dp)
-                                    )
+                                            .fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(50.dp)
+                                        )
+                                        Image(
+                                            painterResource(
+                                                id = R.drawable.ic_settime
+                                            ),
+                                            contentDescription = null,
+                                            Modifier
+                                                .size(30.dp),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(15.dp)
+                                        )
+                                        Text(
+                                            text = "Add Time",
+                                            color = Color.White,
+                                            fontSize = 20.sp
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(
+                                                color = IntervalColor
+                                            )
+                                    ) {}
                                 }
                             }
                         }
