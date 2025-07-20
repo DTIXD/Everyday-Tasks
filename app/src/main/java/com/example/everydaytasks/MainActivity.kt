@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +27,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -78,10 +83,22 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.GreyButtonBGColor
 import com.example.everydaytasks.ui.theme.TodayColor
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.everydaytasks.ui.theme.IntervalColor
+import com.example.everydaytasks.ui.theme.SelectedItemColor
+import kotlinx.coroutines.delay
 import java.time.DayOfWeek
+import java.time.YearMonth
+import java.time.ZoneId
 import kotlin.text.replaceFirstChar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -564,6 +581,50 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+
+                    var selectedYearMonth by remember {
+                        mutableStateOf(
+                            YearMonth.now()
+                        )
+                    }
+
+                    val currentDate = LocalDate.now()
+                    var selectedDate by remember { mutableStateOf(currentDate) }
+                    var lastCheckedDate by remember { mutableStateOf(currentDate) }
+
+                    val lifecycleOwner = LocalLifecycleOwner.current
+                    DisposableEffect(lifecycleOwner) {
+                        val observer = LifecycleEventObserver { _, event ->
+                            if (event == Lifecycle.Event.ON_RESUME) {
+                                val now = LocalDate.now()
+                                if (now != lastCheckedDate) {
+                                    selectedDate = now
+                                    lastCheckedDate = now
+                                }
+                            }
+                        }
+
+                        lifecycleOwner.lifecycle.addObserver(observer)
+                        onDispose {
+                            lifecycleOwner.lifecycle.removeObserver(observer)
+                        }
+                    }
+
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            val nowMillis = System.currentTimeMillis()
+                            val midnightMillis = LocalDate.now()
+                                .plusDays(1)
+                                .atStartOfDay(ZoneId.systemDefault())
+                                .toInstant()
+                                .toEpochMilli()
+                            val delayMillis = midnightMillis - nowMillis
+
+                            delay(delayMillis)
+
+                            selectedDate = LocalDate.now()
+                        }
+                    }
                     if (sheet2State.value == true) {
                         ModalBottomSheet(
                             onDismissRequest = {
@@ -704,6 +765,133 @@ class MainActivity : ComponentActivity() {
                                             color = CaptionTextColor
                                         )
                                     }
+
+
+
+                                    val firstDay = selectedYearMonth
+                                        .atDay(1)
+                                    val lastDay = firstDay
+                                        .plusYears(1)
+                                        .minusDays(1)
+                                    val totalDays = java.time.temporal
+                                        .ChronoUnit.DAYS.between(
+                                            firstDay,
+                                            lastDay
+                                        ).toInt() + 1
+                                    val startOffset = firstDay
+                                        .dayOfWeek.value % 7 - 1
+
+                                    val allDates = (0 until totalDays).map { offset ->
+                                        firstDay.plusDays(offset.toLong())
+                                    }
+                                    val days = List(
+                                        startOffset
+                                    ) { null } + allDates + List(
+                                        (7 - (allDates.size + startOffset) % 7) % 7
+                                    ) { null }
+
+
+
+                                    val gridState = rememberLazyGridState()
+                                    val scrollOffset by remember {
+                                        derivedStateOf {
+                                            gridState.firstVisibleItemScrollOffset
+                                        }
+                                    }
+                                    val calendarHeight by animateDpAsState(
+                                        targetValue =
+                                            if (scrollOffset > 0) 250.dp
+                                            else 100.dp,
+                                        label = "CalendarHeightAnimation"
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .height(calendarHeight)
+                                    ) {
+                                        LazyVerticalGrid(
+                                            state = gridState,
+                                            columns = GridCells.Fixed(7),
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                        ) {
+                                            items(days.size) { index ->
+                                                val day = days[index]
+                                                val dayDate = day
+
+                                                val isFirstDay = day?.dayOfMonth == 1
+
+                                                Box(
+                                                    modifier = Modifier
+                                                        .padding(10.dp)
+                                                        .then(
+                                                            if (isFirstDay) Modifier
+                                                                .aspectRatio(1f)
+                                                                .clip(
+                                                                    RoundedCornerShape(4.dp)
+                                                                )
+                                                            else Modifier
+                                                                .aspectRatio(1f)
+                                                                .clip(
+                                                                    RoundedCornerShape(26.dp)
+                                                                )
+                                                        )
+                                                        .background(
+                                                            when {
+                                                                dayDate == selectedDate -> SelectedItemColor
+                                                                else -> BGColor
+                                                            }
+                                                        )
+                                                        .clickable(enabled = day != null) {
+                                                            day?.let {
+                                                                selectedDate = it
+                                                            }
+                                                        },
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    days[index]?.let {
+                                                        Column(
+                                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                                            verticalArrangement = Arrangement.Center
+                                                        ) {
+                                                            if (it.dayOfMonth == 1) {
+                                                                Text(
+                                                                    text = it.month
+                                                                        .name.take(3)
+                                                                        .lowercase()
+                                                                        .replaceFirstChar { c ->
+                                                                            c.uppercase()
+                                                                        },
+                                                                    fontSize = 10.sp,
+                                                                    color =
+                                                                        if (dayDate == selectedDate) CaptionTextColor
+                                                                        else SelectedItemColor
+                                                                )
+                                                            }
+                                                            Text(
+                                                                text = it.dayOfMonth
+                                                                    .toString(),
+                                                                color = Color.White,
+                                                                fontSize = 14.sp
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(
+                                                color = IntervalColor
+                                            )
+                                    ) {}
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(100.dp)
+                                    )
                                 }
                             }
                         }

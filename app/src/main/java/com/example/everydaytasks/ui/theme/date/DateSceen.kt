@@ -153,7 +153,7 @@ fun DatePage(
             val firstDay = selectedYearMonth
                 .atDay(1)
             val lastDay = firstDay
-                .plusYears(2)
+                .plusYears(1)
                 .minusDays(1)
             val totalDays = java.time.temporal
                 .ChronoUnit.DAYS.between(
@@ -161,7 +161,7 @@ fun DatePage(
                     lastDay
                 ).toInt() + 1
             val startOffset = firstDay
-                .dayOfWeek.value % 7
+                .dayOfWeek.value % 7 - 1
 
             val allDates = (0 until totalDays).map { offset ->
                 firstDay.plusDays(offset.toLong())
