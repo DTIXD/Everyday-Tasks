@@ -539,6 +539,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                         Box(
                                             modifier = Modifier
+                                                .width(50.dp)
                                                 .clip(
                                                     RoundedCornerShape(8.dp)
                                                 )
@@ -641,21 +642,19 @@ class MainActivity : ComponentActivity() {
                             Box(
                                 modifier = Modifier
                                     .wrapContentHeight()
-                                    .fillMaxWidth()
-                                    .padding(
-                                        horizontal = 16.dp
-                                    ),
+                                    .fillMaxWidth(),
                                 contentAlignment = Alignment.TopCenter
                             ) {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(
-                                            start = 15.dp,
-                                            end = 15.dp
-                                        )
                                 ) {
                                     Text(
+                                        modifier = Modifier
+                                            .padding(
+                                                start = 23.dp,
+                                                end = 23.dp
+                                            ),
                                         text = "Date",
                                         fontSize = 25.sp,
                                         color = Color.White
@@ -664,7 +663,14 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .height(20.dp)
                                     )
-                                    Row{
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                start = 23.dp,
+                                                end = 23.dp
+                                            )
+                                    ){
                                         Image(
                                             painterResource(
                                                 id = R.drawable.edit
@@ -709,7 +715,11 @@ class MainActivity : ComponentActivity() {
                                     )
                                     Row(
                                         Modifier
-                                            .fillMaxWidth(),
+                                            .fillMaxWidth()
+                                            .padding(
+                                                start = 23.dp,
+                                                end = 23.dp
+                                            ),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         DayOfWeek.entries.forEach {
@@ -814,6 +824,10 @@ class MainActivity : ComponentActivity() {
                                             columns = GridCells.Fixed(7),
                                             modifier = Modifier
                                                 .fillMaxSize()
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                )
                                         ) {
                                             items(days.size) { index ->
                                                 val day = days[index]
@@ -890,7 +904,11 @@ class MainActivity : ComponentActivity() {
                                     ) {}
                                     Row(
                                         modifier = Modifier
-                                            .fillMaxWidth(),
+                                            .fillMaxWidth()
+                                            .padding(
+                                                start = 23.dp,
+                                                end = 23.dp
+                                            ),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Spacer(
@@ -924,6 +942,77 @@ class MainActivity : ComponentActivity() {
                                                 color = IntervalColor
                                             )
                                     ) {}
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                start = 23.dp,
+                                                end = 23.dp
+                                            ),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(50.dp)
+                                        )
+                                        Image(
+                                            painterResource(
+                                                id = R.drawable.ic_repeat
+                                            ),
+                                            contentDescription = null,
+                                            Modifier
+                                                .size(30.dp),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(15.dp)
+                                        )
+                                        Text(
+                                            text = "Repeat",
+                                            color = Color.White,
+                                            fontSize = 20.sp
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(
+                                                color = IntervalColor
+                                            )
+                                    ) {}
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(5.dp)
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(40.dp)
+                                            .padding(
+                                                start = 23.dp,
+                                                end = 23.dp
+                                            )
+                                            .clip(
+                                                RoundedCornerShape(15.dp)
+                                            )
+                                            .background(color = ButtonBGColor)
+                                            .clickable {
+
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "Save",
+                                            fontSize = 20.sp,
+                                            color = Color.White
+                                        )
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(10.dp)
+                                    )
                                 }
                             }
                         }
