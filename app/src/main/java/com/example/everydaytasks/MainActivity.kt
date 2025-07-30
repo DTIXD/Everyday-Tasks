@@ -44,7 +44,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -88,6 +87,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
@@ -490,7 +490,7 @@ class MainActivity : ComponentActivity() {
                                                 )
                                                 Image(
                                                     painterResource(
-                                                        id = R.drawable.ic_edit
+                                                        id = R.drawable.three_dots
                                                     ),
                                                     contentDescription = null,
                                                     Modifier
@@ -713,6 +713,75 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .height(20.dp)
                                     )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.put_tommorow
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Tomorrow",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Text(
+                                                text = today.plusDays(1)
+                                                    .dayOfWeek.name.take(3)
+                                                    .lowercase()
+                                                    .replaceFirstChar {
+                                                            c -> c.uppercase()
+                                                    },
+                                                color = CaptionTextColor,
+                                                fontSize = 18.sp
+                                            )
+                                        }
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(20.dp)
+                                    )
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(
+                                                color = IntervalColor
+                                            )
+                                    ) {}
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(20.dp)
+                                    )
                                     Row(
                                         Modifier
                                             .fillMaxWidth()
@@ -913,7 +982,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         Spacer(
                                             modifier = Modifier
-                                                .height(50.dp)
+                                                .height(60.dp)
                                         )
                                         Image(
                                             painterResource(
@@ -953,7 +1022,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         Spacer(
                                             modifier = Modifier
-                                                .height(50.dp)
+                                                .height(60.dp)
                                         )
                                         Image(
                                             painterResource(
@@ -984,18 +1053,18 @@ class MainActivity : ComponentActivity() {
                                     ) {}
                                     Spacer(
                                         modifier = Modifier
-                                            .height(5.dp)
+                                            .height(10.dp)
                                     )
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(40.dp)
+                                            .height(50.dp)
                                             .padding(
                                                 start = 23.dp,
                                                 end = 23.dp
                                             )
                                             .clip(
-                                                RoundedCornerShape(15.dp)
+                                                RoundedCornerShape(20.dp)
                                             )
                                             .background(color = ButtonBGColor)
                                             .clickable {
@@ -1011,7 +1080,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                     Spacer(
                                         modifier = Modifier
-                                            .height(10.dp)
+                                            .height(15.dp)
                                     )
                                 }
                             }
