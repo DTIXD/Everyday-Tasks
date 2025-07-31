@@ -631,6 +631,7 @@ class MainActivity : ComponentActivity() {
                             onDismissRequest = {
                                 scope.launch {
                                     sheet2State.value = false
+                                    sheet1State.value = true
                                 }
                             },
                             sheetState = rememberModalBottomSheetState(
@@ -711,7 +712,64 @@ class MainActivity : ComponentActivity() {
                                     ) {}
                                     Spacer(
                                         modifier = Modifier
-                                            .height(20.dp)
+                                            .height(15.dp)
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.today_red
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Today",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Text(
+                                                text = today.dayOfWeek
+                                                    .name.take(3)
+                                                    .lowercase()
+                                                    .replaceFirstChar {
+                                                            c -> c.uppercase()
+                                                    },
+                                                color = CaptionTextColor,
+                                                fontSize = 18.sp
+                                            )
+                                        }
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(15.dp)
                                     )
                                     Box(
                                         modifier = Modifier
@@ -768,7 +826,147 @@ class MainActivity : ComponentActivity() {
                                     }
                                     Spacer(
                                         modifier = Modifier
-                                            .height(20.dp)
+                                            .height(15.dp)
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.put_weekend
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "On Weekends",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Text(
+                                                text = "Sun",
+                                                color = CaptionTextColor,
+                                                fontSize = 18.sp
+                                            )
+                                        }
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(15.dp)
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.today_red
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Next Week",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    start = 23.dp,
+                                                    end = 23.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Text(
+                                                text = today.dayOfWeek
+                                                    .name.take(3)
+                                                    .lowercase()
+                                                    .replaceFirstChar {
+                                                            c -> c.uppercase()
+                                                    },
+                                                color = CaptionTextColor,
+                                                fontSize = 18.sp
+                                            )
+                                        }
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(15.dp)
+                                    )
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(
+                                                start = 23.dp,
+                                                end = 23.dp
+                                            ),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painterResource(
+                                                id = R.drawable.put_nodate
+                                            ),
+                                            contentDescription = null,
+                                            Modifier
+                                                .size(30.dp),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(15.dp)
+                                        )
+                                        Text(
+                                            text = "No Date",
+                                            fontSize = 20.sp,
+                                            color = Color.White
+                                        )
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(15.dp)
                                     )
                                     Row(
                                         modifier = Modifier
@@ -879,7 +1077,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                     val calendarHeight by animateDpAsState(
                                         targetValue =
-                                            if (scrollOffset > 0) 250.dp
+                                            if (scrollOffset > 0) 200.dp
                                             else 100.dp,
                                         label = "CalendarHeightAnimation"
                                     )
