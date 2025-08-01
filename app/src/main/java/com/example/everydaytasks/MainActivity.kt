@@ -33,7 +33,6 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -98,6 +97,15 @@ import com.example.everydaytasks.ui.theme.SelectedItemColor
 import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.YearMonth
+import androidx.compose.ui.graphics.ColorFilter
+import com.example.everydaytasks.ui.theme.FridayColor
+import com.example.everydaytasks.ui.theme.MondayColor
+import com.example.everydaytasks.ui.theme.SaturdayColor
+import com.example.everydaytasks.ui.theme.SundayColor
+import com.example.everydaytasks.ui.theme.ThursdayColor
+import com.example.everydaytasks.ui.theme.TomorrowColor
+import com.example.everydaytasks.ui.theme.TuesdayColor
+import com.example.everydaytasks.ui.theme.WednesdayColor
 import java.time.ZoneId
 import kotlin.text.replaceFirstChar
 
@@ -211,14 +219,13 @@ class MainActivity : ComponentActivity() {
                             emptyList<ProgressScreenDataObject>()
                         )
                     }
-
-                    fs.collection("tasks").addSnapshotListener{snapshot, exception ->
-                        list.value = snapshot?.toObjects(ProgressScreenDataObject::class.java) ?: emptyList()
-                    }
                     val key = fs.collection("tasks")
                         .document().id
                     val today = remember {
                         LocalDate.now()
+                    }
+                    fs.collection("tasks").addSnapshotListener{snapshot, exception ->
+                        list.value = snapshot?.toObjects(ProgressScreenDataObject::class.java) ?: emptyList()
                     }
 
                     val dayAdding = remember {
@@ -231,6 +238,9 @@ class MainActivity : ComponentActivity() {
                     val filters = listOf(
                         "Today"
                     )
+                    val dateSelection = remember {
+                        androidx.compose.runtime.mutableIntStateOf(1)
+                    }
 
                     if (sheet1State.value == true) {
                         ModalBottomSheet(
@@ -340,12 +350,26 @@ class MainActivity : ComponentActivity() {
                                                     modifier = Modifier
                                                         .width(10.dp)
                                                 )
-                                                Icon(
-                                                    Icons.Default.DateRange,
-                                                    contentDescription = "",
-                                                    tint = TodayColor,
-                                                    modifier = Modifier
-                                                        .size(20.dp)
+                                                Image(
+                                                    painterResource(
+                                                        id = R.drawable.ic_today
+                                                    ),
+                                                    contentDescription = null,
+                                                    Modifier
+                                                        .size(20.dp),
+                                                    contentScale = ContentScale.Crop,
+                                                    colorFilter = ColorFilter.tint(
+                                                        if (dateSelection.intValue == 1) TodayColor
+                                                        else if (dateSelection.intValue == 2) TomorrowColor
+                                                        else if (dateSelection.intValue == 3) MondayColor
+                                                        else if (dateSelection.intValue == 4) TuesdayColor
+                                                        else if (dateSelection.intValue == 5) WednesdayColor
+                                                        else if (dateSelection.intValue == 6) ThursdayColor
+                                                        else if (dateSelection.intValue == 7) FridayColor
+                                                        else if (dateSelection.intValue == 8) SaturdayColor
+                                                        else SundayColor
+
+                                                    )
                                                 )
                                                 Spacer(
                                                     modifier = Modifier
@@ -353,7 +377,16 @@ class MainActivity : ComponentActivity() {
                                                 )
                                                 Text(
                                                     text = "Today",
-                                                    color = TodayColor,
+                                                    color =
+                                                        if (dateSelection.intValue == 1) TodayColor
+                                                        else if (dateSelection.intValue == 2) TomorrowColor
+                                                        else if (dateSelection.intValue == 3) MondayColor
+                                                        else if (dateSelection.intValue == 4) TuesdayColor
+                                                        else if (dateSelection.intValue == 5) WednesdayColor
+                                                        else if (dateSelection.intValue == 6) ThursdayColor
+                                                        else if (dateSelection.intValue == 7) FridayColor
+                                                        else if (dateSelection.intValue == 8) SaturdayColor
+                                                        else SundayColor,
                                                     fontSize = 15.sp
                                                 )
                                                 Spacer(
@@ -717,6 +750,13 @@ class MainActivity : ComponentActivity() {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
+                                            .clickable {
+                                                scope.launch {
+                                                    dateSelection.intValue = 1
+                                                    sheet2State.value = false
+                                                    sheet1State.value = true
+                                                }
+                                            }
                                     ) {
                                         Row(
                                             modifier = Modifier

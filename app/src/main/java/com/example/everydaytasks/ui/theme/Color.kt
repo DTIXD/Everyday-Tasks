@@ -19,12 +19,24 @@ val TextFieldLabelColor = Color(0xFFABAE7A)
 
 val BGColor = Color(0xFF1E1E1E)
 val BottomMenuColor = Color(0xFF262626)
+
 val IntervalColor = Color(0xFF323232)
 val CaptionTextColor = Color(0xFFBFBFBF)
+
 val ButtonBGColor = Color(0xFFDD4C49)
 val SelectedItemColor = Color(0xFFDD4C49)
+val GreyButtonBGColor = Color(0xFF4D4D4D)
+
 val UnSelectedItemColor = Color(0xFFD0D0D0)
 val SelectedItemBGColor = Color(0xFF482424)
-val GreyButtonBGColor = Color(0xFF4D4D4D)
+
 val BorderColor = Color(0xFF393939)
 val TodayColor = Color(0xFF28B050)
+val TomorrowColor = Color(0xFF28B050)
+val MondayColor = Color(0xFF28B050)
+val TuesdayColor = Color(0xFF28B050)
+val WednesdayColor = Color(0xFF28B050)
+val ThursdayColor = Color(0xFF28B050)
+val FridayColor = Color(0xFF28B050)
+val SaturdayColor = Color(0xFF28B050)
+val SundayColor = Color(0xFF28B050)
