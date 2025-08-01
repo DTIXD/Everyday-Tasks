@@ -98,14 +98,8 @@ import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.YearMonth
 import androidx.compose.ui.graphics.ColorFilter
-import com.example.everydaytasks.ui.theme.FridayColor
-import com.example.everydaytasks.ui.theme.MondayColor
-import com.example.everydaytasks.ui.theme.SaturdayColor
-import com.example.everydaytasks.ui.theme.SundayColor
-import com.example.everydaytasks.ui.theme.ThursdayColor
 import com.example.everydaytasks.ui.theme.TomorrowColor
-import com.example.everydaytasks.ui.theme.TuesdayColor
-import com.example.everydaytasks.ui.theme.WednesdayColor
+import com.example.everydaytasks.ui.theme.WeekColor
 import java.time.ZoneId
 import kotlin.text.replaceFirstChar
 
@@ -361,14 +355,8 @@ class MainActivity : ComponentActivity() {
                                                     colorFilter = ColorFilter.tint(
                                                         if (dateSelection.intValue == 1) TodayColor
                                                         else if (dateSelection.intValue == 2) TomorrowColor
-                                                        else if (dateSelection.intValue == 3) MondayColor
-                                                        else if (dateSelection.intValue == 4) TuesdayColor
-                                                        else if (dateSelection.intValue == 5) WednesdayColor
-                                                        else if (dateSelection.intValue == 6) ThursdayColor
-                                                        else if (dateSelection.intValue == 7) FridayColor
-                                                        else if (dateSelection.intValue == 8) SaturdayColor
-                                                        else SundayColor
-
+                                                        else if (dateSelection.intValue == 3) Color.White
+                                                        else WeekColor,
                                                     )
                                                 )
                                                 Spacer(
@@ -380,13 +368,8 @@ class MainActivity : ComponentActivity() {
                                                     color =
                                                         if (dateSelection.intValue == 1) TodayColor
                                                         else if (dateSelection.intValue == 2) TomorrowColor
-                                                        else if (dateSelection.intValue == 3) MondayColor
-                                                        else if (dateSelection.intValue == 4) TuesdayColor
-                                                        else if (dateSelection.intValue == 5) WednesdayColor
-                                                        else if (dateSelection.intValue == 6) ThursdayColor
-                                                        else if (dateSelection.intValue == 7) FridayColor
-                                                        else if (dateSelection.intValue == 8) SaturdayColor
-                                                        else SundayColor,
+                                                        else if (dateSelection.intValue == 3) Color.White
+                                                        else WeekColor,
                                                     fontSize = 15.sp
                                                 )
                                                 Spacer(
@@ -814,6 +797,13 @@ class MainActivity : ComponentActivity() {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
+                                            .clickable {
+                                                scope.launch {
+                                                    dateSelection.intValue = 2
+                                                    sheet2State.value = false
+                                                    sheet1State.value = true
+                                                }
+                                            }
                                     ) {
                                         Row(
                                             modifier = Modifier
@@ -871,6 +861,16 @@ class MainActivity : ComponentActivity() {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
+                                            .clickable {
+                                                scope.launch {
+                                                    dateSelection.intValue =
+                                                        if (today.dayOfWeek.name == "sunday") 1
+                                                        else if (today.dayOfWeek.name == "saturday") 2
+                                                        else 3
+                                                    sheet2State.value = false
+                                                    sheet1State.value = true
+                                                }
+                                            }
                                     ) {
                                         Row(
                                             modifier = Modifier
@@ -923,6 +923,13 @@ class MainActivity : ComponentActivity() {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
+                                            .clickable {
+                                                scope.launch {
+                                                    dateSelection.intValue = 3
+                                                    sheet2State.value = false
+                                                    sheet1State.value = true
+                                                }
+                                            }
                                     ) {
                                         Row(
                                             modifier = Modifier
@@ -982,7 +989,14 @@ class MainActivity : ComponentActivity() {
                                             .padding(
                                                 start = 23.dp,
                                                 end = 23.dp
-                                            ),
+                                            )
+                                            .clickable {
+                                                scope.launch {
+                                                    dateSelection.intValue = 3
+                                                    sheet2State.value = false
+                                                    sheet1State.value = true
+                                                }
+                                            },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Image(
