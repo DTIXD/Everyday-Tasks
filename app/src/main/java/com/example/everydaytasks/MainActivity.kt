@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -101,6 +102,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import com.example.everydaytasks.ui.theme.TomorrowColor
 import com.example.everydaytasks.ui.theme.WeekColor
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import kotlin.text.replaceFirstChar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -233,7 +235,10 @@ class MainActivity : ComponentActivity() {
                         "Today"
                     )
                     val dateSelection = remember {
-                        androidx.compose.runtime.mutableIntStateOf(1)
+                        mutableIntStateOf(1)
+                    }
+                    val dateSelectionText = remember {
+                        mutableStateOf("Today")
                     }
 
                     if (sheet1State.value == true) {
@@ -364,7 +369,7 @@ class MainActivity : ComponentActivity() {
                                                         .width(8.dp)
                                                 )
                                                 Text(
-                                                    text = "Today",
+                                                    text = dateSelectionText.value,
                                                     color =
                                                         if (dateSelection.intValue == 1) TodayColor
                                                         else if (dateSelection.intValue == 2) TomorrowColor
@@ -561,7 +566,8 @@ class MainActivity : ComponentActivity() {
                                                 )
                                                 .background(
                                                     color = GreyButtonBGColor
-                                                )
+                                                ),
+                                            contentAlignment = Alignment.Center
                                         ) {
                                             Image(
                                                 painterResource(id = R.drawable.addbutton),
@@ -735,6 +741,7 @@ class MainActivity : ComponentActivity() {
                                             .fillMaxWidth()
                                             .clickable {
                                                 scope.launch {
+                                                    dateSelectionText.value = "Today"
                                                     dateSelection.intValue = 1
                                                     sheet2State.value = false
                                                     sheet1State.value = true
@@ -799,6 +806,7 @@ class MainActivity : ComponentActivity() {
                                             .fillMaxWidth()
                                             .clickable {
                                                 scope.launch {
+                                                    dateSelectionText.value = "Tomorrow"
                                                     dateSelection.intValue = 2
                                                     sheet2State.value = false
                                                     sheet1State.value = true
@@ -863,10 +871,14 @@ class MainActivity : ComponentActivity() {
                                             .fillMaxWidth()
                                             .clickable {
                                                 scope.launch {
+                                                    dateSelectionText.value =
+                                                        if (today.dayOfWeek.name == "sunday") "Today"
+                                                        else if (today.dayOfWeek.name == "saturday") "Tomorrow"
+                                                        else "Sunday"
                                                     dateSelection.intValue =
                                                         if (today.dayOfWeek.name == "sunday") 1
                                                         else if (today.dayOfWeek.name == "saturday") 2
-                                                        else 3
+                                                        else 4
                                                     sheet2State.value = false
                                                     sheet1State.value = true
                                                 }
@@ -925,6 +937,14 @@ class MainActivity : ComponentActivity() {
                                             .fillMaxWidth()
                                             .clickable {
                                                 scope.launch {
+                                                    dateSelectionText.value = "${
+                                                        selectedDate.dayOfMonth
+                                                    } ${
+                                                        selectedDate.month.name.take(3).lowercase()
+                                                            .replaceFirstChar {
+                                                                    c -> c.uppercase()
+                                                            }
+                                                    }."
                                                     dateSelection.intValue = 3
                                                     sheet2State.value = false
                                                     sheet1State.value = true
@@ -992,6 +1012,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                             .clickable {
                                                 scope.launch {
+                                                    dateSelectionText.value = "No Date"
                                                     dateSelection.intValue = 3
                                                     sheet2State.value = false
                                                     sheet1State.value = true
@@ -1320,7 +1341,33 @@ class MainActivity : ComponentActivity() {
                                             )
                                             .background(color = ButtonBGColor)
                                             .clickable {
-
+                                                scope.launch {
+                                                    dateSelectionText.value =
+                                                        if (selectedDate == today) "Today"
+                                                        else if (selectedDate.minusDays(1) == today) "Tomorrow"
+                                                        else if (ChronoUnit.DAYS.between(today, selectedDate) > 6)
+                                                            "${
+                                                                selectedDate.dayOfMonth
+                                                            } ${
+                                                                selectedDate.month.name.take(3)
+                                                                    .lowercase()
+                                                                    .replaceFirstChar {
+                                                                           c -> c.uppercase()
+                                                                  }
+                                                           }."
+                                                        else selectedDate.dayOfWeek.name
+                                                            .lowercase()
+                                                            .replaceFirstChar {
+                                                                    c -> c.uppercase()
+                                                            }
+                                                    dateSelection.intValue =
+                                                        if (selectedDate == today) 1
+                                                        else if (selectedDate.minusDays(1) == today) 2
+                                                        else if (ChronoUnit.DAYS.between(today, selectedDate) > 6) 3
+                                                        else 4
+                                                    sheet2State.value = false
+                                                    sheet1State.value = true
+                                                }
                                             },
                                         contentAlignment = Alignment.Center
                                     ) {
