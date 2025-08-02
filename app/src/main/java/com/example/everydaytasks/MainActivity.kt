@@ -99,6 +99,9 @@ import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.YearMonth
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.TomorrowColor
 import com.example.everydaytasks.ui.theme.WeekColor
 import java.time.ZoneId
@@ -1125,8 +1128,7 @@ class MainActivity : ComponentActivity() {
                                     val lastDay = firstDay
                                         .plusYears(1)
                                         .minusDays(1)
-                                    val totalDays = java.time.temporal
-                                        .ChronoUnit.DAYS.between(
+                                    val totalDays = ChronoUnit.DAYS.between(
                                             firstDay,
                                             lastDay
                                         ).toInt() + 1
@@ -1284,13 +1286,19 @@ class MainActivity : ComponentActivity() {
                                                 color = IntervalColor
                                             )
                                     ) {}
+                                    var showDialog = remember {
+                                        mutableStateOf(false)
+                                    }
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(
                                                 start = 23.dp,
                                                 end = 23.dp
-                                            ),
+                                            )
+                                            .clickable{
+                                                showDialog.value = true
+                                            },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Spacer(
@@ -1381,6 +1389,146 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .height(15.dp)
                                     )
+                                    if(showDialog.value == true) {
+                                        Popup(
+                                            alignment = Alignment.Center,
+                                            onDismissRequest = {
+                                                showDialog.value = false
+                                            },
+                                            properties = PopupProperties(
+                                                focusable = true
+                                            )
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(
+                                                        start = 60.dp,
+                                                        top = 90.dp
+                                                    )
+                                                    .clip(
+                                                        RoundedCornerShape(10.dp)
+                                                    )
+                                                    .border(
+                                                        width = 2.dp,
+                                                        color = IntervalColor,
+                                                        shape = RoundedCornerShape(10.dp)
+                                                    )
+                                                    .background(
+                                                        color = BGColor
+                                                    )
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier
+                                                        .padding(
+                                                            start = 20.dp
+                                                        ),
+                                                    horizontalAlignment = Alignment.Start
+                                                ) {
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(20.dp)
+                                                    )
+                                                    Text(
+                                                        text = "Every day",
+                                                        color = Color.White,
+                                                        fontSize = 20.sp
+                                                    )
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(25.dp)
+                                                    )
+                                                    Text(
+                                                        text =
+                                                            "Every week at ${
+                                                                LocalDate.now().dayOfWeek
+                                                                    .name.take(3)
+                                                                    .lowercase()
+                                                                    .replaceFirstChar { c ->
+                                                                        c.uppercase()
+                                                                    }
+                                                            }",
+                                                        color = Color.White,
+                                                        fontSize = 20.sp
+                                                    )
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(25.dp)
+                                                    )
+                                                    Text(
+                                                        text = "Every business day (Mon - Fri)",
+                                                        color = Color.White,
+                                                        fontSize = 20.sp
+                                                    )
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(25.dp)
+                                                    )
+                                                    Text(
+                                                        text =
+                                                            "Every month at ${
+                                                                LocalDate.now().dayOfMonth
+                                                            }",
+                                                        color = Color.White,
+                                                        fontSize = 20.sp
+                                                    )
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(25.dp)
+                                                    )
+                                                    Text(
+                                                        text =
+                                                            "Every year at ${
+                                                                LocalDate.now().month
+                                                                    .name.take(3)
+                                                                    .lowercase()
+                                                                    .replaceFirstChar { c ->
+                                                                        c.uppercase()
+                                                                    }
+                                                            }. ${
+                                                                LocalDate.now().dayOfMonth
+                                                            }",
+                                                        color = Color.White,
+                                                        fontSize = 20.sp
+                                                    )
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(25.dp)
+                                                    )
+                                                    Text(
+                                                        text = "Own pattern",
+                                                        color = Color.White,
+                                                        fontSize = 20.sp
+                                                    )
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(20.dp)
+                                                    )
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .height(1.dp)
+                                                            .background(
+                                                                color = IntervalColor
+                                                            )
+                                                    ) {}
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(25.dp)
+                                                    )
+                                                    Text(
+                                                        text = "Cancel",
+                                                        color = SelectedItemColor,
+                                                        fontSize = 20.sp
+                                                    )
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(25.dp)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
