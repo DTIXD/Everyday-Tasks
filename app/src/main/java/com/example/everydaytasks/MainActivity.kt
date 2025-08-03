@@ -99,12 +99,14 @@ import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.YearMonth
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.example.everydaytasks.ui.theme.AddingToneColor
 import com.example.everydaytasks.ui.theme.TomorrowColor
 import com.example.everydaytasks.ui.theme.WeekColor
+import java.time.LocalTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.text.replaceFirstChar
 
@@ -278,6 +280,8 @@ class MainActivity : ComponentActivity() {
                                             },
                                             shape = RoundedCornerShape(7.dp),
                                             colors = TextFieldDefaults.colors(
+                                                unfocusedTextColor = Color.White,
+                                                focusedTextColor = Color.White,
                                                 unfocusedContainerColor = BGColor,
                                                 focusedContainerColor = BGColor,
                                                 unfocusedIndicatorColor = Color.Transparent,
@@ -1353,7 +1357,9 @@ class MainActivity : ComponentActivity() {
                                             .clip(
                                                 RoundedCornerShape(20.dp)
                                             )
-                                            .background(color = ButtonBGColor)
+                                            .background(
+                                                color = ButtonBGColor
+                                            )
                                             .clickable {
                                                 scope.launch {
                                                     dateSelectionText.value =
@@ -1594,6 +1600,11 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
+
+                                    val selectedDimension = remember{
+                                        mutableIntStateOf(1)
+                                    }
+
                                     if(showDialog2.value == true) {
                                         Popup(
                                             alignment = Alignment.Center,
@@ -1635,9 +1646,88 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                     Text(
                                                         text = "Choose your time",
-                                                        color = Color.White,
+                                                        color = CaptionTextColor,
                                                         fontSize = 15.sp
                                                     )
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(10.dp)
+                                                    )
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth(),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .clip(
+                                                                    RoundedCornerShape(10.dp)
+                                                                )
+                                                                .background(
+                                                                    color =
+                                                                        if (selectedDimension.intValue == 1) AddingToneColor
+                                                                        else BottomMenuColor
+                                                                )
+                                                                .clickable{
+                                                                    selectedDimension.intValue = 1
+                                                                }
+                                                        ) {
+                                                            Text(
+                                                                modifier = Modifier
+                                                                    .padding(
+                                                                        horizontal = 15.dp,
+                                                                        vertical = 10.dp
+                                                                    ),
+                                                                text = LocalTime.now().format(
+                                                                        DateTimeFormatter
+                                                                            .ofPattern("hh")
+                                                                    ),
+                                                                color = Color.White,
+                                                                fontSize = 50.sp
+                                                            )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .width(5.dp)
+                                                        )
+                                                        Text(
+                                                            text = ":",
+                                                            color = Color.White,
+                                                            fontSize = 50.sp
+                                                        )
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .width(5.dp)
+                                                        )
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .clip(
+                                                                    RoundedCornerShape(10.dp)
+                                                                )
+                                                                .background(
+                                                                    color =
+                                                                        if (selectedDimension.intValue == 2) AddingToneColor
+                                                                        else BottomMenuColor
+                                                                )
+                                                                .clickable{
+                                                                    selectedDimension.intValue = 2
+                                                                }
+                                                        ) {
+                                                            Text(
+                                                                modifier = Modifier
+                                                                    .padding(
+                                                                        horizontal = 15.dp,
+                                                                        vertical = 10.dp
+                                                                    ),
+                                                                text = LocalTime.now().format(
+                                                                    DateTimeFormatter
+                                                                        .ofPattern("mm")
+                                                                ),
+                                                                color = Color.White,
+                                                                fontSize = 50.sp
+                                                            )
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

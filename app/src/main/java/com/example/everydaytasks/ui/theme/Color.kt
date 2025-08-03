@@ -34,3 +34,5 @@ val BorderColor = Color(0xFF393939)
 val TodayColor = Color(0xFF28B050)
 val TomorrowColor = Color(0xFFD4873B)
 val WeekColor = Color(0xFF9E77E6)
+
+val AddingToneColor = Color(0xFF774641)
