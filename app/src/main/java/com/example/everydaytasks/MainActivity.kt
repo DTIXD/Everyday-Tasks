@@ -1,6 +1,7 @@
 package com.example.everydaytasks
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Canvas
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -82,12 +84,15 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.GreyButtonBGColor
 import com.example.everydaytasks.ui.theme.TodayColor
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
@@ -99,6 +104,9 @@ import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.YearMonth
 import androidx.compose.ui.graphics.ColorFilter
+import kotlin.math.cos
+import kotlin.math.sin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.AddingToneColor
@@ -1604,6 +1612,16 @@ class MainActivity : ComponentActivity() {
                                     val selectedDimension = remember{
                                         mutableIntStateOf(1)
                                     }
+                                    val selectedDayPart = remember{
+                                        mutableIntStateOf(
+                                            if (
+                                                LocalTime.now().format(
+                                                    DateTimeFormatter.ofPattern("a")
+                                                ) == "AM"
+                                            ) 1
+                                            else 2
+                                        )
+                                    }
 
                                     if(showDialog2.value == true) {
                                         Popup(
@@ -1637,7 +1655,7 @@ class MainActivity : ComponentActivity() {
                                                     modifier = Modifier
                                                         .fillMaxWidth()
                                                         .padding(
-                                                            horizontal = 20.dp
+                                                            horizontal = 40.dp
                                                         )
                                                 ) {
                                                     Spacer(
@@ -1655,11 +1673,14 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                     Row(
                                                         modifier = Modifier
-                                                            .fillMaxWidth(),
+                                                            .fillMaxWidth()
+                                                            .height(80.dp),
                                                         verticalAlignment = Alignment.CenterVertically
                                                     ) {
                                                         Box(
                                                             modifier = Modifier
+                                                                .fillMaxHeight()
+                                                                .width(100.dp)
                                                                 .clip(
                                                                     RoundedCornerShape(10.dp)
                                                                 )
@@ -1670,14 +1691,10 @@ class MainActivity : ComponentActivity() {
                                                                 )
                                                                 .clickable{
                                                                     selectedDimension.intValue = 1
-                                                                }
+                                                                },
+                                                            contentAlignment = Alignment.Center
                                                         ) {
                                                             Text(
-                                                                modifier = Modifier
-                                                                    .padding(
-                                                                        horizontal = 15.dp,
-                                                                        vertical = 10.dp
-                                                                    ),
                                                                 text = LocalTime.now().format(
                                                                         DateTimeFormatter
                                                                             .ofPattern("hh")
@@ -1701,6 +1718,8 @@ class MainActivity : ComponentActivity() {
                                                         )
                                                         Box(
                                                             modifier = Modifier
+                                                                .fillMaxHeight()
+                                                                .width(100.dp)
                                                                 .clip(
                                                                     RoundedCornerShape(10.dp)
                                                                 )
@@ -1711,14 +1730,10 @@ class MainActivity : ComponentActivity() {
                                                                 )
                                                                 .clickable{
                                                                     selectedDimension.intValue = 2
-                                                                }
+                                                                },
+                                                            contentAlignment = Alignment.Center
                                                         ) {
                                                             Text(
-                                                                modifier = Modifier
-                                                                    .padding(
-                                                                        horizontal = 15.dp,
-                                                                        vertical = 10.dp
-                                                                    ),
                                                                 text = LocalTime.now().format(
                                                                     DateTimeFormatter
                                                                         .ofPattern("mm")
@@ -1726,6 +1741,132 @@ class MainActivity : ComponentActivity() {
                                                                 color = Color.White,
                                                                 fontSize = 50.sp
                                                             )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .width(10.dp)
+                                                        )
+                                                        Column(
+                                                            modifier = Modifier
+                                                                .fillMaxHeight()
+                                                                .clip(
+                                                                    RoundedCornerShape(10.dp)
+                                                                )
+                                                                .background(
+                                                                    color = BottomMenuColor
+                                                                ),
+                                                            verticalArrangement = Arrangement.Center,
+                                                            horizontalAlignment = Alignment.CenterHorizontally
+                                                        ) {
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .fillMaxHeight(.5f)
+                                                                    .fillMaxWidth(.98f)
+                                                                    .clip(
+                                                                        RoundedCornerShape(
+                                                                            topStart = 10.dp,
+                                                                            topEnd = 10.dp
+                                                                        )
+                                                                    )
+                                                                    .background(
+                                                                        color =
+                                                                            if (selectedDayPart.intValue == 1) AddingToneColor
+                                                                            else BottomMenuColor
+                                                                    )
+                                                                    .clickable{
+                                                                        selectedDayPart.intValue = 1
+                                                                    },
+                                                                contentAlignment = Alignment.Center
+                                                            ) {
+                                                                Text(
+                                                                    text = "AM",
+                                                                    color = Color.White,
+                                                                    fontSize = 20.sp
+                                                                )
+                                                            }
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .fillMaxWidth(.98f)
+                                                                    .fillMaxHeight()
+                                                                    .clip(
+                                                                        RoundedCornerShape(
+                                                                            bottomStart = 10.dp,
+                                                                            bottomEnd = 10.dp
+                                                                        )
+                                                                    )
+                                                                    .background(
+                                                                        color =
+                                                                            if (selectedDayPart.intValue == 2) AddingToneColor
+                                                                            else BottomMenuColor
+                                                                    )
+                                                                    .clickable{
+                                                                        selectedDayPart.intValue = 2
+                                                                    },
+                                                                contentAlignment = Alignment.Center
+                                                            ) {
+                                                                Text(
+                                                                    text = "PM",
+                                                                    color = Color.White,
+                                                                    fontSize = 20.sp
+                                                                )
+                                                            }
+                                                        }
+                                                    }
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(25.dp)
+                                                    )
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth(),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .size(200.dp)
+                                                                .clip(
+                                                                    CircleShape
+                                                                )
+                                                                .background(
+                                                                    BottomMenuColor
+                                                                )
+                                                                .border(
+                                                                    2.dp,
+                                                                    BottomMenuColor,
+                                                                    CircleShape
+                                                                ),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Canvas(
+                                                                modifier = Modifier.fillMaxSize()
+                                                            ) {
+                                                                val center = size.center
+                                                                val radius = size.minDimension / 2
+
+                                                                drawCircle(
+                                                                    color = BottomMenuColor,
+                                                                    radius = radius,
+                                                                    center = center,
+                                                                    style = Stroke(4f)
+                                                                )
+
+                                                                val angleDegrees =
+                                                                    (LocalTime.now().hour % 12) * 30 - 90
+                                                                val angleRad =
+                                                                    Math.toRadians(angleDegrees.toDouble())
+                                                                val handLength = radius
+                                                                val endX =
+                                                                    center.x + cos(angleRad).toFloat() * handLength
+                                                                val endY =
+                                                                    center.y + sin(angleRad).toFloat() * handLength
+
+                                                                drawLine(
+                                                                    color = SelectedItemColor,
+                                                                    start = center,
+                                                                    end = Offset(endX, endY),
+                                                                    strokeWidth = 6f
+                                                                )
+                                                            }
                                                         }
                                                     }
                                                 }
