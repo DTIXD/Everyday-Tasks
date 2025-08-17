@@ -107,6 +107,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.AddingToneColor
@@ -1655,7 +1657,7 @@ class MainActivity : ComponentActivity() {
                                                     modifier = Modifier
                                                         .fillMaxWidth()
                                                         .padding(
-                                                            horizontal = 40.dp
+                                                            horizontal = 20.dp
                                                         )
                                                 ) {
                                                     Spacer(
@@ -1823,7 +1825,7 @@ class MainActivity : ComponentActivity() {
                                                     ) {
                                                         Box(
                                                             modifier = Modifier
-                                                                .size(200.dp)
+                                                                .size(250.dp)
                                                                 .clip(
                                                                     CircleShape
                                                                 )
@@ -1850,22 +1852,67 @@ class MainActivity : ComponentActivity() {
                                                                     style = Stroke(4f)
                                                                 )
 
-                                                                val angleDegrees =
-                                                                    (LocalTime.now().hour % 12) * 30 - 90
-                                                                val angleRad =
-                                                                    Math.toRadians(angleDegrees.toDouble())
-                                                                val handLength = radius
-                                                                val endX =
-                                                                    center.x + cos(angleRad).toFloat() * handLength
-                                                                val endY =
-                                                                    center.y + sin(angleRad).toFloat() * handLength
+                                                                drawIntoCanvas { canvas ->
+                                                                    val angleDegrees =
+                                                                        (LocalTime.now().hour % 12) * 30 - 90
+                                                                    val angleRad =
+                                                                        Math.toRadians(
+                                                                            angleDegrees.toDouble()
+                                                                        )
+                                                                    val handLength = radius * .75f
+                                                                    val endX =
+                                                                        center.x + cos(angleRad).toFloat() * handLength
+                                                                    val endY =
+                                                                        center.y + sin(angleRad).toFloat() * handLength
 
-                                                                drawLine(
-                                                                    color = SelectedItemColor,
-                                                                    start = center,
-                                                                    end = Offset(endX, endY),
-                                                                    strokeWidth = 6f
-                                                                )
+                                                                    drawLine(
+                                                                        color = SelectedItemColor,
+                                                                        start = center,
+                                                                        end = Offset(endX, endY),
+                                                                        strokeWidth = 6f
+                                                                    )
+
+                                                                    drawCircle(
+                                                                        color = SelectedItemColor,
+                                                                        radius = 50f,
+                                                                        center = Offset(endX, endY)
+                                                                    )
+
+                                                                    drawCircle(
+                                                                        color = SelectedItemColor,
+                                                                        radius = 16f,
+                                                                        center = center
+                                                                    )
+                                                                    val paint = android.graphics
+                                                                        .Paint().apply {
+                                                                            color = android.graphics
+                                                                                .Color.WHITE
+                                                                            textSize = 45f
+                                                                            textAlign =
+                                                                                android.graphics
+                                                                                    .Paint.Align.CENTER
+                                                                            isAntiAlias = true
+                                                                        }
+                                                                    for (number in 1..12) {
+                                                                        val angle = Math.toRadians(
+                                                                            ((number * 30) - 90)
+                                                                                .toDouble()
+                                                                        )
+                                                                        val textRadius =
+                                                                            radius * 0.75f
+                                                                        val x =
+                                                                            center.x + cos(angle).toFloat() * textRadius
+                                                                        val y =
+                                                                            center.y + sin(angle).toFloat() * textRadius + (paint.textSize / 3)
+                                                                        canvas.nativeCanvas
+                                                                            .drawText(
+                                                                                number.toString(),
+                                                                                x,
+                                                                                y,
+                                                                                paint
+                                                                            )
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
