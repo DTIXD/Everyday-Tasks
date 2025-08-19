@@ -30,6 +30,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
+import kotlin.math.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -41,6 +47,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.geometry.center
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.mutableStateOf
@@ -50,7 +57,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -84,7 +90,6 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.GreyButtonBGColor
 import com.example.everydaytasks.ui.theme.TodayColor
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -92,7 +97,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.center
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
@@ -107,7 +111,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -122,7 +125,7 @@ import kotlin.text.replaceFirstChar
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "DefaultLocale")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,7 +147,6 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(false)
             }
             val scope = rememberCoroutineScope()
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -1624,6 +1626,12 @@ class MainActivity : ComponentActivity() {
                                             else 2
                                         )
                                     }
+                                    var selectedHour = remember {
+                                        mutableIntStateOf(LocalTime.now().hour % 12)
+                                    }
+                                    var selectedMinute = remember {
+                                        mutableIntStateOf(LocalTime.now().minute)
+                                    }
 
                                     if(showDialog2.value == true) {
                                         Popup(
@@ -1656,15 +1664,16 @@ class MainActivity : ComponentActivity() {
                                                 Column(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
-                                                        .padding(
-                                                            horizontal = 20.dp
-                                                        )
                                                 ) {
                                                     Spacer(
                                                         modifier = Modifier
                                                             .height(10.dp)
                                                     )
                                                     Text(
+                                                        modifier = Modifier
+                                                            .padding(
+                                                                horizontal = 20.dp
+                                                            ),
                                                         text = "Choose your time",
                                                         color = CaptionTextColor,
                                                         fontSize = 15.sp
@@ -1676,6 +1685,9 @@ class MainActivity : ComponentActivity() {
                                                     Row(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
+                                                            .padding(
+                                                                horizontal = 40.dp
+                                                            )
                                                             .height(80.dp),
                                                         verticalAlignment = Alignment.CenterVertically
                                                     ) {
@@ -1691,16 +1703,18 @@ class MainActivity : ComponentActivity() {
                                                                         if (selectedDimension.intValue == 1) AddingToneColor
                                                                         else BottomMenuColor
                                                                 )
+                                                                .border(
+                                                                    width = 2.dp,
+                                                                    color = BottomMenuColor,
+                                                                    shape = RoundedCornerShape(10.dp)
+                                                                )
                                                                 .clickable{
                                                                     selectedDimension.intValue = 1
                                                                 },
                                                             contentAlignment = Alignment.Center
                                                         ) {
                                                             Text(
-                                                                text = LocalTime.now().format(
-                                                                        DateTimeFormatter
-                                                                            .ofPattern("hh")
-                                                                    ),
+                                                                text = String.format("%02d", selectedHour.intValue),
                                                                 color = Color.White,
                                                                 fontSize = 50.sp
                                                             )
@@ -1730,16 +1744,18 @@ class MainActivity : ComponentActivity() {
                                                                         if (selectedDimension.intValue == 2) AddingToneColor
                                                                         else BottomMenuColor
                                                                 )
+                                                                .border(
+                                                                    width = 2.dp,
+                                                                    color = BottomMenuColor,
+                                                                    shape = RoundedCornerShape(10.dp)
+                                                                )
                                                                 .clickable{
                                                                     selectedDimension.intValue = 2
                                                                 },
                                                             contentAlignment = Alignment.Center
                                                         ) {
                                                             Text(
-                                                                text = LocalTime.now().format(
-                                                                    DateTimeFormatter
-                                                                        .ofPattern("mm")
-                                                                ),
+                                                                text = String.format("%02d", selectedMinute.intValue),
                                                                 color = Color.White,
                                                                 fontSize = 50.sp
                                                             )
@@ -1753,6 +1769,11 @@ class MainActivity : ComponentActivity() {
                                                                 .fillMaxHeight()
                                                                 .clip(
                                                                     RoundedCornerShape(10.dp)
+                                                                )
+                                                                .border(
+                                                                    width = 2.dp,
+                                                                    color = BottomMenuColor,
+                                                                    shape = RoundedCornerShape(10.dp)
                                                                 )
                                                                 .background(
                                                                     color = BottomMenuColor
@@ -1820,101 +1841,228 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                     Box(
                                                         modifier = Modifier
-                                                            .fillMaxWidth(),
-                                                        contentAlignment = Alignment.Center
+                                                            .padding(
+                                                                horizontal = 20.dp
+                                                            )
                                                     ) {
                                                         Box(
                                                             modifier = Modifier
-                                                                .size(250.dp)
-                                                                .clip(
-                                                                    CircleShape
-                                                                )
-                                                                .background(
-                                                                    BottomMenuColor
-                                                                )
-                                                                .border(
-                                                                    2.dp,
-                                                                    BottomMenuColor,
-                                                                    CircleShape
-                                                                ),
+                                                                .fillMaxWidth(),
                                                             contentAlignment = Alignment.Center
                                                         ) {
-                                                            Canvas(
-                                                                modifier = Modifier.fillMaxSize()
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .size(250.dp)
+                                                                    .clip(
+                                                                        CircleShape
+                                                                    )
+                                                                    .background(
+                                                                        BottomMenuColor
+                                                                    )
+                                                                    .border(
+                                                                        2.dp,
+                                                                        BottomMenuColor,
+                                                                        CircleShape
+                                                                    ),
+                                                                contentAlignment = Alignment.Center
                                                             ) {
-                                                                val center = size.center
-                                                                val radius = size.minDimension / 2
+                                                                Canvas(
+                                                                    modifier = Modifier
+                                                                        .fillMaxSize()
+                                                                        .pointerInput(Unit) {
+                                                                            detectTapGestures { offset ->
+                                                                                val center = Offset(size.width / 2f, size.height / 2f)
+                                                                                val dx = offset.x - center.x
+                                                                                val dy = offset.y - center.y
+                                                                                val angleRad = atan2(dy, dx)
+                                                                                var angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
 
-                                                                drawCircle(
-                                                                    color = BottomMenuColor,
-                                                                    radius = radius,
-                                                                    center = center,
-                                                                    style = Stroke(4f)
-                                                                )
+                                                                                angleDeg = (angleDeg + 90 + 360) % 360
 
-                                                                drawIntoCanvas { canvas ->
-                                                                    val angleDegrees =
-                                                                        (LocalTime.now().hour % 12) * 30 - 90
-                                                                    val angleRad =
-                                                                        Math.toRadians(
-                                                                            angleDegrees.toDouble()
-                                                                        )
-                                                                    val handLength = radius * .75f
-                                                                    val endX =
-                                                                        center.x + cos(angleRad).toFloat() * handLength
-                                                                    val endY =
-                                                                        center.y + sin(angleRad).toFloat() * handLength
-
-                                                                    drawLine(
-                                                                        color = SelectedItemColor,
-                                                                        start = center,
-                                                                        end = Offset(endX, endY),
-                                                                        strokeWidth = 6f
-                                                                    )
-
-                                                                    drawCircle(
-                                                                        color = SelectedItemColor,
-                                                                        radius = 50f,
-                                                                        center = Offset(endX, endY)
-                                                                    )
-
-                                                                    drawCircle(
-                                                                        color = SelectedItemColor,
-                                                                        radius = 16f,
-                                                                        center = center
-                                                                    )
-                                                                    val paint = android.graphics
-                                                                        .Paint().apply {
-                                                                            color = android.graphics
-                                                                                .Color.WHITE
-                                                                            textSize = 45f
-                                                                            textAlign =
-                                                                                android.graphics
-                                                                                    .Paint.Align.CENTER
-                                                                            isAntiAlias = true
+                                                                                if (selectedDimension.intValue == 1) {
+                                                                                    val clickedHour = ((angleDeg / 30f).roundToInt() % 12).let {
+                                                                                        if (it == 0) 12 else it
+                                                                                    }
+                                                                                    selectedHour.intValue = clickedHour
+                                                                                } else {
+                                                                                    val clickedMinute = ((angleDeg / 6f).roundToInt() % 60)
+                                                                                    val snappedMinute = (clickedMinute / 5) * 5
+                                                                                    selectedMinute.intValue = snappedMinute
+                                                                                }
+                                                                            }
                                                                         }
-                                                                    for (number in 1..12) {
-                                                                        val angle = Math.toRadians(
-                                                                            ((number * 30) - 90)
-                                                                                .toDouble()
-                                                                        )
-                                                                        val textRadius =
-                                                                            radius * 0.75f
-                                                                        val x =
-                                                                            center.x + cos(angle).toFloat() * textRadius
-                                                                        val y =
-                                                                            center.y + sin(angle).toFloat() * textRadius + (paint.textSize / 3)
-                                                                        canvas.nativeCanvas
-                                                                            .drawText(
-                                                                                number.toString(),
-                                                                                x,
-                                                                                y,
-                                                                                paint
+                                                                ) {
+                                                                    val center = size.center
+                                                                    val radius =
+                                                                        size.minDimension / 2
+
+                                                                    drawCircle(
+                                                                        color = BottomMenuColor,
+                                                                        radius = radius,
+                                                                        center = center,
+                                                                        style = Stroke(4f)
+                                                                    )
+
+                                                                    drawIntoCanvas { canvas ->
+                                                                        val angleDegrees =
+                                                                            if (selectedDimension.intValue == 1)
+                                                                                (selectedHour.intValue % 12) * 30 - 90
+                                                                            else
+                                                                                (selectedMinute.intValue % 60) * 6 - 90
+                                                                        val angleRad =
+                                                                            Math.toRadians(
+                                                                                angleDegrees.toDouble()
                                                                             )
+                                                                        val handLength =
+                                                                            radius * .65f
+                                                                        val endX =
+                                                                            center.x + cos(angleRad).toFloat() * handLength
+                                                                        val endY =
+                                                                            center.y + sin(angleRad).toFloat() * handLength
+
+                                                                        drawLine(
+                                                                            color = SelectedItemColor,
+                                                                            start = center,
+                                                                            end = Offset(
+                                                                                endX,
+                                                                                endY
+                                                                            ),
+                                                                            strokeWidth = 6f
+                                                                        )
+
+                                                                        drawCircle(
+                                                                            color = SelectedItemColor,
+                                                                            radius = 60f,
+                                                                            center = Offset(
+                                                                                endX,
+                                                                                endY
+                                                                            )
+                                                                        )
+
+                                                                        drawCircle(
+                                                                            color = SelectedItemColor,
+                                                                            radius = 16f,
+                                                                            center = center
+                                                                        )
+                                                                        val paint = android.graphics
+                                                                            .Paint().apply {
+                                                                                color =
+                                                                                    android.graphics
+                                                                                        .Color.WHITE
+                                                                                textSize = 40f
+                                                                                textAlign =
+                                                                                    android.graphics
+                                                                                        .Paint.Align.CENTER
+                                                                                isAntiAlias = true
+                                                                            }
+                                                                        if (selectedDimension.intValue == 1) {
+                                                                            for (number in 1..12) {
+                                                                                val angle =
+                                                                                    Math.toRadians(
+                                                                                        ((number * 30) - 90)
+                                                                                            .toDouble()
+                                                                                    )
+                                                                                val textRadius =
+                                                                                    radius * 0.65f
+                                                                                val x =
+                                                                                    center.x + cos(
+                                                                                        angle
+                                                                                    ).toFloat() * textRadius
+                                                                                val y =
+                                                                                    center.y + sin(angle).toFloat() * textRadius + (paint.textSize / 3)
+                                                                                canvas.nativeCanvas
+                                                                                    .drawText(
+                                                                                        number.toString(), x, y, paint
+                                                                                    )
+                                                                            }
+                                                                        } else {
+                                                                            for (number in 0..55 step 5) {
+                                                                                val angle =
+                                                                                    Math.toRadians(
+                                                                                        ((number * 6) - 90)
+                                                                                            .toDouble()
+                                                                                    )
+                                                                                val textRadius =
+                                                                                    radius * 0.65f
+                                                                                val x =
+                                                                                    center.x + cos(
+                                                                                        angle
+                                                                                    ).toFloat() * textRadius
+                                                                                val y =
+                                                                                    center.y + sin(
+                                                                                        angle
+                                                                                    ).toFloat() * textRadius + (paint.textSize / 3)
+                                                                                canvas.nativeCanvas
+                                                                                    .drawText(
+                                                                                        number.toString(), x, y, paint
+                                                                                    )
+                                                                            }
+                                                                        }
                                                                     }
                                                                 }
                                                             }
                                                         }
+                                                        Box(
+                                                            contentAlignment = Alignment.BottomStart
+                                                        ) {
+                                                            Image(
+                                                                painterResource(
+                                                                    id = R.drawable.ic_keyboard
+                                                                ),
+                                                                contentDescription = null,
+                                                                Modifier
+                                                                    .size(30.dp),
+                                                                contentScale = ContentScale.Crop
+                                                            )
+                                                        }
+                                                    }
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(20.dp)
+                                                    )
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .height(1.dp)
+                                                            .background(
+                                                                color = IntervalColor
+                                                            )
+                                                    ) {}
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(
+                                                                horizontal = 20.dp
+                                                            ),
+                                                        horizontalArrangement = Arrangement.End,
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .height(83.dp)
+                                                        )
+                                                        Text(
+                                                            modifier = Modifier
+                                                                .clickable {
+                                                                    showDialog2.value = false
+                                                                },
+                                                            text = "Cancel",
+                                                            fontSize = 25.sp,
+                                                            color = SelectedItemColor
+                                                        )
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .width(32.dp)
+                                                        )
+                                                        Text(
+                                                            modifier = Modifier
+                                                                .clickable {
+                                                                    showDialog2.value = false
+                                                                },
+                                                            text = "Ok",
+                                                            fontSize = 25.sp,
+                                                            color = SelectedItemColor
+                                                        )
                                                     }
                                                 }
                                             }
