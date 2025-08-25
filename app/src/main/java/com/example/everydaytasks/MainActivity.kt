@@ -14,7 +14,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +31,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
@@ -120,6 +120,8 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.AddingToneColor
 import com.example.everydaytasks.ui.theme.TomorrowColor
+import com.example.everydaytasks.ui.theme.WarningBorderColor
+import com.example.everydaytasks.ui.theme.WarningColor
 import com.example.everydaytasks.ui.theme.WeekColor
 import java.time.LocalTime
 import java.time.ZoneId
@@ -150,7 +152,11 @@ class MainActivity : ComponentActivity() {
             val sheet2State = remember {
                 mutableStateOf(false)
             }
+            val sheet3State = remember {
+                mutableStateOf(false)
+            }
             val scope = rememberCoroutineScope()
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -371,8 +377,10 @@ class MainActivity : ComponentActivity() {
                                                         color = BorderColor
                                                     )
                                                     .clickable {
-                                                        sheet1State.value = false
-                                                        sheet2State.value = true
+                                                        scope.launch {
+                                                            sheet1State.value = false
+                                                            sheet2State.value = true
+                                                        }
                                                     },
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
@@ -436,7 +444,7 @@ class MainActivity : ComponentActivity() {
                                                         color = BorderColor
                                                     )
                                                     .clickable {
-
+                                                        showDialog3.value = true
                                                     },
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
@@ -454,10 +462,7 @@ class MainActivity : ComponentActivity() {
                                                     ),
                                                     contentDescription = null,
                                                     Modifier
-                                                        .size(20.dp)
-                                                        .clickable {
-                                                            showDialog3.value = true
-                                                        },
+                                                        .size(20.dp),
                                                     contentScale = ContentScale.Crop,
                                                     colorFilter =
                                                         if (selectedPriority.intValue == 0)
@@ -517,7 +522,10 @@ class MainActivity : ComponentActivity() {
                                                         color = BorderColor
                                                     )
                                                     .clickable {
-
+                                                        scope.launch {
+                                                            sheet1State.value = false
+                                                            sheet3State.value = true
+                                                        }
                                                     },
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
@@ -827,6 +835,9 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
+                    }
+                    val timeFlag = remember {
+                        mutableStateOf(false)
                     }
 
                     var selectedYearMonth by remember {
@@ -1478,9 +1489,6 @@ class MainActivity : ComponentActivity() {
 
                                     val timeSelected = remember {
                                         mutableStateOf("Add time")
-                                    }
-                                    val timeFlag = remember {
-                                        mutableStateOf(false)
                                     }
 
                                     val repeatSelected = remember {
@@ -2601,7 +2609,7 @@ class MainActivity : ComponentActivity() {
                                                             contentAlignment = Alignment.BottomStart
                                                         ) {
                                                             Image(
-                                                                painterResource(
+                                                                painter = painterResource(
                                                                     id =
                                                                         if (keyboard.value)
                                                                             R.drawable.ic_reminder
@@ -2610,7 +2618,7 @@ class MainActivity : ComponentActivity() {
                                                                 ),
                                                                 contentDescription = null,
                                                                 Modifier
-                                                                    .size(30.dp)
+                                                                    .size(size = 30.dp)
                                                                     .clickable {
                                                                         keyboard.value =
                                                                             !keyboard.value
@@ -2621,12 +2629,12 @@ class MainActivity : ComponentActivity() {
                                                     }
                                                     Spacer(
                                                         modifier = Modifier
-                                                            .height(20.dp)
+                                                            .height(height = 20.dp)
                                                     )
                                                     Row(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
-                                                            .height(1.dp)
+                                                            .height(height = 1.dp)
                                                             .background(
                                                                 color = IntervalColor
                                                             )
@@ -2642,7 +2650,7 @@ class MainActivity : ComponentActivity() {
                                                     ) {
                                                         Spacer(
                                                             modifier = Modifier
-                                                                .height(83.dp)
+                                                                .height(height = 83.dp)
                                                         )
                                                         Text(
                                                             modifier = Modifier
@@ -2655,7 +2663,7 @@ class MainActivity : ComponentActivity() {
                                                         )
                                                         Spacer(
                                                             modifier = Modifier
-                                                                .width(32.dp)
+                                                                .width(width = 32.dp)
                                                         )
                                                         Text(
                                                             modifier = Modifier
@@ -2681,6 +2689,112 @@ class MainActivity : ComponentActivity() {
                                                 }
                                             }
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (sheet3State.value) {
+                        ModalBottomSheet(
+                            onDismissRequest = {
+                                scope.launch {
+                                    sheet3State.value = false
+                                    sheet1State.value = true
+                                }
+                            },
+                            sheetState = rememberModalBottomSheetState(
+                                skipPartiallyExpanded = true
+                            ),
+                            containerColor = BGColor,
+                            shape = RoundedCornerShape(size = 16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Column (
+                                    modifier = Modifier
+                                        .padding(
+                                            horizontal = 15.dp
+                                        )
+                                ) {
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(height = 15.dp)
+                                    )
+                                    Text(
+                                        text = "Reminders",
+                                        fontSize = 25.sp,
+                                        color = Color.White
+                                    )
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(height = 15.dp)
+                                    )
+                                    if (!timeFlag.value) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(
+                                                    shape = RoundedCornerShape(size = 10.dp)
+                                                )
+                                                .background(
+                                                    color = WarningColor
+                                                )
+                                                .border(
+                                                    width = 1.dp,
+                                                    color = WarningBorderColor,
+                                                    shape = RoundedCornerShape(size = 10.dp)
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .padding(
+                                                        horizontal = 15.dp,
+                                                        vertical = 15.dp
+                                                    ),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.Center
+                                            ) {
+                                                Text(
+                                                    text = "!",
+                                                    fontSize = 30.sp,
+                                                    color = Color.White
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(width = 20.dp)
+                                                )
+                                                Text(
+                                                    text = "Add time in the first section in order to add reminders",
+                                                    fontSize = 15.sp,
+                                                    color = CaptionTextColor
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(1.dp)
+                                                .background(
+                                                    color = IntervalColor
+                                                )
+                                        ) {}
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 15.dp)
+                                        )
+                                        Text(
+                                            text = "Recommendations",
+                                            fontSize = 20.sp,
+                                            color = Color.White
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 15.dp)
+                                        )
                                     }
                                 }
                             }
