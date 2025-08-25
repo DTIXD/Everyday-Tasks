@@ -1287,6 +1287,13 @@ class MainActivity : ComponentActivity() {
                                         mutableStateOf(false)
                                     }
 
+                                    val repeatSelected = remember {
+                                        mutableStateOf("Repeat")
+                                    }
+                                    val repeatFlag = remember {
+                                        mutableStateOf(false)
+                                    }
+
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -1360,7 +1367,10 @@ class MainActivity : ComponentActivity() {
                                                     ),
                                                     contentDescription = null,
                                                     Modifier
-                                                        .size(20.dp),
+                                                        .size(20.dp)
+                                                        .clickable {
+                                                            timeFlag.value = false
+                                                        },
                                                     contentScale = ContentScale.Crop
                                                 )
                                                 Spacer(
@@ -1407,11 +1417,62 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .width(15.dp)
                                         )
-                                        Text(
-                                            text = "Repeat",
-                                            color = Color.White,
-                                            fontSize = 20.sp
-                                        )
+                                        if (!repeatFlag.value) {
+                                            Text(
+                                                text = "Repeat",
+                                                color = Color.White,
+                                                fontSize = 20.sp
+                                            )
+                                        } else {
+                                            Row(
+                                                modifier = Modifier
+                                                    .clip(
+                                                        RoundedCornerShape(10.dp)
+                                                    )
+                                                    .background(
+                                                        color = BGColor
+                                                    )
+                                                    .border(
+                                                        width = 1.dp,
+                                                        color = IntervalColor,
+                                                        shape = RoundedCornerShape(10.dp)
+                                                    ),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.Center
+                                            ) {
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(5.dp)
+                                                )
+                                                Text(
+                                                    modifier = Modifier
+                                                        .padding(7.dp),
+                                                    text = repeatSelected.value,
+                                                    fontSize = 20.sp,
+                                                    color = Color.White
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(7.dp)
+                                                )
+                                                Image(
+                                                    painterResource(
+                                                        id = R.drawable.ic_close
+                                                    ),
+                                                    contentDescription = null,
+                                                    Modifier
+                                                        .size(20.dp)
+                                                        .clickable {
+                                                            repeatFlag.value = false
+                                                        },
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(5.dp)
+                                                )
+                                            }
+                                        }
                                     }
                                     Row(
                                         modifier = Modifier
@@ -1528,7 +1589,9 @@ class MainActivity : ComponentActivity() {
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-
+                                                                repeatFlag.value = true
+                                                                repeatSelected.value = "Every day"
+                                                                showDialog1.value = false
                                                             }
                                                     ) {
                                                         Spacer(
@@ -1549,7 +1612,16 @@ class MainActivity : ComponentActivity() {
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-
+                                                                repeatFlag.value = true
+                                                                repeatSelected.value = "Every week at ${
+                                                                    LocalDate.now().dayOfWeek
+                                                                        .name.take(3)
+                                                                        .lowercase()
+                                                                        .replaceFirstChar { c ->
+                                                                            c.uppercase()
+                                                                        }
+                                                                }"
+                                                                showDialog1.value = false
                                                             }
                                                     ) {
                                                         Text(
@@ -1574,7 +1646,9 @@ class MainActivity : ComponentActivity() {
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-
+                                                                repeatFlag.value = true
+                                                                repeatSelected.value = "Every business day (Mon - Fri)"
+                                                                showDialog1.value = false
                                                             }
                                                     ) {
                                                         Text(
@@ -1591,7 +1665,11 @@ class MainActivity : ComponentActivity() {
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-
+                                                                repeatFlag.value = true
+                                                                repeatSelected.value = "Every month at ${
+                                                                    LocalDate.now().dayOfMonth
+                                                                }"
+                                                                showDialog1.value = false
                                                             }
                                                     ) {
                                                         Text(
@@ -1611,7 +1689,18 @@ class MainActivity : ComponentActivity() {
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-
+                                                                repeatFlag.value = true
+                                                                repeatSelected.value = "Every year at ${
+                                                                    LocalDate.now().month
+                                                                        .name.take(3)
+                                                                        .lowercase()
+                                                                        .replaceFirstChar { c ->
+                                                                            c.uppercase()
+                                                                        }
+                                                                }. ${
+                                                                    LocalDate.now().dayOfMonth
+                                                                }"
+                                                                showDialog1.value = false
                                                             }
                                                     ) {
                                                         Text(
@@ -1638,7 +1727,9 @@ class MainActivity : ComponentActivity() {
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-
+                                                                repeatFlag.value = true
+                                                                repeatSelected.value = "Own pattern"
+                                                                showDialog1.value = false
                                                             }
                                                     ) {
                                                         Text(
@@ -1666,7 +1757,7 @@ class MainActivity : ComponentActivity() {
                                                         modifier = Modifier
                                                             .fillMaxWidth()
                                                             .clickable {
-
+                                                                showDialog1.value = false
                                                             }
                                                     ) {
                                                         Spacer(
@@ -2382,7 +2473,9 @@ class MainActivity : ComponentActivity() {
                                                                         ) + ":" + String.format(
                                                                             "%02d",
                                                                             selectedMinute.intValue
-                                                                        )
+                                                                        ) + " " +
+                                                                                if (selectedDayPart.intValue == 1) "am"
+                                                                                else "pm"
                                                                 },
                                                             text = "Ok",
                                                             fontSize = 25.sp,
