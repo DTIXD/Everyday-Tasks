@@ -92,7 +92,6 @@ import com.example.everydaytasks.ui.theme.GreyButtonBGColor
 import com.example.everydaytasks.ui.theme.TodayColor
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -120,8 +119,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.AddingToneColor
-import com.example.everydaytasks.ui.theme.TextFieldColor
-import com.example.everydaytasks.ui.theme.TextFieldLabelColor
 import com.example.everydaytasks.ui.theme.TomorrowColor
 import com.example.everydaytasks.ui.theme.WeekColor
 import java.time.LocalTime
@@ -266,7 +263,7 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf("Today")
                     }
 
-                    if (sheet1State.value == true) {
+                    if (sheet1State.value) {
                         ModalBottomSheet(
                             onDismissRequest = {
                                 scope.launch {
@@ -385,10 +382,12 @@ class MainActivity : ComponentActivity() {
                                                         .size(20.dp),
                                                     contentScale = ContentScale.Crop,
                                                     colorFilter = ColorFilter.tint(
-                                                        if (dateSelection.intValue == 1) TodayColor
-                                                        else if (dateSelection.intValue == 2) TomorrowColor
-                                                        else if (dateSelection.intValue == 3) Color.White
-                                                        else WeekColor,
+                                                        when (dateSelection.intValue) {
+                                                            1 -> TodayColor
+                                                            2 -> TomorrowColor
+                                                            3 -> Color.White
+                                                            else -> WeekColor
+                                                        },
                                                     )
                                                 )
                                                 Spacer(
@@ -398,10 +397,12 @@ class MainActivity : ComponentActivity() {
                                                 Text(
                                                     text = dateSelectionText.value,
                                                     color =
-                                                        if (dateSelection.intValue == 1) TodayColor
-                                                        else if (dateSelection.intValue == 2) TomorrowColor
-                                                        else if (dateSelection.intValue == 3) Color.White
-                                                        else WeekColor,
+                                                        when (dateSelection.intValue) {
+                                                            1 -> TodayColor
+                                                            2 -> TomorrowColor
+                                                            3 -> Color.White
+                                                            else -> WeekColor
+                                                        },
                                                     fontSize = 15.sp
                                                 )
                                                 Spacer(
@@ -675,7 +676,7 @@ class MainActivity : ComponentActivity() {
                             selectedDate = LocalDate.now()
                         }
                     }
-                    if (sheet2State.value == true) {
+                    if (sheet2State.value) {
                         ModalBottomSheet(
                             onDismissRequest = {
                                 scope.launch {
@@ -899,13 +900,17 @@ class MainActivity : ComponentActivity() {
                                             .clickable {
                                                 scope.launch {
                                                     dateSelectionText.value =
-                                                        if (today.dayOfWeek.name == "sunday") "Today"
-                                                        else if (today.dayOfWeek.name == "saturday") "Tomorrow"
-                                                        else "Sunday"
+                                                        when (today.dayOfWeek.name) {
+                                                            today.dayOfWeek.name -> "Today"
+                                                            today.dayOfWeek.name -> "Tomorrow"
+                                                            else -> "Sunday"
+                                                        }
                                                     dateSelection.intValue =
-                                                        if (today.dayOfWeek.name == "sunday") 1
-                                                        else if (today.dayOfWeek.name == "saturday") 2
-                                                        else 4
+                                                        when (today.dayOfWeek.name) {
+                                                            today.dayOfWeek.name -> 1
+                                                            today.dayOfWeek.name -> 2
+                                                            else -> 4
+                                                        }
                                                     sheet2State.value = false
                                                     sheet1State.value = true
                                                 }
@@ -1268,10 +1273,10 @@ class MainActivity : ComponentActivity() {
                                                 color = IntervalColor
                                             )
                                     ) {}
-                                    var showDialog1 = remember {
+                                    val showDialog1 = remember {
                                         mutableStateOf(false)
                                     }
-                                    var showDialog2 = remember {
+                                    val showDialog2 = remember {
                                         mutableStateOf(false)
                                     }
 
@@ -1311,7 +1316,7 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .width(15.dp)
                                         )
-                                        if (timeFlag.value == false) {
+                                        if (!timeFlag.value) {
                                             Text(
                                                 text = "Add Time",
                                                 color = Color.White,
@@ -1483,7 +1488,7 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .height(15.dp)
                                     )
-                                    if (showDialog1.value == true) {
+                                    if (showDialog1.value) {
                                         Popup(
                                             alignment = Alignment.Center,
                                             onDismissRequest = {
@@ -1696,17 +1701,17 @@ class MainActivity : ComponentActivity() {
                                             else 2
                                         )
                                     }
-                                    var selectedHour = remember {
+                                    val selectedHour = remember {
                                         mutableIntStateOf(LocalTime.now().hour % 12)
                                     }
-                                    var selectedMinute = remember {
+                                    val selectedMinute = remember {
                                         mutableIntStateOf(LocalTime.now().minute)
                                     }
                                     val keyboard = remember {
                                         mutableStateOf(false)
                                     }
 
-                                    if (showDialog2.value == true) {
+                                    if (showDialog2.value) {
                                         Popup(
                                             alignment = Alignment.Center,
                                             onDismissRequest = {
@@ -1764,7 +1769,7 @@ class MainActivity : ComponentActivity() {
                                                         verticalAlignment = Alignment.CenterVertically
                                                     ) {
                                                         Column {
-                                                            if (keyboard.value == false) {
+                                                            if (!keyboard.value) {
                                                                 Box(
                                                                     modifier = Modifier
                                                                         .height(80.dp)
@@ -1839,13 +1844,13 @@ class MainActivity : ComponentActivity() {
                                                                     )
                                                                 )
                                                             }
-                                                            if (keyboard.value != false) {
+                                                            if (keyboard.value) {
                                                                 Spacer(
                                                                     modifier = Modifier
                                                                         .height(5.dp)
                                                                 )
                                                             }
-                                                            if (keyboard.value != false) {
+                                                            if (keyboard.value) {
                                                                 Text(
                                                                     text = "Hours",
                                                                     color = CaptionTextColor,
@@ -1863,13 +1868,13 @@ class MainActivity : ComponentActivity() {
                                                                 color = Color.White,
                                                                 fontSize = 50.sp
                                                             )
-                                                            if (keyboard.value != false) {
+                                                            if (keyboard.value) {
                                                                 Spacer(
                                                                     modifier = Modifier
                                                                         .height(5.dp)
                                                                 )
                                                             }
-                                                            if (keyboard.value != false) {
+                                                            if (keyboard.value) {
                                                                 Text(
                                                                     text = " ",
                                                                     color = CaptionTextColor,
@@ -1882,7 +1887,7 @@ class MainActivity : ComponentActivity() {
                                                                 .width(5.dp)
                                                         )
                                                         Column {
-                                                            if (keyboard.value == false) {
+                                                            if (!keyboard.value) {
                                                                 Box(
                                                                     modifier = Modifier
                                                                         .height(80.dp)
@@ -1957,13 +1962,13 @@ class MainActivity : ComponentActivity() {
                                                                     )
                                                                 )
                                                             }
-                                                            if (keyboard.value != false) {
+                                                            if (keyboard.value) {
                                                                 Spacer(
                                                                     modifier = Modifier
                                                                         .height(5.dp)
                                                                 )
                                                             }
-                                                            if (keyboard.value != false) {
+                                                            if (keyboard.value) {
                                                                 Text(
                                                                     text = "Minutes",
                                                                     color = CaptionTextColor,
@@ -2050,13 +2055,13 @@ class MainActivity : ComponentActivity() {
                                                                     )
                                                                 }
                                                             }
-                                                            if (keyboard.value != false) {
+                                                            if (keyboard.value) {
                                                                 Spacer(
                                                                     modifier = Modifier
                                                                         .height(5.dp)
                                                                 )
                                                             }
-                                                            if (keyboard.value != false) {
+                                                            if (keyboard.value) {
                                                                 Text(
                                                                     text = " ",
                                                                     color = CaptionTextColor,
@@ -2075,7 +2080,7 @@ class MainActivity : ComponentActivity() {
                                                                 horizontal = 20.dp
                                                             )
                                                     ) {
-                                                        if (keyboard.value == false) {
+                                                        if (!keyboard.value) {
                                                             Box(
                                                                 modifier = Modifier
                                                                     .fillMaxWidth(),
@@ -2311,7 +2316,7 @@ class MainActivity : ComponentActivity() {
                                                             Image(
                                                                 painterResource(
                                                                     id =
-                                                                        if (keyboard.value == true)
+                                                                        if (keyboard.value)
                                                                             R.drawable.ic_reminder
                                                                         else
                                                                             R.drawable.ic_keyboard
