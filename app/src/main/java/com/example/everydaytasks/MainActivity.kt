@@ -263,6 +263,13 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf("Today")
                     }
 
+                    val showDialog3 = remember {
+                        mutableStateOf(false)
+                    }
+                    val selectedPriority = remember {
+                        mutableIntStateOf(0)
+                    }
+
                     if (sheet1State.value) {
                         ModalBottomSheet(
                             onDismissRequest = {
@@ -439,20 +446,51 @@ class MainActivity : ComponentActivity() {
                                                 )
                                                 Image(
                                                     painterResource(
-                                                        id = R.drawable.ic_priority
+                                                        id =
+                                                            if (selectedPriority.intValue == 0)
+                                                                R.drawable.ic_priority
+                                                            else
+                                                                R.drawable.ic_priority_number
                                                     ),
                                                     contentDescription = null,
                                                     Modifier
-                                                        .size(20.dp),
-                                                    contentScale = ContentScale.Crop
+                                                        .size(20.dp)
+                                                        .clickable {
+                                                            showDialog3.value = true
+                                                        },
+                                                    contentScale = ContentScale.Crop,
+                                                    colorFilter =
+                                                        if (selectedPriority.intValue == 0)
+                                                            null
+                                                        else ColorFilter.tint(
+                                                            when (selectedPriority.intValue) {
+                                                                1 -> Color.Red
+                                                                2 -> Color(0xFFFF9800)
+                                                                3 -> Color.Blue
+                                                                else -> Color.Gray
+                                                            }
+                                                        )
                                                 )
                                                 Spacer(
                                                     modifier = Modifier
                                                         .width(8.dp)
                                                 )
                                                 Text(
-                                                    text = "Priority",
-                                                    color = Color.White,
+                                                    text =
+                                                        when (selectedPriority.intValue) {
+                                                            1 -> "P1"
+                                                            2 -> "P2"
+                                                            3 -> "P3"
+                                                            4 -> "P4"
+                                                            else -> "Priority"
+                                                        },
+                                                    color =
+                                                        when (selectedPriority.intValue) {
+                                                            1 -> Color.Red
+                                                            2 -> Color(0xFFFF9800)
+                                                            3 -> Color.Blue
+                                                            else -> Color.White
+                                                        },
                                                     fontSize = 15.sp
                                                 )
                                                 Spacer(
@@ -625,6 +663,164 @@ class MainActivity : ComponentActivity() {
                                                             )
                                                     },
                                                 contentScale = ContentScale.Crop
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (showDialog3.value) {
+                            Popup(
+                                alignment = Alignment.Center,
+                                onDismissRequest = {
+                                    showDialog3.value = false
+                                },
+                                properties = PopupProperties(
+                                    focusable = true
+                                )
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .offset(y = 25.dp)
+                                        .width(400.dp)
+                                        .clip(
+                                            RoundedCornerShape(15.dp)
+                                        )
+                                        .background(
+                                            color = BottomMenuColor
+                                        )
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(
+                                                vertical = 15.dp,
+                                                horizontal = 20.dp
+                                            )
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .clickable {
+                                                    showDialog3.value = false
+                                                    selectedPriority.intValue = 1
+                                                },
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_priority_number
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(Color.Red)
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Priority 1",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(30.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .clickable {
+                                                    showDialog3.value = false
+                                                    selectedPriority.intValue = 2
+                                                },
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_priority_number
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(
+                                                    Color(0xFFFF9800)
+                                                )
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Priority 2",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(30.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .clickable {
+                                                    showDialog3.value = false
+                                                    selectedPriority.intValue = 3
+                                                },
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_priority_number
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(Color.Blue)
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Priority 3",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(30.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .clickable {
+                                                    showDialog3.value = false
+                                                    selectedPriority.intValue = 4
+                                                },
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_priority_number
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(Color.Gray)
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Priority 4",
+                                                fontSize = 20.sp,
+                                                color = Color.White
                                             )
                                         }
                                     }
