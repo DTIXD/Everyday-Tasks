@@ -269,6 +269,10 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf("Today")
                     }
 
+                    val selectedReminder = remember {
+                        mutableIntStateOf(0)
+                    }
+
                     val showDialog3 = remember {
                         mutableStateOf(false)
                     }
@@ -386,18 +390,18 @@ class MainActivity : ComponentActivity() {
                                             ) {
                                                 Spacer(
                                                     modifier = Modifier
-                                                        .width(10.dp)
+                                                        .width(width = 10.dp)
                                                 )
                                                 Image(
-                                                    painterResource(
+                                                    painter = painterResource(
                                                         id = R.drawable.ic_today
                                                     ),
                                                     contentDescription = null,
                                                     Modifier
-                                                        .size(20.dp),
+                                                        .size(size = 20.dp),
                                                     contentScale = ContentScale.Crop,
                                                     colorFilter = ColorFilter.tint(
-                                                        when (dateSelection.intValue) {
+                                                        color = when (dateSelection.intValue) {
                                                             1 -> TodayColor
                                                             2 -> TomorrowColor
                                                             3 -> Color.White
@@ -540,15 +544,35 @@ class MainActivity : ComponentActivity() {
                                                     contentDescription = null,
                                                     Modifier
                                                         .size(20.dp),
-                                                    contentScale = ContentScale.Crop
+                                                    contentScale = ContentScale.Crop,
+                                                    colorFilter = ColorFilter.tint(
+                                                        color = when (selectedReminder.intValue) {
+                                                            0 -> Color.White
+                                                            1 -> SelectedItemColor
+                                                            2 -> Color.Blue
+                                                            else -> Color.Green
+                                                        }
+                                                    )
                                                 )
                                                 Spacer(
                                                     modifier = Modifier
                                                         .width(8.dp)
                                                 )
                                                 Text(
-                                                    text = "Reminder",
-                                                    color = Color.White,
+                                                    text =
+                                                        when (selectedReminder.intValue) {
+                                                            0 -> "Reminder"
+                                                            1 -> "30 minutes"
+                                                            2 -> "Location"
+                                                            else -> "Time"
+                                                        },
+                                                    color =
+                                                        when (selectedReminder.intValue) {
+                                                            0 -> Color.White
+                                                            1 -> SelectedItemColor
+                                                            2 -> Color.Blue
+                                                            else -> Color.Green
+                                                        },
                                                     fontSize = 15.sp
                                                 )
                                                 Spacer(
@@ -2716,9 +2740,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                             ) {
-                                Column(
-
-                                ) {
+                                Column{
                                     Spacer(
                                         modifier = Modifier
                                             .height(height = 15.dp)
@@ -2812,22 +2834,29 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .padding(
                                                     horizontal = 15.dp
-                                                ),
+                                                )
+                                                .clickable {
+                                                    scope.launch {
+                                                        selectedReminder.intValue = 1
+                                                        sheet3State.value = false
+                                                        sheet1State.value = true
+                                                    }
+                                                },
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Image(
-                                                painterResource(
+                                                painter = painterResource(
                                                     id = R.drawable.ic_time_for_remind
                                                 ),
                                                 contentDescription = null,
                                                 Modifier
-                                                    .size(30.dp),
+                                                    .size(size = 30.dp),
                                                 contentScale = ContentScale.Crop,
                                                 colorFilter = ColorFilter.tint(SelectedItemColor)
                                             )
                                             Spacer(
                                                 modifier = Modifier
-                                                    .width(20.dp)
+                                                    .width(width = 20.dp)
                                             )
                                             Text(
                                                 text = "30 minutes before due time",
@@ -2843,22 +2872,29 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .padding(
                                                     horizontal = 15.dp
-                                                ),
+                                                )
+                                                .clickable {
+                                                    scope.launch {
+                                                        selectedReminder.intValue = 2
+                                                        sheet3State.value = false
+                                                        sheet1State.value = true
+                                                    }
+                                                },
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Image(
-                                                painterResource(
+                                                painter = painterResource(
                                                     id = R.drawable.ic_location
                                                 ),
                                                 contentDescription = null,
                                                 Modifier
-                                                    .size(30.dp),
+                                                    .size(size = 30.dp),
                                                 contentScale = ContentScale.Crop,
                                                 colorFilter = ColorFilter.tint(SelectedItemColor)
                                             )
                                             Spacer(
                                                 modifier = Modifier
-                                                    .width(20.dp)
+                                                    .width(width = 20.dp)
                                             )
                                             Text(
                                                 text = "Location",
@@ -2874,22 +2910,29 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .padding(
                                                     horizontal = 15.dp
-                                                ),
+                                                )
+                                                .clickable {
+                                                    scope.launch {
+                                                        selectedReminder.intValue = 3
+                                                        sheet3State.value = false
+                                                        sheet1State.value = true
+                                                    }
+                                                },
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Image(
-                                                painterResource(
+                                                painter = painterResource(
                                                     id = R.drawable.ic_reminder
                                                 ),
                                                 contentDescription = null,
                                                 Modifier
-                                                    .size(30.dp),
+                                                    .size(size = 30.dp),
                                                 contentScale = ContentScale.Crop,
                                                 colorFilter = ColorFilter.tint(SelectedItemColor)
                                             )
                                             Spacer(
                                                 modifier = Modifier
-                                                    .width(20.dp)
+                                                    .width(width = 20.dp)
                                             )
                                             Text(
                                                 text = "Time",
@@ -2897,6 +2940,47 @@ class MainActivity : ComponentActivity() {
                                                 color = Color.White
                                             )
                                         }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 15.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(1.dp)
+                                                .background(
+                                                    color = IntervalColor
+                                                )
+                                        ) {}
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 15.dp)
+                                        )
+                                        Row (
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                )
+                                                .clickable {
+                                                    scope.launch {
+                                                        selectedReminder.intValue = 0
+                                                        sheet3State.value = false
+                                                        sheet1State.value = true
+                                                    }
+                                                },
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Text(
+                                                text = "Cancel",
+                                                fontSize = 20.sp,
+                                                color = SelectedItemColor
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 15.dp)
+                                        )
                                     }
                                 }
                             }
