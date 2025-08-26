@@ -1817,14 +1817,15 @@ class MainActivity : ComponentActivity() {
                                                             .fillMaxWidth()
                                                             .clickable {
                                                                 repeatFlag.value = true
-                                                                repeatSelected.value = "Every week at ${
-                                                                    LocalDate.now().dayOfWeek
-                                                                        .name.take(3)
-                                                                        .lowercase()
-                                                                        .replaceFirstChar { c ->
-                                                                            c.uppercase()
-                                                                        }
-                                                                }"
+                                                                repeatSelected.value =
+                                                                    "Every week at ${
+                                                                        LocalDate.now().dayOfWeek
+                                                                            .name.take(3)
+                                                                            .lowercase()
+                                                                            .replaceFirstChar { c ->
+                                                                                c.uppercase()
+                                                                            }
+                                                                    }"
                                                                 showDialog1.value = false
                                                             }
                                                     ) {
@@ -1851,7 +1852,8 @@ class MainActivity : ComponentActivity() {
                                                             .fillMaxWidth()
                                                             .clickable {
                                                                 repeatFlag.value = true
-                                                                repeatSelected.value = "Every business day (Mon - Fri)"
+                                                                repeatSelected.value =
+                                                                    "Every business day (Mon - Fri)"
                                                                 showDialog1.value = false
                                                             }
                                                     ) {
@@ -1870,9 +1872,10 @@ class MainActivity : ComponentActivity() {
                                                             .fillMaxWidth()
                                                             .clickable {
                                                                 repeatFlag.value = true
-                                                                repeatSelected.value = "Every month at ${
-                                                                    LocalDate.now().dayOfMonth
-                                                                }"
+                                                                repeatSelected.value =
+                                                                    "Every month at ${
+                                                                        LocalDate.now().dayOfMonth
+                                                                    }"
                                                                 showDialog1.value = false
                                                             }
                                                     ) {
@@ -1894,16 +1897,17 @@ class MainActivity : ComponentActivity() {
                                                             .fillMaxWidth()
                                                             .clickable {
                                                                 repeatFlag.value = true
-                                                                repeatSelected.value = "Every year at ${
-                                                                    LocalDate.now().month
-                                                                        .name.take(3)
-                                                                        .lowercase()
-                                                                        .replaceFirstChar { c ->
-                                                                            c.uppercase()
-                                                                        }
-                                                                }. ${
-                                                                    LocalDate.now().dayOfMonth
-                                                                }"
+                                                                repeatSelected.value =
+                                                                    "Every year at ${
+                                                                        LocalDate.now().month
+                                                                            .name.take(3)
+                                                                            .lowercase()
+                                                                            .replaceFirstChar { c ->
+                                                                                c.uppercase()
+                                                                            }
+                                                                    }. ${
+                                                                        LocalDate.now().dayOfMonth
+                                                                    }"
                                                                 showDialog1.value = false
                                                             }
                                                     ) {
@@ -2712,17 +2716,18 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                             ) {
-                                Column (
-                                    modifier = Modifier
-                                        .padding(
-                                            horizontal = 15.dp
-                                        )
+                                Column(
+
                                 ) {
                                     Spacer(
                                         modifier = Modifier
                                             .height(height = 15.dp)
                                     )
                                     Text(
+                                        modifier = Modifier
+                                            .padding(
+                                                horizontal = 15.dp
+                                            ),
                                         text = "Reminders",
                                         fontSize = 25.sp,
                                         color = Color.White
@@ -2734,6 +2739,9 @@ class MainActivity : ComponentActivity() {
                                     if (!timeFlag.value) {
                                         Box(
                                             modifier = Modifier
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                )
                                                 .fillMaxWidth()
                                                 .clip(
                                                     shape = RoundedCornerShape(size = 10.dp)
@@ -2767,7 +2775,8 @@ class MainActivity : ComponentActivity() {
                                                         .width(width = 20.dp)
                                                 )
                                                 Text(
-                                                    text = "Add time in the first section in order to add reminders",
+                                                    text =
+                                                        "Add time in the first section in order to add reminders",
                                                     fontSize = 15.sp,
                                                     color = CaptionTextColor
                                                 )
@@ -2787,6 +2796,10 @@ class MainActivity : ComponentActivity() {
                                                 .height(height = 15.dp)
                                         )
                                         Text(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                ),
                                             text = "Recommendations",
                                             fontSize = 20.sp,
                                             color = Color.White
@@ -2795,6 +2808,33 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .height(height = 15.dp)
                                         )
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_time_for_remind
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(SelectedItemColor)
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(20.dp)
+                                            )
+                                            Text(
+                                                text = "30 minutes before due time",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
                                     }
                                 }
                             }
