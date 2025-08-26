@@ -123,6 +123,8 @@ import com.example.everydaytasks.ui.theme.TomorrowColor
 import com.example.everydaytasks.ui.theme.WarningBorderColor
 import com.example.everydaytasks.ui.theme.WarningColor
 import com.example.everydaytasks.ui.theme.WeekColor
+import com.example.everydaytasks.ui.theme.taskfunc.TaskFunctionsObject
+import com.example.everydaytasks.ui.theme.taskfunc.TaskFunctionsPage
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -230,6 +232,14 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<ReviewScreenDataObject> {
                             ReviewPage()
+                        }
+                        composable<TaskFunctionsObject> {
+                            TaskFunctionsPage(
+                                onNavigationToProgressPage = { navData ->
+                                    navController.navigate(navData)
+                                    isBottomMenuVisible.value = true
+                                }
+                            )
                         }
                     }
                     val newTask = remember {
@@ -599,7 +609,11 @@ class MainActivity : ComponentActivity() {
                                                         color = BorderColor
                                                     )
                                                     .clickable {
-
+                                                        navController.navigate(TaskFunctionsObject)
+                                                        scope.launch {
+                                                            sheet1State.value = false
+                                                            isBottomMenuVisible.value = false
+                                                        }
                                                     },
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
