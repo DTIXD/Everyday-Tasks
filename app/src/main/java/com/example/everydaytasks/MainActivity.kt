@@ -2835,6 +2835,68 @@ class MainActivity : ComponentActivity() {
                                                 color = Color.White
                                             )
                                         }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 15.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_location
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(SelectedItemColor)
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(20.dp)
+                                            )
+                                            Text(
+                                                text = "Location",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 15.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_reminder
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(SelectedItemColor)
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(20.dp)
+                                            )
+                                            Text(
+                                                text = "Time",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
                                     }
                                 }
                             }
