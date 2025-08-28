@@ -109,11 +109,15 @@ fun DatePage(
                 color = BGColor
             )
             .padding(
-                horizontal = 8.dp,
-                vertical = 12.dp
+                horizontal = 8.dp
             )
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .padding(
+                horizontal = 8.dp
+            )
+        ) {
             Text(
                 modifier = Modifier
                     .padding(
@@ -257,8 +261,11 @@ fun DatePage(
         }
 
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
+                .padding(
+                    horizontal = 8.dp
+                )
                 .offset(y = (-100).dp),
             contentAlignment = Alignment.BottomCenter
         ) {

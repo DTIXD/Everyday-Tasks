@@ -13,14 +13,15 @@ import androidx.compose.ui.unit.sp
 import com.example.everydaytasks.ui.theme.BGColor
 
 @Composable
-fun ReviewPage() {
+fun ReviewPage(
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(color = BGColor)
             .padding(
-                horizontal = 8.dp,
-                vertical = 12.dp
+                horizontal = 8.dp
             )
     ) {
         Text(

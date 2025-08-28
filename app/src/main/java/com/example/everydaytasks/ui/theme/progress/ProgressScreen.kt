@@ -41,7 +41,7 @@ import com.example.everydaytasks.ui.theme.IntervalColor
 import java.time.LocalDate
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(value = Build.VERSION_CODES.O)
 @Composable
 fun ProgressPage(
     modifier: Modifier = Modifier
@@ -49,11 +49,11 @@ fun ProgressPage(
     val fs = Firebase.firestore
     val list = remember {
         mutableStateOf(
-            emptyList<ProgressScreenDataObject>()
+            value = emptyList<ProgressScreenDataObject>()
         )
     }
 
-    fs.collection("tasks").addSnapshotListener{snapshot, exception ->
+    fs.collection("tasks").addSnapshotListener { snapshot, exception ->
         list.value = snapshot?.toObjects(
             ProgressScreenDataObject::class.java
         ) ?: emptyList()
@@ -69,12 +69,14 @@ fun ProgressPage(
             .background(
                 color = BGColor
             )
-            .padding(
-                horizontal = 8.dp,
-                vertical = 12.dp
-            )
+
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .padding(
+                    horizontal = 8.dp
+                )
+        ) {
             Text(
                 modifier = Modifier
                     .padding(
@@ -98,15 +100,15 @@ fun ProgressPage(
                     if (
                         list.value.count {
                             it.category == "Today" &&
-                            it.dayAdded == today.toString()
+                                    it.dayAdded == today.toString()
                         }
                         == 0
                     ) "You've done everything today"
                     else "${
                         list.value.count {
-                            it.category == "Today" && 
-                            it.dayAdded == today.toString()
-                        } 
+                            it.category == "Today" &&
+                                    it.dayAdded == today.toString()
+                        }
                     } ${
                         if (
                             list.value.count {
@@ -139,12 +141,11 @@ fun ProgressPage(
                 }
 
                 if (
-                    today.toString()
-                    > progressScreenDataObject.lastAdded
-                    && progressScreenDataObject.category
-                    == "EveryDay"
+                    (today.toString() > progressScreenDataObject.lastAdded
+                            && progressScreenDataObject.category
+                            == "EveryDay"
+                    )
                     && progressScreenDataObject.wasAdded
-                    == true
                 ) {
                     fs.collection("tasks")
                         .document(progressScreenDataObject.key)
@@ -191,6 +192,9 @@ fun ProgressPage(
                             Row(
                                 modifier = Modifier
                                     .padding(5.dp)
+                                    .padding(
+                                        horizontal = 8.dp
+                                    )
                             ) {
                                 Image(
                                     painterResource(
@@ -240,7 +244,10 @@ fun ProgressPage(
                             }
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .padding(
+                                        horizontal = 8.dp
+                                    ),
                                 horizontalArrangement = Arrangement.End
                             ) {
                                 IconButton(
@@ -262,12 +269,9 @@ fun ProgressPage(
                         }
                     }
                 } else if (
-                    progressScreenDataObject.lastAdded
-                    < today.toString()
-                    && progressScreenDataObject.wasAdded
-                    == false
-                    && progressScreenDataObject.category
-                    == "EveryDay"
+                    (progressScreenDataObject.lastAdded
+                            < today.toString()) && !progressScreenDataObject.wasAdded && (progressScreenDataObject.category
+                            == "EveryDay")
                 ) {
                     fs.collection("tasks")
                         .document(progressScreenDataObject.key).set(

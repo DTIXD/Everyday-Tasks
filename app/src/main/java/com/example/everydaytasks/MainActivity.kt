@@ -222,19 +222,43 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable<ProgressScreenDataObject> {
-                            ProgressPage()
+                            ProgressPage(
+                                modifier = Modifier
+                                    .padding(
+                                        innerPadding
+                                    )
+                            )
                         }
                         composable<DateScreenDataObject> {
-                            DatePage()
+                            DatePage(
+                                modifier = Modifier
+                                    .padding(
+                                    innerPadding
+                                    )
+                            )
                         }
                         composable<SearchScreenDataObject> {
-                            SearchPage()
+                            SearchPage(
+                                modifier = Modifier
+                                    .padding(
+                                        innerPadding
+                                    )
+                            )
                         }
                         composable<ReviewScreenDataObject> {
-                            ReviewPage()
+                            ReviewPage(
+                                modifier = Modifier
+                                    .padding(
+                                        innerPadding
+                                    )
+                            )
                         }
                         composable<TaskFunctionsObject> {
                             TaskFunctionsPage(
+                                modifier = Modifier
+                                    .padding(
+                                        innerPadding
+                                    ),
                                 onNavigationToProgressPage = { navData ->
                                     navController.navigate(navData)
                                     isBottomMenuVisible.value = true
@@ -272,6 +296,7 @@ class MainActivity : ComponentActivity() {
                     val filters = listOf(
                         "Today"
                     )
+
                     val dateSelection = remember {
                         mutableIntStateOf(1)
                     }
