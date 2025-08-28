@@ -311,6 +311,10 @@ class MainActivity : ComponentActivity() {
                     val showDialog3 = remember {
                         mutableStateOf(false)
                     }
+                    val showDialog4 = remember {
+                        mutableStateOf(false)
+                    }
+
                     val selectedPriority = remember {
                         mutableIntStateOf(0)
                     }
@@ -341,36 +345,6 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                 ) {
-                                    if (addForToday.value) {
-                                        TextField(
-                                            value = dayAdding.value,
-                                            onValueChange = {
-                                                dayAdding.value = it
-                                            },
-                                            shape = RoundedCornerShape(7.dp),
-                                            colors = TextFieldDefaults.colors(
-                                                unfocusedTextColor = Color.White,
-                                                focusedTextColor = Color.White,
-                                                unfocusedContainerColor = BGColor,
-                                                focusedContainerColor = BGColor,
-                                                unfocusedIndicatorColor = Color.Transparent,
-                                                focusedIndicatorColor = Color.Transparent,
-                                            ),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(50.dp),
-                                            label = {
-                                                Text(
-                                                    text = "YYYY-DD-MM",
-                                                    color = CaptionTextColor
-                                                )
-                                            }
-                                        )
-                                    }
-                                    Spacer(
-                                        modifier = Modifier
-                                            .height(20.dp)
-                                    )
                                     TextField(
                                         value = newTask.value,
                                         onValueChange = {
@@ -634,11 +608,7 @@ class MainActivity : ComponentActivity() {
                                                         color = BorderColor
                                                     )
                                                     .clickable {
-                                                        navController.navigate(TaskFunctionsObject)
-                                                        scope.launch {
-                                                            sheet1State.value = false
-                                                            isBottomMenuVisible.value = false
-                                                        }
+                                                        showDialog4.value = true
                                                     },
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
@@ -676,25 +646,6 @@ class MainActivity : ComponentActivity() {
                                             .padding(5.dp),
                                         horizontalArrangement = Arrangement.End
                                     ) {
-                                        Image(
-                                            painterResource(
-                                                id = if (addForToday.value) R.drawable.completed
-                                                else R.drawable.notcompleted
-                                            ),
-                                            contentDescription = null,
-                                            Modifier
-                                                .padding(5.dp)
-                                                .size(30.dp)
-                                                .clickable {
-                                                    addForToday.value =
-                                                        !addForToday.value
-                                                },
-                                            contentScale = ContentScale.Crop
-                                        )
-                                        Spacer(
-                                            modifier = Modifier
-                                                .width(5.dp)
-                                        )
                                         Box(
                                             modifier = Modifier
                                                 .width(50.dp)
@@ -752,7 +703,9 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .offset(y = 25.dp)
+                                        .padding(
+                                            top = 100.dp
+                                        )
                                         .width(400.dp)
                                         .clip(
                                             RoundedCornerShape(15.dp)
@@ -760,6 +713,12 @@ class MainActivity : ComponentActivity() {
                                         .background(
                                             color = BottomMenuColor
                                         )
+                                        .border(
+                                            width = 2.dp,
+                                            color = IntervalColor,
+                                            shape = RoundedCornerShape(15.dp)
+                                        )
+
                                 ) {
                                     Column(
                                         modifier = Modifier
@@ -894,6 +853,151 @@ class MainActivity : ComponentActivity() {
                                                 color = Color.White
                                             )
                                         }
+                                    }
+                                }
+                            }
+                        }
+                        if (showDialog4.value) {
+                            Popup(
+                                alignment = Alignment.Center,
+                                onDismissRequest = {
+                                    showDialog4.value = false
+                                },
+                                properties = PopupProperties(
+                                    focusable = true
+                                )
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(
+                                            top = 500.dp
+                                        )
+                                        .width(300.dp)
+                                        .background(
+                                            color = BGColor
+                                        )
+                                        .clip(
+                                            RoundedCornerShape(10.dp)
+                                        )
+                                        .border(
+                                            width = 2.dp,
+                                            color = IntervalColor,
+                                            shape = RoundedCornerShape(10.dp)
+                                        )
+                                ) {
+                                    Column {
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(15.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_location
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Location",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(25.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.ic_deadline
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(
+                                                    Color.White
+                                                )
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Deadline",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(15.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(1.dp)
+                                                .background(
+                                                    color = IntervalColor
+                                                )
+                                        ) {}
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(15.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painterResource(
+                                                    id = R.drawable.edit
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(
+                                                    Color.White
+                                                )
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(15.dp)
+                                            )
+                                            Text(
+                                                text = "Edit task actions",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(15.dp)
+                                        )
                                     }
                                 }
                             }
@@ -3033,3 +3137,9 @@ class MainActivity : ComponentActivity() {
 
     }
 }
+
+// navController.navigate(TaskFunctionsObject)
+//                                                        scope.launch {
+//                                                            sheet1State.value = false
+//                                                            isBottomMenuVisible.value = false
+//                                                        }
