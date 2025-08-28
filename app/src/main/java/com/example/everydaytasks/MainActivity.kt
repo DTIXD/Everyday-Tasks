@@ -969,7 +969,15 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .padding(
                                                     horizontal = 15.dp
-                                                ),
+                                                )
+                                                .clickable {
+                                                    navController.navigate(TaskFunctionsObject)
+                                                    scope.launch {
+                                                        sheet1State.value = false
+                                                        showDialog4.value = false
+                                                        isBottomMenuVisible.value = false
+                                                    }
+                                                },
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Image(
@@ -3137,9 +3145,3 @@ class MainActivity : ComponentActivity() {
 
     }
 }
-
-// navController.navigate(TaskFunctionsObject)
-//                                                        scope.launch {
-//                                                            sheet1State.value = false
-//                                                            isBottomMenuVisible.value = false
-//                                                        }
