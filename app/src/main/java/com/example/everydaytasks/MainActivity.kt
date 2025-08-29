@@ -715,7 +715,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                         .border(
                                             width = 2.dp,
-                                            color = IntervalColor,
+                                            color = BorderColor,
                                             shape = RoundedCornerShape(15.dp)
                                         )
 
@@ -881,7 +881,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                         .border(
                                             width = 2.dp,
-                                            color = IntervalColor,
+                                            color = BorderColor,
                                             shape = RoundedCornerShape(10.dp)
                                         )
                                 ) {
@@ -1950,7 +1950,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                     .border(
                                                         width = 2.dp,
-                                                        color = IntervalColor,
+                                                        color = BorderColor,
                                                         shape = RoundedCornerShape(10.dp)
                                                     )
                                                     .background(
@@ -2206,7 +2206,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                     .border(
                                                         width = 2.dp,
-                                                        color = IntervalColor,
+                                                        color = BorderColor,
                                                         shape = RoundedCornerShape(10.dp)
                                                     )
                                                     .background(

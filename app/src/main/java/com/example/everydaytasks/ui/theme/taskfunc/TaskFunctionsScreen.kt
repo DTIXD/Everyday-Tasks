@@ -2,13 +2,13 @@ package com.example.everydaytasks.ui.theme.taskfunc
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,10 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.everydaytasks.R
 import com.example.everydaytasks.ui.theme.BGColor
+import com.example.everydaytasks.ui.theme.BorderColor
 import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.ButtonBGColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
@@ -232,10 +236,13 @@ fun TaskFunctionsPage(
             val selectedActions = remember {
                 mutableStateListOf<String>()
             }
+            if (selectedActions.isEmpty())
+                selectedActions.add("...")
+
             Text(
                 modifier = Modifier
                     .padding(
-                        horizontal = 25.dp
+                        horizontal = 35.dp
                     ),
                 text = "Preview",
                 fontSize = 20.sp,
@@ -249,28 +256,73 @@ fun TaskFunctionsPage(
                 modifier = Modifier
                     .padding(
                         horizontal = 25.dp
-                    ),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp)
+                    )
             ) {
                 items(selectedActions) { label ->
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .height(40.dp)
-                            .clip(
-                                RoundedCornerShape(20.dp)
-                            )
                             .background(
-                                Color(0xFFE0E0E0)
+                                color = BGColor
                             )
-                            .padding(
-                                horizontal = 16.dp
+                            .padding(10.dp)
+                            .clip(
+                                RoundedCornerShape(10.dp)
+                            )
+                            .border(
+                                1.dp,
+                                shape = RoundedCornerShape(10.dp),
+                                color = BorderColor
                             ),
-                        contentAlignment = Alignment.Center
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Spacer(
+                            modifier = Modifier
+                                .width(width = 10.dp)
+                        )
+                        Image(
+                            painter = painterResource(
+                                id =
+                                    when (label) {
+                                        "Date" -> R.drawable.ic_today
+                                        "Priority" -> R.drawable.ic_priority
+                                        "Reminder" -> R.drawable.ic_reminder
+                                        "Executor" -> R.drawable.ic_executor
+                                        "Tags" -> R.drawable.ic_tags
+                                        "Deadline" -> R.drawable.ic_deadline
+                                        "..." -> R.drawable.three_dots
+                                        else -> R.drawable.ic_location
+                                    }
+                            ),
+                            contentDescription = null,
+                            Modifier
+                                .size(size = 20.dp),
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(
+                                color = Color.White
+                            )
+                        )
+                        if (label != "...") {
+                            Spacer(
+                                modifier = Modifier
+                                    .width(8.dp)
+                            )
+                        }
                         Text(
-                            text = label,
-                            fontWeight = FontWeight.Medium
+                            text =
+                                if (label != "...")
+                                    label
+                                else
+                                    "",
+                            color = Color.White,
+                            fontSize = 15.sp
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(10.dp)
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .height(40.dp)
                         )
                     }
                 }
@@ -338,7 +390,11 @@ fun TaskFunctionsPage(
                                     element = label
                                 )
                             } else {
+                                selectedActions.remove(
+                                    element = "..."
+                                )
                                 selectedActions.add(label)
+                                selectedActions.add("...")
                             }
                         }
                         .padding(vertical = 8.dp)
