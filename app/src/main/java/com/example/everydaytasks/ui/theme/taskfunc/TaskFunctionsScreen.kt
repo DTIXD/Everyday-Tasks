@@ -26,6 +26,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -39,8 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.everydaytasks.R
 import com.example.everydaytasks.ui.theme.AddActionsColor
 import com.example.everydaytasks.ui.theme.BGColor
@@ -78,7 +78,7 @@ fun TaskFunctionsPage(
                 Icon(
                     modifier = Modifier
                         .padding(
-                            top = 25.dp,
+                            top = 5.dp,
                             bottom = 5.dp,
                             start = 5.dp,
                             end = 5.dp
@@ -94,12 +94,12 @@ fun TaskFunctionsPage(
                 )
                 Spacer(
                     modifier = Modifier
-                        .width(30.dp)
+                        .width(25.dp)
                 )
                 Text(
                     modifier = Modifier
                         .padding(
-                            top = 25.dp,
+                            top = 5.dp,
                             bottom = 5.dp,
                             start = 5.dp,
                             end = 5.dp
@@ -111,7 +111,7 @@ fun TaskFunctionsPage(
             }
             Spacer(
                 modifier = Modifier
-                    .height(35.dp)
+                    .height(30.dp)
             )
             var isOn by remember {
                 mutableStateOf(true)
@@ -129,7 +129,7 @@ fun TaskFunctionsPage(
                 ) {
                     Text(
                         text = "Show names of actions",
-                        fontSize = 25.sp,
+                        fontSize = 20.sp,
                         color = Color.White
                     )
                     Spacer(
@@ -142,7 +142,7 @@ fun TaskFunctionsPage(
                                 "All actions text are shown"
                             else
                                 "All actions text are hidden",
-                        fontSize = 15.sp,
+                        fontSize = 10.sp,
                         color = CaptionTextColor
                     )
                 }
@@ -153,30 +153,30 @@ fun TaskFunctionsPage(
                 ) {
                     val offset by animateDpAsState(
                         targetValue =
-                            if (isOn) 40.dp
-                            else 5.dp,
+                            if (isOn) 15.dp
+                            else 3.dp,
                         animationSpec = tween(durationMillis = 250),
                         label = ""
                     )
 
                     val knobSize by animateDpAsState(
                         targetValue =
-                            if (isOn) 32.dp
-                            else 24.dp,
+                            if (isOn) 16.dp
+                            else 12.dp,
                         animationSpec = tween(durationMillis = 250),
                         label = ""
                     )
 
                     val borderWidth by animateDpAsState(
-                        targetValue = if (isOn) 0.dp else 4.dp,
+                        targetValue = if (isOn) 0.dp else 2.dp,
                         animationSpec = tween(durationMillis = 250),
                         label = ""
                     )
 
                     Box(
                         modifier = Modifier
-                            .width(80.dp)
-                            .height(40.dp)
+                            .width(40.dp)
+                            .height(25.dp)
                             .clip(
                                 RoundedCornerShape(20.dp)
                             )
@@ -243,10 +243,10 @@ fun TaskFunctionsPage(
             Text(
                 modifier = Modifier
                     .padding(
-                        horizontal = 35.dp
+                        horizontal = 38.dp
                     ),
                 text = "Preview",
-                fontSize = 20.sp,
+                fontSize = 15.sp,
                 color = Color.White
             )
             Spacer(
@@ -258,6 +258,7 @@ fun TaskFunctionsPage(
                     .padding(
                         horizontal = 25.dp
                     )
+                    .offset(y = (-2).dp)
             ) {
                 items(selectedActions) { label ->
                     Row(
@@ -354,7 +355,7 @@ fun TaskFunctionsPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = 15.dp
+                        horizontal = 18.dp
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -363,7 +364,7 @@ fun TaskFunctionsPage(
                 ) {
                     Text(
                         text = "Order of actions in the task",
-                        fontSize = 20.sp,
+                        fontSize = 15.sp,
                         color = Color.White
                     )
                 }
@@ -401,7 +402,7 @@ fun TaskFunctionsPage(
                         text =
                             if (all.value) "Show all"
                             else "Hide all",
-                        fontSize = 20.sp,
+                        fontSize = 15.sp,
                         color = SelectedItemColor
                     )
                 }
@@ -412,95 +413,158 @@ fun TaskFunctionsPage(
                         25.dp
                     )
             )
-            actionsList.forEach { label ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            vertical = 8.dp,
-                            horizontal = 20.dp
-                        ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(
-                            id =
-                                if (label in selectedActions)
-                                    R.drawable.ic_remove_action
-                                else
-                                    R.drawable.ic_add_action
-                        ),
-                        contentDescription = null,
-                        Modifier
-                            .size(size = 30.dp)
-                            .clickable {
-                                if (label in selectedActions) {
+            selectedActions.forEach { label ->
+                if (label != "...") {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                vertical = 8.dp,
+                                horizontal = 20.dp
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(
+                                id = R.drawable.ic_remove_action
+                            ),
+                            contentDescription = null,
+                            Modifier
+                                .size(size = 30.dp)
+                                .clickable {
                                     selectedActions.remove(
                                         element = label
                                     )
-                                } else {
-                                    selectedActions.remove(
-                                        element = "..."
-                                    )
-                                    selectedActions.add(label)
-                                    selectedActions.add("...")
-                                }
-                            },
-                        contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.tint(
-                            color =
-                                if (label !in selectedActions)
-                                    AddActionsColor
-                                else
-                                    SelectedItemColor
+                                },
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(
+                                color = SelectedItemColor
+                            )
                         )
-                    )
-                    Spacer(
-                        modifier = Modifier
-                            .width(20.dp)
-                    )
-                    Image(
-                        painter = painterResource(
-                            id =
-                                when (label) {
-                                    "Date" -> R.drawable.ic_today
-                                    "Priority" -> R.drawable.ic_priority
-                                    "Reminder" -> R.drawable.ic_reminder
-                                    "Executor" -> R.drawable.ic_executor
-                                    "Tags" -> R.drawable.ic_tags
-                                    "Deadline" -> R.drawable.ic_deadline
-                                    "..." -> R.drawable.three_dots
-                                    else -> R.drawable.ic_location
-                                }
-                        ),
-                        contentDescription = null,
-                        Modifier
-                            .size(size = 30.dp),
-                        contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.tint(
+                        Spacer(
+                            modifier = Modifier
+                                .width(20.dp)
+                        )
+                        Image(
+                            painter = painterResource(
+                                id =
+                                    when (label) {
+                                        "Date" -> R.drawable.ic_today
+                                        "Priority" -> R.drawable.ic_priority
+                                        "Reminder" -> R.drawable.ic_reminder
+                                        "Executor" -> R.drawable.ic_executor
+                                        "Tags" -> R.drawable.ic_tags
+                                        "Deadline" -> R.drawable.ic_deadline
+                                        else -> R.drawable.ic_location
+                                    }
+                            ),
+                            contentDescription = null,
+                            Modifier
+                                .size(size = 20.dp),
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(
+                                color = Color.White
+                            )
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(22.dp)
+                        )
+                        Text(
+                            text = label,
+                            fontSize = 20.sp,
                             color = Color.White
                         )
-                    )
-                    Spacer(
-                        modifier = Modifier
-                            .width(20.dp)
-                    )
-                    Text(
-                        text = label,
-                        fontSize = 25.sp,
-                        color = Color.White
-                    )
+                    }
                 }
             }
             Spacer(
                 modifier = Modifier
                     .height(25.dp)
             )
-            Text(
-                text = "Actions available",
-                fontSize = 20.sp,
-                color = Color.White
-            )
+            val notSelectedActions =
+                actionsList.filterNot {
+                    it in selectedActions
+                }
+
+            if (notSelectedActions.isNotEmpty()) {
+                Text(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 18.dp
+                        ),
+                    text = "Actions available",
+                    fontSize = 15.sp,
+                    color = Color.White
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(25.dp)
+                )
+                notSelectedActions.forEach { label ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                vertical = 8.dp,
+                                horizontal = 20.dp
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(
+                                id = R.drawable.ic_add_action
+                            ),
+                            contentDescription = null,
+                            Modifier
+                                .size(size = 30.dp)
+                                .clickable {
+                                    selectedActions.add(
+                                        element = label
+                                    )
+                                },
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(
+                                color = AddActionsColor
+                            )
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(20.dp)
+                        )
+                        Image(
+                            painter = painterResource(
+                                id =
+                                    when (label) {
+                                        "Date" -> R.drawable.ic_today
+                                        "Priority" -> R.drawable.ic_priority
+                                        "Reminder" -> R.drawable.ic_reminder
+                                        "Executor" -> R.drawable.ic_executor
+                                        "Tags" -> R.drawable.ic_tags
+                                        "Deadline" -> R.drawable.ic_deadline
+                                        else -> R.drawable.ic_location
+                                    }
+                            ),
+                            contentDescription = null,
+                            Modifier
+                                .size(size = 20.dp),
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(
+                                color = Color.White
+                            )
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(22.dp)
+                        )
+                        Text(
+                            text = label,
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
         }
     }
 }
