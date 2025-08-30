@@ -42,13 +42,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.everydaytasks.R
+import com.example.everydaytasks.ui.theme.AddActionsColor
 import com.example.everydaytasks.ui.theme.BGColor
 import com.example.everydaytasks.ui.theme.BorderColor
 import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.ButtonBGColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
-import com.example.everydaytasks.ui.theme.Purple40
 import com.example.everydaytasks.ui.theme.SelectedItemColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
 
@@ -329,7 +329,7 @@ fun TaskFunctionsPage(
             }
             Spacer(
                 modifier = Modifier
-                    .height(50.dp)
+                    .height(40.dp)
             )
             Row(
                 modifier = Modifier
@@ -347,14 +347,14 @@ fun TaskFunctionsPage(
             Spacer(
                 modifier = Modifier
                     .height(
-                        15.dp
+                        20.dp
                     )
             )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = 12.dp
+                        horizontal = 15.dp
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -422,21 +422,17 @@ fun TaskFunctionsPage(
                         ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(
-                                CircleShape
-                            )
-                            .background(
-                                color =
-                                    if (label in selectedActions)
-                                        SelectedItemColor
-                                    else
-                                        Purple40
-                            )
-                            .size(
-                                31.dp
-                            )
+                    Image(
+                        painter = painterResource(
+                            id =
+                                if (label in selectedActions)
+                                    R.drawable.ic_remove_action
+                                else
+                                    R.drawable.ic_add_action
+                        ),
+                        contentDescription = null,
+                        Modifier
+                            .size(size = 30.dp)
                             .clickable {
                                 if (label in selectedActions) {
                                     selectedActions.remove(
@@ -450,23 +446,18 @@ fun TaskFunctionsPage(
                                     selectedActions.add("...")
                                 }
                             },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .offset(y = (-1).dp),
-                            text =
-                                if (label in selectedActions)
-                                    "-"
+                        contentScale = ContentScale.Crop,
+                        colorFilter = ColorFilter.tint(
+                            color =
+                                if (label !in selectedActions)
+                                    AddActionsColor
                                 else
-                                    "+",
-                            fontSize = 20.sp,
-                            color = Color.White
+                                    SelectedItemColor
                         )
-                    }
+                    )
                     Spacer(
                         modifier = Modifier
-                            .width(15.dp)
+                            .width(20.dp)
                     )
                     Image(
                         painter = painterResource(
@@ -492,7 +483,7 @@ fun TaskFunctionsPage(
                     )
                     Spacer(
                         modifier = Modifier
-                            .width(15.dp)
+                            .width(20.dp)
                     )
                     Text(
                         text = label,
@@ -501,6 +492,15 @@ fun TaskFunctionsPage(
                     )
                 }
             }
+            Spacer(
+                modifier = Modifier
+                    .height(25.dp)
+            )
+            Text(
+                text = "Actions available",
+                fontSize = 20.sp,
+                color = Color.White
+            )
         }
     }
 }
