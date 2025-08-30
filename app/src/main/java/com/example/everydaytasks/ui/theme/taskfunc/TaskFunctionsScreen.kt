@@ -48,6 +48,7 @@ import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.ButtonBGColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
+import com.example.everydaytasks.ui.theme.Purple40
 import com.example.everydaytasks.ui.theme.SelectedItemColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
 
@@ -113,7 +114,7 @@ fun TaskFunctionsPage(
                     .height(35.dp)
             )
             var isOn by remember {
-                mutableStateOf(false)
+                mutableStateOf(true)
             }
             Row(
                 modifier = Modifier
@@ -301,21 +302,20 @@ fun TaskFunctionsPage(
                                 color = Color.White
                             )
                         )
-                        if (label != "...") {
+                        if (
+                            label != "..."
+                            && isOn
+                        ) {
                             Spacer(
                                 modifier = Modifier
                                     .width(8.dp)
                             )
+                            Text(
+                                text = label,
+                                color = Color.White,
+                                fontSize = 15.sp
+                            )
                         }
-                        Text(
-                            text =
-                                if (label != "...")
-                                    label
-                                else
-                                    "",
-                            color = Color.White,
-                            fontSize = 15.sp
-                        )
                         Spacer(
                             modifier = Modifier
                                 .width(10.dp)
@@ -329,7 +329,7 @@ fun TaskFunctionsPage(
             }
             Spacer(
                 modifier = Modifier
-                    .height(65.dp)
+                    .height(50.dp)
             )
             Row(
                 modifier = Modifier
@@ -339,6 +339,11 @@ fun TaskFunctionsPage(
                         color = IntervalColor
                     )
             ) {}
+
+            val all = remember{
+                mutableStateOf(true)
+            }
+
             Spacer(
                 modifier = Modifier
                     .height(
@@ -364,11 +369,38 @@ fun TaskFunctionsPage(
                 }
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .clickable {
+                            if (all.value) {
+                                selectedActions.remove(
+                                    element = "..."
+                                )
+                                actionsList.forEach { label ->
+                                    if (label !in selectedActions) {
+                                        selectedActions.add(label)
+                                    }
+                                }
+                                selectedActions.add("...")
+                            } else {
+                                actionsList.forEach { label ->
+                                    if (
+                                        label in selectedActions
+                                        && label != "..."
+                                    ) {
+                                        selectedActions.remove(
+                                            element = label
+                                        )
+                                    }
+                                }
+                            }
+                            all.value = !all.value
+                        },
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(
-                        text = "Show all",
+                        text =
+                            if (all.value) "Show all"
+                            else "Hide all",
                         fontSize = 20.sp,
                         color = SelectedItemColor
                     )
@@ -384,29 +416,88 @@ fun TaskFunctionsPage(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            if (label in selectedActions) {
-                                selectedActions.remove(
-                                    element = label
-                                )
-                            } else {
-                                selectedActions.remove(
-                                    element = "..."
-                                )
-                                selectedActions.add(label)
-                                selectedActions.add("...")
-                            }
-                        }
-                        .padding(vertical = 8.dp)
+                        .padding(
+                            vertical = 8.dp,
+                            horizontal = 20.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(
+                                CircleShape
+                            )
+                            .background(
+                                color =
+                                    if (label in selectedActions)
+                                        SelectedItemColor
+                                    else
+                                        Purple40
+                            )
+                            .size(
+                                31.dp
+                            )
+                            .clickable {
+                                if (label in selectedActions) {
+                                    selectedActions.remove(
+                                        element = label
+                                    )
+                                } else {
+                                    selectedActions.remove(
+                                        element = "..."
+                                    )
+                                    selectedActions.add(label)
+                                    selectedActions.add("...")
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .offset(y = (-1).dp),
+                            text =
+                                if (label in selectedActions)
+                                    "-"
+                                else
+                                    "+",
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .width(15.dp)
+                    )
+                    Image(
+                        painter = painterResource(
+                            id =
+                                when (label) {
+                                    "Date" -> R.drawable.ic_today
+                                    "Priority" -> R.drawable.ic_priority
+                                    "Reminder" -> R.drawable.ic_reminder
+                                    "Executor" -> R.drawable.ic_executor
+                                    "Tags" -> R.drawable.ic_tags
+                                    "Deadline" -> R.drawable.ic_deadline
+                                    "..." -> R.drawable.three_dots
+                                    else -> R.drawable.ic_location
+                                }
+                        ),
+                        contentDescription = null,
+                        Modifier
+                            .size(size = 30.dp),
+                        contentScale = ContentScale.Crop,
+                        colorFilter = ColorFilter.tint(
+                            color = Color.White
+                        )
+                    )
+                    Spacer(
+                        modifier = Modifier
+                            .width(15.dp)
+                    )
                     Text(
                         text = label,
-                        fontSize = 20.sp,
-                        color =
-                            if (label in selectedActions)
-                                Color.Cyan
-                            else
-                                Color.White
+                        fontSize = 25.sp,
+                        color = Color.White
                     )
                 }
             }
