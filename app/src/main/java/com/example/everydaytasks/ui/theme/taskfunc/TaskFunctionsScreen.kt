@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,15 +32,19 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import com.example.everydaytasks.R
 import com.example.everydaytasks.ui.theme.AddActionsColor
@@ -237,8 +242,22 @@ fun TaskFunctionsPage(
             val selectedActions = remember {
                 mutableStateListOf<String>()
             }
+            val notSelectedActions = remember {
+                actionsList.toMutableStateList()
+            }
+
             if (selectedActions.isEmpty())
                 selectedActions.add("...")
+
+            var draggedItem by remember {
+                mutableStateOf<String?>(null)
+            }
+            val itemOffsets = remember {
+                mutableStateMapOf<String, Float>()
+            }
+
+            val density = LocalDensity.current
+            val dragThresholdPx = with(density) { 30.dp.toPx() }
 
             Text(
                 modifier = Modifier
@@ -379,6 +398,7 @@ fun TaskFunctionsPage(
                                 actionsList.forEach { label ->
                                     if (label !in selectedActions) {
                                         selectedActions.add(label)
+                                        notSelectedActions.remove(label)
                                     }
                                 }
                                 selectedActions.add("...")
@@ -391,6 +411,7 @@ fun TaskFunctionsPage(
                                         selectedActions.remove(
                                             element = label
                                         )
+                                        notSelectedActions.add(label)
                                     }
                                 }
                             }
@@ -415,13 +436,46 @@ fun TaskFunctionsPage(
             )
             selectedActions.forEach { label ->
                 if (label != "...") {
+                    val offset = itemOffsets.getOrDefault(
+                        label, 0f
+                    )
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
                                 vertical = 8.dp,
                                 horizontal = 20.dp
-                            ),
+                            )
+                            .offset(y = offset.dp)
+                            .pointerInput(label) {
+                                detectDragGestures(
+                                    onDragStart = {
+                                        draggedItem = label
+                                                  },
+                                    onDrag = { change, dragAmount ->
+                                        change.consume()
+                                        val newOffset = itemOffsets.getOrDefault(
+                                            label, 0f
+                                        ) + (dragAmount.y * .5f)
+                                        itemOffsets[label] = newOffset
+                                    },
+                                    onDragEnd = {
+                                        draggedItem?.let {
+                                            val finalOffset = itemOffsets.getOrDefault(label, 0f)
+                                            if (finalOffset < -dragThresholdPx) {
+                                                notSelectedActions.remove(it)
+                                                selectedActions.add(it)
+                                            } else if (finalOffset > dragThresholdPx) {
+                                                selectedActions.remove(it)
+                                                notSelectedActions.add(it)
+                                            }
+                                            itemOffsets[label] = 0f
+                                            draggedItem = null
+                                        }
+                                    },
+                                    onDragCancel = { itemOffsets[label] = 0f; draggedItem = null }
+                                )
+                            },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
@@ -433,6 +487,9 @@ fun TaskFunctionsPage(
                                 .size(size = 30.dp)
                                 .clickable {
                                     selectedActions.remove(
+                                        element = label
+                                    )
+                                    notSelectedActions.add(
                                         element = label
                                     )
                                 },
@@ -482,33 +539,56 @@ fun TaskFunctionsPage(
                 modifier = Modifier
                     .height(25.dp)
             )
-            val notSelectedActions =
-                actionsList.filterNot {
-                    it in selectedActions
-                }
-
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 18.dp
+                    ),
+                text = "Actions available",
+                fontSize = 15.sp,
+                color = Color.White
+            )
+            Spacer(
+                modifier = Modifier
+                    .height(25.dp)
+            )
             if (notSelectedActions.isNotEmpty()) {
-                Text(
-                    modifier = Modifier
-                        .padding(
-                            horizontal = 18.dp
-                        ),
-                    text = "Actions available",
-                    fontSize = 15.sp,
-                    color = Color.White
-                )
-                Spacer(
-                    modifier = Modifier
-                        .height(25.dp)
-                )
                 notSelectedActions.forEach { label ->
+                    val offset = itemOffsets.getOrDefault(label, 0f)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
                                 vertical = 8.dp,
                                 horizontal = 20.dp
-                            ),
+                            )
+                            .offset(y = offset.dp)
+                            .pointerInput(label) {
+                                detectDragGestures(
+                                    onDragStart = { draggedItem = label },
+                                    onDrag = { change, dragAmount ->
+                                        change.consume()
+                                        val newOffset = itemOffsets.getOrDefault(label, 0f) + (dragAmount.y * .5f)
+                                        itemOffsets[label] = newOffset
+                                    },
+                                    onDragEnd = {
+                                        draggedItem?.let {
+                                            val finalOffset = itemOffsets.getOrDefault(label, 0f)
+                                            if (finalOffset < -dragThresholdPx) {
+                                                notSelectedActions.remove(it)
+                                                selectedActions.add(it)
+                                            } else if (finalOffset > dragThresholdPx) {
+                                                selectedActions.remove(it)
+                                                notSelectedActions.add(it)
+                                            }
+                                            itemOffsets[label] = 0f
+                                            draggedItem = null
+                                        }
+                                    },
+                                    onDragCancel = { itemOffsets[label] = 0f; draggedItem = null }
+                                )
+                            },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
@@ -519,9 +599,16 @@ fun TaskFunctionsPage(
                             Modifier
                                 .size(size = 30.dp)
                                 .clickable {
+                                    selectedActions.remove(
+                                        element = "..."
+                                    )
+                                    notSelectedActions.remove(
+                                        element = label
+                                    )
                                     selectedActions.add(
                                         element = label
                                     )
+                                    selectedActions.add("...")
                                 },
                             contentScale = ContentScale.Crop,
                             colorFilter = ColorFilter.tint(
