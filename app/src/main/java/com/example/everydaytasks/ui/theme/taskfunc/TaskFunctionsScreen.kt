@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,8 +45,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.zIndex
 import com.example.everydaytasks.R
 import com.example.everydaytasks.ui.theme.AddActionsColor
 import com.example.everydaytasks.ui.theme.BGColor
@@ -239,26 +243,18 @@ fun TaskFunctionsPage(
                 "Deadline",
                 "Location",
             )
-            val selectedActions = remember {
-                mutableStateListOf<String>()
-            }
-            val notSelectedActions = remember {
-                actionsList.toMutableStateList()
-            }
+            val selectedActions = remember { mutableStateListOf<String>() }
+            val notSelectedActions = remember { actionsList.toMutableStateList() }
 
             if (selectedActions.isEmpty())
                 selectedActions.add("...")
+            val draggedItem = remember { mutableStateOf<String?>(null) }
+            val itemOffsets = remember { mutableStateMapOf<String, Float>() }
 
-            var draggedItem by remember {
-                mutableStateOf<String?>(null)
-            }
-            val itemOffsets = remember {
-                mutableStateMapOf<String, Float>()
-            }
+            val itemStartY = remember { mutableStateMapOf<String, Float>() } // store absolute start Y
+            var availableTitleY by remember { mutableFloatStateOf(0f) }
 
             val density = LocalDensity.current
-            val dragThresholdPx = with(density) { 30.dp.toPx() }
-
             Text(
                 modifier = Modifier
                     .padding(
@@ -446,34 +442,40 @@ fun TaskFunctionsPage(
                                 vertical = 8.dp,
                                 horizontal = 20.dp
                             )
+                            .zIndex(if (draggedItem.value == label) 1f else 0f)
+                            .background(
+                                color = BGColor
+                            )
                             .offset(y = offset.dp)
+                            .onGloballyPositioned { coordinates ->
+                                itemStartY[label] = coordinates.positionInParent().y
+                            }
                             .pointerInput(label) {
                                 detectDragGestures(
-                                    onDragStart = {
-                                        draggedItem = label
-                                                  },
+                                    onDragStart = { draggedItem.value = label },
                                     onDrag = { change, dragAmount ->
                                         change.consume()
-                                        val newOffset = itemOffsets.getOrDefault(
-                                            label, 0f
-                                        ) + (dragAmount.y * .5f)
-                                        itemOffsets[label] = newOffset
-                                    },
-                                    onDragEnd = {
-                                        draggedItem?.let {
-                                            val finalOffset = itemOffsets.getOrDefault(label, 0f)
-                                            if (finalOffset < -dragThresholdPx) {
-                                                notSelectedActions.remove(it)
-                                                selectedActions.add(it)
-                                            } else if (finalOffset > dragThresholdPx) {
-                                                selectedActions.remove(it)
-                                                notSelectedActions.add(it)
-                                            }
-                                            itemOffsets[label] = 0f
-                                            draggedItem = null
+                                        with(density) {
+                                            val dragAmountDp = dragAmount.y.toDp().value
+                                            itemOffsets[label] =
+                                                itemOffsets.getOrDefault(label, 0f) + dragAmountDp
                                         }
                                     },
-                                    onDragCancel = { itemOffsets[label] = 0f; draggedItem = null }
+                                    onDragEnd = {
+                                        val startY = itemStartY[label] ?: 0f
+                                        val finalY = startY + itemOffsets.getOrDefault(label, 0f)
+
+                                        if (finalY > availableTitleY) {
+                                            selectedActions.remove(label)
+                                            notSelectedActions.add(label)
+                                        }
+                                        itemOffsets[label] = 0f
+                                        draggedItem.value = null
+                                    },
+                                    onDragCancel = {
+                                        itemOffsets[label] = 0f
+                                        draggedItem.value = null
+                                    }
                                 )
                             },
                         verticalAlignment = Alignment.CenterVertically
@@ -544,7 +546,10 @@ fun TaskFunctionsPage(
                     .fillMaxWidth()
                     .padding(
                         horizontal = 18.dp
-                    ),
+                    )
+                    .onGloballyPositioned { coordinates ->
+                        availableTitleY = coordinates.positionInParent().y
+                    },
                 text = "Actions available",
                 fontSize = 15.sp,
                 color = Color.White
@@ -563,30 +568,40 @@ fun TaskFunctionsPage(
                                 vertical = 8.dp,
                                 horizontal = 20.dp
                             )
+                            .zIndex(if (draggedItem.value == label) 1f else 0f)
+                            .background(
+                                color = BGColor
+                            )
                             .offset(y = offset.dp)
+                            .onGloballyPositioned { coordinates ->
+                                itemStartY[label] = coordinates.positionInParent().y
+                            }
                             .pointerInput(label) {
                                 detectDragGestures(
-                                    onDragStart = { draggedItem = label },
+                                    onDragStart = { draggedItem.value = label },
                                     onDrag = { change, dragAmount ->
                                         change.consume()
-                                        val newOffset = itemOffsets.getOrDefault(label, 0f) + (dragAmount.y * .5f)
-                                        itemOffsets[label] = newOffset
-                                    },
-                                    onDragEnd = {
-                                        draggedItem?.let {
-                                            val finalOffset = itemOffsets.getOrDefault(label, 0f)
-                                            if (finalOffset < -dragThresholdPx) {
-                                                notSelectedActions.remove(it)
-                                                selectedActions.add(it)
-                                            } else if (finalOffset > dragThresholdPx) {
-                                                selectedActions.remove(it)
-                                                notSelectedActions.add(it)
-                                            }
-                                            itemOffsets[label] = 0f
-                                            draggedItem = null
+                                        with(density) {
+                                            val dragAmountDp = dragAmount.y.toDp().value
+                                            itemOffsets[label] =
+                                                itemOffsets.getOrDefault(label, 0f) + dragAmountDp
                                         }
                                     },
-                                    onDragCancel = { itemOffsets[label] = 0f; draggedItem = null }
+                                    onDragEnd = {
+                                        val startY = itemStartY[label] ?: 0f
+                                        val finalY = startY + itemOffsets.getOrDefault(label, 0f)
+
+                                        if (finalY < availableTitleY) {
+                                            notSelectedActions.remove(label)
+                                            selectedActions.add(label)
+                                        }
+                                        itemOffsets[label] = 0f
+                                        draggedItem.value = null
+                                    },
+                                    onDragCancel = {
+                                        itemOffsets[label] = 0f
+                                        draggedItem.value = null
+                                    }
                                 )
                             },
                         verticalAlignment = Alignment.CenterVertically
