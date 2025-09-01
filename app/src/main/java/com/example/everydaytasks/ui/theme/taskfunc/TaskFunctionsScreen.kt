@@ -32,12 +32,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -235,27 +235,31 @@ fun TaskFunctionsPage(
                     .height(35.dp)
             )
 
-            val actionsList = listOf(
-                "Date",
-                "Priority",
-                "Reminder",
-                "Executor",
-                "Tags",
-                "Deadline",
-                "Location",
-            )
-            val selectedActions = remember { mutableStateListOf<String>() }
-            val notSelectedActions = remember { actionsList.toMutableStateList() }
+            val actions = remember {
+                mutableStateListOf(
+                    "...",
+                    "Actions Available",
+                    "Date",
+                    "Priority",
+                    "Reminder",
+                    "Executor",
+                    "Tags",
+                    "Deadline",
+                    "Location",
+                )
+            }
+            val dividerIndex = remember {
+                mutableIntStateOf(actions.indexOf("Actions Available"))
+            }
 
-            if (selectedActions.isEmpty())
-                selectedActions.add("...")
             val draggedItem = remember { mutableStateOf<String?>(null) }
             val itemOffsets = remember { mutableStateMapOf<String, Float>() }
 
-            val itemStartY = remember { mutableStateMapOf<String, Float>() } // store absolute start Y
+            val itemStartY = remember { mutableStateMapOf<String, Float>() }
             var availableTitleY by remember { mutableFloatStateOf(0f) }
 
             val density = LocalDensity.current
+
             Text(
                 modifier = Modifier
                     .padding(
@@ -276,71 +280,73 @@ fun TaskFunctionsPage(
                     )
                     .offset(y = (-2).dp)
             ) {
-                items(selectedActions) { label ->
-                    Row(
-                        modifier = Modifier
-                            .background(
-                                color = BGColor
-                            )
-                            .padding(10.dp)
-                            .clip(
-                                RoundedCornerShape(10.dp)
-                            )
-                            .border(
-                                1.dp,
-                                shape = RoundedCornerShape(10.dp),
-                                color = BorderColor
-                            ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Spacer(
+                items(actions) { label ->
+                    if (actions.indexOf(label) < dividerIndex.intValue) {
+                        Row(
                             modifier = Modifier
-                                .width(width = 10.dp)
-                        )
-                        Image(
-                            painter = painterResource(
-                                id =
-                                    when (label) {
-                                        "Date" -> R.drawable.ic_today
-                                        "Priority" -> R.drawable.ic_priority
-                                        "Reminder" -> R.drawable.ic_reminder
-                                        "Executor" -> R.drawable.ic_executor
-                                        "Tags" -> R.drawable.ic_tags
-                                        "Deadline" -> R.drawable.ic_deadline
-                                        "..." -> R.drawable.three_dots
-                                        else -> R.drawable.ic_location
-                                    }
-                            ),
-                            contentDescription = null,
-                            Modifier
-                                .size(size = 20.dp),
-                            contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(
-                                color = Color.White
-                            )
-                        )
-                        if (
-                            label != "..."
-                            && isOn
+                                .background(
+                                    color = BGColor
+                                )
+                                .padding(10.dp)
+                                .clip(
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .border(
+                                    1.dp,
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = BorderColor
+                                ),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Spacer(
                                 modifier = Modifier
-                                    .width(8.dp)
+                                    .width(width = 10.dp)
                             )
-                            Text(
-                                text = label,
-                                color = Color.White,
-                                fontSize = 15.sp
+                            Image(
+                                painter = painterResource(
+                                    id =
+                                        when (label) {
+                                            "Date" -> R.drawable.ic_today
+                                            "Priority" -> R.drawable.ic_priority
+                                            "Reminder" -> R.drawable.ic_reminder
+                                            "Executor" -> R.drawable.ic_executor
+                                            "Tags" -> R.drawable.ic_tags
+                                            "Deadline" -> R.drawable.ic_deadline
+                                            "..." -> R.drawable.three_dots
+                                            else -> R.drawable.ic_location
+                                        }
+                                ),
+                                contentDescription = null,
+                                Modifier
+                                    .size(size = 20.dp),
+                                contentScale = ContentScale.Crop,
+                                colorFilter = ColorFilter.tint(
+                                    color = Color.White
+                                )
+                            )
+                            if (
+                                label != "..."
+                                && isOn
+                            ) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .width(8.dp)
+                                )
+                                Text(
+                                    text = label,
+                                    color = Color.White,
+                                    fontSize = 15.sp
+                                )
+                            }
+                            Spacer(
+                                modifier = Modifier
+                                    .width(10.dp)
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .height(40.dp)
                             )
                         }
-                        Spacer(
-                            modifier = Modifier
-                                .width(10.dp)
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .height(40.dp)
-                        )
                     }
                 }
             }
@@ -357,8 +363,14 @@ fun TaskFunctionsPage(
                     )
             ) {}
 
-            val all = remember{
+            val all = remember {
                 mutableStateOf(true)
+            }
+
+            all.value = when (dividerIndex.intValue) {
+                1 -> true
+                actions.size - 1 -> false
+                else -> all.value
             }
 
             Spacer(
@@ -389,29 +401,17 @@ fun TaskFunctionsPage(
                         .fillMaxWidth()
                         .clickable {
                             if (all.value) {
-                                selectedActions.remove(
-                                    element = "..."
-                                )
-                                actionsList.forEach { label ->
-                                    if (label !in selectedActions) {
-                                        selectedActions.add(label)
-                                        notSelectedActions.remove(label)
-                                    }
-                                }
-                                selectedActions.add("...")
+                                actions.remove("Actions Available")
+                                actions.remove("...")
+                                actions.add(actions.size, "...")
+                                actions.add(actions.size, "Actions Available")
                             } else {
-                                actionsList.forEach { label ->
-                                    if (
-                                        label in selectedActions
-                                        && label != "..."
-                                    ) {
-                                        selectedActions.remove(
-                                            element = label
-                                        )
-                                        notSelectedActions.add(label)
-                                    }
-                                }
+                                actions.remove("...")
+                                actions.add(0, "...")
+                                actions.remove("Actions Available")
+                                actions.add(1, "Actions Available")
                             }
+                            dividerIndex.intValue = actions.indexOf("Actions Available")
                             all.value = !all.value
                         },
                     horizontalArrangement = Arrangement.End
@@ -431,127 +431,115 @@ fun TaskFunctionsPage(
                         25.dp
                     )
             )
-            selectedActions.forEach { label ->
+            actions.forEachIndexed { index, label ->
                 if (label != "...") {
-                    val offset = itemOffsets.getOrDefault(
-                        label, 0f
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = 20.dp
-                            )
-                            .offset(y = offset.dp)
-                            .zIndex(if (draggedItem.value == label) 10f else 0f)
-                            .shadow(
-                                elevation = if (draggedItem.value == label) 20.dp else 0.dp,
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .background(
-                                color = BGColor
-                            )
-                            .onGloballyPositioned { coordinates ->
-                                itemStartY[label] = coordinates.positionInParent().y
-                            }
-                            .pointerInput(label) {
-                                detectDragGestures(
-                                    onDragStart = { draggedItem.value = label },
-                                    onDrag = { change, dragAmount ->
-                                        change.consume()
-                                        with(density) {
-                                            val dragAmountDp = dragAmount.y.toDp().value
-                                            itemOffsets[label] =
-                                                itemOffsets.getOrDefault(label, 0f) + dragAmountDp
-                                        }
-                                    },
-                                    onDragEnd = {
-                                        val startY = itemStartY[label] ?: 0f
-                                        val finalY = startY + itemOffsets.getOrDefault(label, 0f)
-
-                                        if (finalY > availableTitleY) {
-                                            selectedActions.remove(label)
-                                            notSelectedActions.add(label)
-                                        }
-                                        itemOffsets[label] = 0f
-                                        draggedItem.value = null
-                                    },
-                                    onDragCancel = {
-                                        itemOffsets[label] = 0f
-                                        draggedItem.value = null
-                                    }
-                                )
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(
-                                id = R.drawable.ic_remove_action
-                            ),
-                            contentDescription = null,
-                            Modifier
-                                .size(size = 30.dp)
-                                .clickable {
-                                    selectedActions.remove(
-                                        element = label
-                                    )
-                                    notSelectedActions.add(
-                                        element = label
-                                    )
-                                },
-                            contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(
-                                color = SelectedItemColor
-                            )
+                    if (label != "Actions Available") {
+                        val offset = itemOffsets.getOrDefault(
+                            label, 0f
                         )
-                        Spacer(
-                            modifier = Modifier
-                                .width(20.dp)
-                        )
-                        Image(
-                            painter = painterResource(
-                                id =
-                                    when (label) {
-                                        "Date" -> R.drawable.ic_today
-                                        "Priority" -> R.drawable.ic_priority
-                                        "Reminder" -> R.drawable.ic_reminder
-                                        "Executor" -> R.drawable.ic_executor
-                                        "Tags" -> R.drawable.ic_tags
-                                        "Deadline" -> R.drawable.ic_deadline
-                                        else -> R.drawable.ic_location
-                                    }
-                            ),
-                            contentDescription = null,
-                            Modifier
-                                .size(size = 20.dp),
-                            contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(
-                                color = Color.White
-                            )
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .width(22.dp)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .height(50.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = label,
-                                fontSize = 20.sp,
-                                color = Color.White
-                            )
-                        }
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = 20.dp
+                                )
+                                .offset(y = offset.dp)
+                                .zIndex(if (draggedItem.value == label) 10f else 0f)
+                                .shadow(
+                                    elevation = if (draggedItem.value == label) 20.dp else 0.dp,
+                                    shape = RoundedCornerShape(10.dp)
+                                )
+                                .background(
+                                    color = BGColor
+                                )
+                                .onGloballyPositioned { coordinates ->
+                                    itemStartY[label] = coordinates.positionInParent().y
+                                }
+                                .pointerInput(label) {
+                                    detectDragGestures(
+                                        onDragStart = { draggedItem.value = label },
+                                        onDrag = { change, dragAmount ->
+                                            change.consume()
+                                            with(density) {
+                                                val dragAmountDp = dragAmount.y.toDp().value
+                                                itemOffsets[label] =
+                                                    itemOffsets.getOrDefault(
+                                                        label,
+                                                        0f
+                                                    ) + dragAmountDp
+                                            }
+                                        },
+                                        onDragEnd = {
+                                            val startY = itemStartY[label] ?: 0f
+                                            val finalY =
+                                                startY + itemOffsets.getOrDefault(label, 0f)
+
+                                            if (index < dividerIndex.intValue && finalY > availableTitleY) {
+                                                actions.removeAt(index)
+                                                actions.add(actions.size, label)
+                                            } else if (index > dividerIndex.intValue && finalY < availableTitleY) {
+                                                actions.removeAt(index)
+                                                actions.add(0, label)
+                                            }
+                                            dividerIndex.intValue =
+                                                actions.indexOf("Actions Available")
+
+                                            itemOffsets[label] = 0f
+                                            draggedItem.value = null
+                                        },
+                                        onDragCancel = {
+                                            itemOffsets[label] = 0f
+                                            draggedItem.value = null
+                                        }
+                                    )
+                                },
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Image(
                                 painter = painterResource(
-                                    id = R.drawable.ic_drag
+                                    id =
+                                        if (index < dividerIndex.intValue)
+                                            R.drawable.ic_remove_action
+                                        else
+                                            R.drawable.ic_add_action
+                                ),
+                                contentDescription = null,
+                                Modifier
+                                    .size(size = 30.dp)
+                                    .clickable {
+                                        actions.remove(label)
+                                        if (index < dividerIndex.intValue) {
+                                            actions.add(actions.size, label)
+                                        } else {
+                                            actions.add(0, label)
+                                        }
+                                        dividerIndex.intValue = actions.indexOf("Actions Available")
+                                    },
+                                contentScale = ContentScale.Crop,
+                                colorFilter = ColorFilter.tint(
+                                    color =
+                                        if (index < dividerIndex.intValue)
+                                            SelectedItemColor
+                                        else
+                                            AddActionsColor
+                                )
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .width(20.dp)
+                            )
+                            Image(
+                                painter = painterResource(
+                                    id =
+                                        when (label) {
+                                            "Date" -> R.drawable.ic_today
+                                            "Priority" -> R.drawable.ic_priority
+                                            "Reminder" -> R.drawable.ic_reminder
+                                            "Executor" -> R.drawable.ic_executor
+                                            "Tags" -> R.drawable.ic_tags
+                                            "Deadline" -> R.drawable.ic_deadline
+                                            else -> R.drawable.ic_location
+                                        }
                                 ),
                                 contentDescription = null,
                                 Modifier
@@ -561,164 +549,62 @@ fun TaskFunctionsPage(
                                     color = Color.White
                                 )
                             )
-                        }
-                    }
-                }
-            }
-            Spacer(
-                modifier = Modifier
-                    .height(25.dp)
-            )
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 18.dp
-                    )
-                    .onGloballyPositioned { coordinates ->
-                        availableTitleY = coordinates.positionInParent().y
-                    },
-                text = "Actions available",
-                fontSize = 15.sp,
-                color = Color.White
-            )
-            Spacer(
-                modifier = Modifier
-                    .height(25.dp)
-            )
-            if (notSelectedActions.isNotEmpty()) {
-                notSelectedActions.forEach { label ->
-                    val offset = itemOffsets.getOrDefault(label, 0f)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = 20.dp
+                            Spacer(
+                                modifier = Modifier
+                                    .width(22.dp)
                             )
-                            .offset(y = offset.dp)
-                            .zIndex(if (draggedItem.value == label) 10f else 0f)
-                            .shadow(
-                                elevation = if (draggedItem.value == label) 20.dp else 0.dp,
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .background(
-                                color = BGColor
-                            )
-                            .onGloballyPositioned { coordinates ->
-                                itemStartY[label] = coordinates.positionInParent().y
-                            }
-                            .pointerInput(label) {
-                                detectDragGestures(
-                                    onDragStart = { draggedItem.value = label },
-                                    onDrag = { change, dragAmount ->
-                                        change.consume()
-                                        with(density) {
-                                            val dragAmountDp = dragAmount.y.toDp().value
-                                            itemOffsets[label] =
-                                                itemOffsets.getOrDefault(label, 0f) + dragAmountDp
-                                        }
-                                    },
-                                    onDragEnd = {
-                                        val startY = itemStartY[label] ?: 0f
-                                        val finalY = startY + itemOffsets.getOrDefault(label, 0f)
-
-                                        if (finalY < availableTitleY) {
-                                            notSelectedActions.remove(label)
-                                            selectedActions.add(label)
-                                        }
-                                        itemOffsets[label] = 0f
-                                        draggedItem.value = null
-                                    },
-                                    onDragCancel = {
-                                        itemOffsets[label] = 0f
-                                        draggedItem.value = null
-                                    }
-                                )
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(
-                                id = R.drawable.ic_add_action
-                            ),
-                            contentDescription = null,
-                            Modifier
-                                .size(size = 30.dp)
-                                .clickable {
-                                    selectedActions.remove(
-                                        element = "..."
-                                    )
-                                    notSelectedActions.remove(
-                                        element = label
-                                    )
-                                    selectedActions.add(
-                                        element = label
-                                    )
-                                    selectedActions.add("...")
-                                },
-                            contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(
-                                color = AddActionsColor
-                            )
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .width(20.dp)
-                        )
-                        Image(
-                            painter = painterResource(
-                                id =
-                                    when (label) {
-                                        "Date" -> R.drawable.ic_today
-                                        "Priority" -> R.drawable.ic_priority
-                                        "Reminder" -> R.drawable.ic_reminder
-                                        "Executor" -> R.drawable.ic_executor
-                                        "Tags" -> R.drawable.ic_tags
-                                        "Deadline" -> R.drawable.ic_deadline
-                                        else -> R.drawable.ic_location
-                                    }
-                            ),
-                            contentDescription = null,
-                            Modifier
-                                .size(size = 20.dp),
-                            contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(
-                                color = Color.White
-                            )
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .width(22.dp)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .height(50.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = label,
-                                fontSize = 20.sp,
-                                color = Color.White
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            Image(
-                                painter = painterResource(
-                                    id = R.drawable.ic_drag
-                                ),
-                                contentDescription = null,
-                                Modifier
-                                    .size(size = 20.dp),
-                                contentScale = ContentScale.Crop,
-                                colorFilter = ColorFilter.tint(
+                            Box(
+                                modifier = Modifier
+                                    .height(50.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = label,
+                                    fontSize = 20.sp,
                                     color = Color.White
                                 )
-                            )
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Image(
+                                    painter = painterResource(
+                                        id = R.drawable.ic_drag
+                                    ),
+                                    contentDescription = null,
+                                    Modifier
+                                        .size(size = 20.dp),
+                                    contentScale = ContentScale.Crop,
+                                    colorFilter = ColorFilter.tint(
+                                        color = Color.White
+                                    )
+                                )
+                            }
                         }
+                    } else {
+                        Spacer(
+                            modifier = Modifier
+                                .height(25.dp)
+                        )
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = 18.dp
+                                )
+                                .onGloballyPositioned { coordinates ->
+                                    availableTitleY = coordinates.positionInParent().y
+                                },
+                            text = "Actions available",
+                            fontSize = 15.sp,
+                            color = Color.White
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .height(25.dp)
+                        )
                     }
                 }
             }
