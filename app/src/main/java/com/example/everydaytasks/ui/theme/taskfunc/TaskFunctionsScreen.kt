@@ -41,6 +41,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
@@ -439,14 +440,17 @@ fun TaskFunctionsPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
-                                vertical = 8.dp,
                                 horizontal = 20.dp
                             )
-                            .zIndex(if (draggedItem.value == label) 1f else 0f)
+                            .offset(y = offset.dp)
+                            .zIndex(if (draggedItem.value == label) 10f else 0f)
+                            .shadow(
+                                elevation = if (draggedItem.value == label) 20.dp else 0.dp,
+                                shape = RoundedCornerShape(10.dp)
+                            )
                             .background(
                                 color = BGColor
                             )
-                            .offset(y = offset.dp)
                             .onGloballyPositioned { coordinates ->
                                 itemStartY[label] = coordinates.positionInParent().y
                             }
@@ -529,11 +533,35 @@ fun TaskFunctionsPage(
                             modifier = Modifier
                                 .width(22.dp)
                         )
-                        Text(
-                            text = label,
-                            fontSize = 20.sp,
-                            color = Color.White
-                        )
+                        Box(
+                            modifier = Modifier
+                                .height(50.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 20.sp,
+                                color = Color.White
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Image(
+                                painter = painterResource(
+                                    id = R.drawable.ic_drag
+                                ),
+                                contentDescription = null,
+                                Modifier
+                                    .size(size = 20.dp),
+                                contentScale = ContentScale.Crop,
+                                colorFilter = ColorFilter.tint(
+                                    color = Color.White
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -565,14 +593,17 @@ fun TaskFunctionsPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
-                                vertical = 8.dp,
                                 horizontal = 20.dp
                             )
-                            .zIndex(if (draggedItem.value == label) 1f else 0f)
+                            .offset(y = offset.dp)
+                            .zIndex(if (draggedItem.value == label) 10f else 0f)
+                            .shadow(
+                                elevation = if (draggedItem.value == label) 20.dp else 0.dp,
+                                shape = RoundedCornerShape(10.dp)
+                            )
                             .background(
                                 color = BGColor
                             )
-                            .offset(y = offset.dp)
                             .onGloballyPositioned { coordinates ->
                                 itemStartY[label] = coordinates.positionInParent().y
                             }
@@ -659,11 +690,35 @@ fun TaskFunctionsPage(
                             modifier = Modifier
                                 .width(22.dp)
                         )
-                        Text(
-                            text = label,
-                            fontSize = 20.sp,
-                            color = Color.White
-                        )
+                        Box(
+                            modifier = Modifier
+                                .height(50.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 20.sp,
+                                color = Color.White
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Image(
+                                painter = painterResource(
+                                    id = R.drawable.ic_drag
+                                ),
+                                contentDescription = null,
+                                Modifier
+                                    .size(size = 20.dp),
+                                contentScale = ContentScale.Crop,
+                                colorFilter = ColorFilter.tint(
+                                    color = Color.White
+                                )
+                            )
+                        }
                     }
                 }
             }
