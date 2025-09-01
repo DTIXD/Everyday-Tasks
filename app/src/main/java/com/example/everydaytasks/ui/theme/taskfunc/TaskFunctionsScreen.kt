@@ -1,6 +1,7 @@
 package com.example.everydaytasks.ui.theme.taskfunc
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,6 +51,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
 import com.example.everydaytasks.R
 import com.example.everydaytasks.ui.theme.AddActionsColor
@@ -61,6 +63,7 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
 import com.example.everydaytasks.ui.theme.SelectedItemColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
+import kotlin.math.roundToInt
 
 @Composable
 fun TaskFunctionsPage(
@@ -256,6 +259,7 @@ fun TaskFunctionsPage(
             val itemOffsets = remember { mutableStateMapOf<String, Float>() }
 
             val itemStartY = remember { mutableStateMapOf<String, Float>() }
+            val itemBounds = remember { mutableStateMapOf<String, Pair<Float, Float>>() }
             var availableTitleY by remember { mutableFloatStateOf(0f) }
 
             val density = LocalDensity.current
@@ -434,16 +438,32 @@ fun TaskFunctionsPage(
             actions.forEachIndexed { index, label ->
                 if (label != "...") {
                     if (label != "Actions Available") {
+                        val animatedOffset by animateFloatAsState(
+                            targetValue = itemOffsets[label] ?: 0f,
+                            animationSpec = tween(durationMillis = 200),
+                            label = "offsetAnim"
+                        )
                         val offset = itemOffsets.getOrDefault(
                             label, 0f
                         )
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(
                                     horizontal = 20.dp
                                 )
-                                .offset(y = offset.dp)
+                                .then(
+                                    if (draggedItem.value == label) {
+                                        Modifier.offset(
+                                            y = offset.dp
+                                        )
+                                    } else {
+                                        Modifier.offset {
+                                            IntOffset(0, animatedOffset.roundToInt())
+                                        }
+                                    }
+                                )
                                 .zIndex(if (draggedItem.value == label) 10f else 0f)
                                 .shadow(
                                     elevation = if (draggedItem.value == label) 20.dp else 0.dp,
@@ -453,7 +473,12 @@ fun TaskFunctionsPage(
                                     color = BGColor
                                 )
                                 .onGloballyPositioned { coordinates ->
-                                    itemStartY[label] = coordinates.positionInParent().y
+                                    if (draggedItem.value == null) {
+                                        val y = coordinates.positionInParent().y
+                                        val h = coordinates.size.height.toFloat()
+                                        itemBounds[label] = y to h
+                                        itemStartY[label] = coordinates.positionInParent().y
+                                    }
                                 }
                                 .pointerInput(label) {
                                     detectDragGestures(
@@ -468,12 +493,33 @@ fun TaskFunctionsPage(
                                                         0f
                                                     ) + dragAmountDp
                                             }
+
+                                            val draggedCenterY = (itemBounds[label]?.first ?: 0f) + (itemOffsets[label] ?: 0f) +
+                                                    (itemBounds[label]?.second ?: 0f) / 2
+
+                                            itemBounds.forEach { (otherLabel, bounds) ->
+                                                if (otherLabel != label) {
+                                                    val (topY, height) = bounds
+                                                    val isOver = draggedCenterY in topY..(topY + height)
+                                                    itemOffsets[otherLabel] =
+                                                        if (isOver) (if (draggedCenterY > topY + height / 2) height else -height)
+                                                        else 0f
+                                                }
+                                            }
                                         },
                                         onDragEnd = {
                                             val startY = itemStartY[label] ?: 0f
                                             val finalY =
                                                 startY + itemOffsets.getOrDefault(label, 0f)
 
+                                            val fromIndex = actions.indexOf(label)
+                                            val shiftTarget = actions.withIndex()
+                                                .firstOrNull { itemOffsets[it.value] != 0f }
+                                                ?.index
+
+                                            if (shiftTarget != null) {
+                                                actions.add(shiftTarget, actions.removeAt(fromIndex))
+                                            }
                                             if (index < dividerIndex.intValue && finalY > availableTitleY) {
                                                 actions.removeAt(index)
                                                 actions.add(actions.size, label)
@@ -484,7 +530,7 @@ fun TaskFunctionsPage(
                                             dividerIndex.intValue =
                                                 actions.indexOf("Actions Available")
 
-                                            itemOffsets[label] = 0f
+                                            itemOffsets.keys.forEach { key -> itemOffsets[key] = 0f }
                                             draggedItem.value = null
                                         },
                                         onDragCancel = {
