@@ -497,36 +497,30 @@ fun TaskFunctionsPage(
 
                                             val draggedTop = (itemBounds[label]?.first ?: 0f) + (itemOffsets[label] ?: 0f)
                                             val draggedHeight = itemBounds[label]?.second ?: 0f
-                                            val draggedBottom = draggedTop + draggedHeight
                                             val draggedCenter = draggedTop + draggedHeight / 2
 
                                             val fromIndex = actions.indexOf(label)
 
-                                            // reset all other offsets
                                             itemOffsets.keys.forEach { key ->
                                                 if (key != label) itemOffsets[key] = 0f
                                             }
 
-                                            // ---- check items BELOW ----
                                             for (i in fromIndex + 1 until actions.size) {
                                                 val other = actions[i]
                                                 val (y, h) = itemBounds[other] ?: continue
                                                 val otherCenter = y + h / 2f
 
                                                 if (draggedCenter > otherCenter) {
-                                                    // shift this item upward
                                                     itemOffsets[other] = -draggedHeight
                                                 } else break
                                             }
 
-                                            // ---- check items ABOVE ----
                                             for (i in (0 until fromIndex).reversed()) {
                                                 val other = actions[i]
                                                 val (y, h) = itemBounds[other] ?: continue
                                                 val otherCenter = y + h / 2f
 
                                                 if (draggedCenter < otherCenter) {
-                                                    // shift this item downward
                                                     itemOffsets[other] = draggedHeight
                                                 } else break
                                             }
@@ -536,15 +530,31 @@ fun TaskFunctionsPage(
                                         if (draggedItem.value != null) {
                                             val fromIndex = actions.indexOf(label)
 
-                                            val targetIndex = actions.withIndex()
-                                                .firstOrNull { itemOffsets[it.value] != 0f }
-                                                ?.index
+                                            val draggedTop = (itemBounds[label]?.first ?: 0f) + (itemOffsets[label] ?: 0f)
+                                            val draggedHeight = itemBounds[label]?.second ?: 0f
+                                            val draggedCenter = draggedTop + draggedHeight / 2f
 
-                                            if (targetIndex != null) {
+                                            val otherShifted = itemOffsets.any { (key, value) ->
+                                                key != label && value != 0f
+                                            }
+                                            val isDraggingUp = (itemOffsets[label] ?: 0f) < 0f
+
+                                            var targetIndex = 0
+                                            for (i in actions.indices) {
+                                                if (i == fromIndex) continue
+                                                val (y, h) = itemBounds[actions[i]] ?: continue
+                                                val otherCenter = y + h / 2f
+                                                if (draggedCenter > otherCenter) {
+                                                    targetIndex =
+                                                        if (!otherShifted || isDraggingUp) i + 1
+                                                        else i
+                                                }
+                                            }
+
+                                            if (targetIndex != fromIndex) {
                                                 actions.add(targetIndex, actions.removeAt(fromIndex))
                                             }
 
-                                            // reset
                                             dividerIndex.intValue = actions.indexOf("Actions Available")
                                             itemOffsets.keys.forEach { key -> itemOffsets[key] = 0f }
                                             draggedItem.value = null
