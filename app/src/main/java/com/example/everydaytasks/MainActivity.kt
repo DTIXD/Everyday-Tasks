@@ -126,7 +126,6 @@ import com.example.everydaytasks.ui.theme.WarningColor
 import com.example.everydaytasks.ui.theme.WeekColor
 import com.example.everydaytasks.ui.theme.taskfunc.TaskFunctionsObject
 import com.example.everydaytasks.ui.theme.taskfunc.TaskFunctionsPage
-import kotlinx.coroutines.tasks.await
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -287,16 +286,13 @@ class MainActivity : ComponentActivity() {
                             "Actions Available",
                         )
                     }
-                    LaunchedEffect(Unit) {
-                        val doc = actionsRef.get().await()
-                        val loadedList = doc.get("items")
-                        val list: List<String> = when (loadedList) {
-                            is List<*> -> loadedList.filterIsInstance<String>()
-                            is String -> listOf(loadedList)
-                            else -> listA.toList()
+                    actionsRef.addSnapshotListener { snapshot, e ->
+                        if (snapshot != null && snapshot.exists()) {
+                            val list = (snapshot.get("items") as? List<*>)?.filterIsInstance<String>()
+                                ?: emptyList()
+                            listA.clear()
+                            listA.addAll(list)
                         }
-                        listA.clear()
-                        listA.addAll(list)
                     }
 
                     val key = fs.collection("tasks")
