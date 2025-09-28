@@ -1131,73 +1131,314 @@ class MainActivity : ComponentActivity() {
                                         )
                                 ) {
                                     Column {
-                                        Spacer(
-                                            modifier = Modifier
-                                                .height(15.dp)
-                                        )
-                                        Row(
-                                            modifier = Modifier
-                                                .padding(
-                                                    horizontal = 15.dp
-                                                ),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Image(
-                                                painterResource(
-                                                    id = R.drawable.ic_location
-                                                ),
-                                                contentDescription = null,
-                                                Modifier
-                                                    .size(30.dp),
-                                                contentScale = ContentScale.Crop
-                                            )
-                                            Spacer(
-                                                modifier = Modifier
-                                                    .width(15.dp)
-                                            )
-                                            Text(
-                                                text = "Location",
-                                                fontSize = 20.sp,
-                                                color = Color.White
-                                            )
-                                        }
-                                        Spacer(
-                                            modifier = Modifier
-                                                .height(25.dp)
-                                        )
-                                        Row(
-                                            modifier = Modifier
-                                                .padding(
-                                                    horizontal = 15.dp
-                                                ),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Image(
-                                                painterResource(
-                                                    id = R.drawable.ic_deadline
-                                                ),
-                                                contentDescription = null,
-                                                Modifier
-                                                    .size(30.dp),
-                                                contentScale = ContentScale.Crop,
-                                                colorFilter = ColorFilter.tint(
-                                                    Color.White
+                                        listA.forEach { label ->
+                                            if (listA.indexOf(label) > listA.indexOf("Actions Available")) {
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .height(15.dp)
                                                 )
-                                            )
-                                            Spacer(
-                                                modifier = Modifier
-                                                    .width(15.dp)
-                                            )
-                                            Text(
-                                                text = "Deadline",
-                                                fontSize = 20.sp,
-                                                color = Color.White
-                                            )
+                                                when (label) {
+                                                    "Location" -> {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .padding(
+                                                                    horizontal = 15.dp
+                                                                )
+                                                                .clickable {
+                                                                    scope.launch {
+                                                                        showDialog4.value = false
+                                                                    }
+                                                                    listA.remove(label)
+                                                                    listA.add(0, label)
+                                                                    actionsRef.set(mapOf("items" to listA.toList()))
+                                                                },
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Image(
+                                                                painterResource(
+                                                                    id = R.drawable.ic_location
+                                                                ),
+                                                                contentDescription = null,
+                                                                Modifier
+                                                                    .size(30.dp),
+                                                                contentScale = ContentScale.Crop
+                                                            )
+                                                            Spacer(
+                                                                modifier = Modifier
+                                                                    .width(15.dp)
+                                                            )
+                                                            Text(
+                                                                text = "Location",
+                                                                fontSize = 20.sp,
+                                                                color = Color.White
+                                                            )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .height(25.dp)
+                                                        )
+                                                    }
+                                                    "Deadline" -> {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .padding(
+                                                                    horizontal = 15.dp
+                                                                )
+                                                                .clickable {
+                                                                    scope.launch {
+                                                                        showDialog4.value = false
+                                                                    }
+                                                                    listA.remove(label)
+                                                                    listA.add(0, label)
+                                                                    actionsRef.set(mapOf("items" to listA.toList()))
+                                                                },
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Image(
+                                                                painterResource(
+                                                                    id = R.drawable.ic_deadline
+                                                                ),
+                                                                contentDescription = null,
+                                                                Modifier
+                                                                    .size(30.dp),
+                                                                contentScale = ContentScale.Crop,
+                                                                colorFilter = ColorFilter.tint(
+                                                                    Color.White
+                                                                )
+                                                            )
+                                                            Spacer(
+                                                                modifier = Modifier
+                                                                    .width(15.dp)
+                                                            )
+                                                            Text(
+                                                                text = "Deadline",
+                                                                fontSize = 20.sp,
+                                                                color = Color.White
+                                                            )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .height(15.dp)
+                                                        )
+                                                    }
+                                                    "Date" -> {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .padding(
+                                                                    horizontal = 15.dp
+                                                                )
+                                                                .clickable {
+                                                                    scope.launch {
+                                                                        showDialog4.value = false
+                                                                    }
+                                                                    listA.remove(label)
+                                                                    listA.add(0, label)
+                                                                    actionsRef.set(mapOf("items" to listA.toList()))
+                                                                },
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Image(
+                                                                painterResource(
+                                                                    id = R.drawable.ic_today
+                                                                ),
+                                                                contentDescription = null,
+                                                                Modifier
+                                                                    .size(30.dp),
+                                                                contentScale = ContentScale.Crop,
+                                                                colorFilter = ColorFilter.tint(
+                                                                    Color.White
+                                                                )
+                                                            )
+                                                            Spacer(
+                                                                modifier = Modifier
+                                                                    .width(15.dp)
+                                                            )
+                                                            Text(
+                                                                text = "Date",
+                                                                fontSize = 20.sp,
+                                                                color = Color.White
+                                                            )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .height(15.dp)
+                                                        )
+                                                    }
+                                                    "Priority" -> {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .padding(
+                                                                    horizontal = 15.dp
+                                                                )
+                                                                .clickable {
+                                                                    scope.launch {
+                                                                        showDialog4.value = false
+                                                                    }
+                                                                    listA.remove(label)
+                                                                    listA.add(0, label)
+                                                                    actionsRef.set(mapOf("items" to listA.toList()))
+                                                                },
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Image(
+                                                                painterResource(
+                                                                    id = R.drawable.ic_priority
+                                                                ),
+                                                                contentDescription = null,
+                                                                Modifier
+                                                                    .size(30.dp),
+                                                                contentScale = ContentScale.Crop,
+                                                                colorFilter = ColorFilter.tint(
+                                                                    Color.White
+                                                                )
+                                                            )
+                                                            Spacer(
+                                                                modifier = Modifier
+                                                                    .width(15.dp)
+                                                            )
+                                                            Text(
+                                                                text = "Priority",
+                                                                fontSize = 20.sp,
+                                                                color = Color.White
+                                                            )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .height(15.dp)
+                                                        )
+                                                    }
+                                                    "Reminder" -> {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .padding(
+                                                                    horizontal = 15.dp
+                                                                )
+                                                                .clickable {
+                                                                    scope.launch {
+                                                                        showDialog4.value = false
+                                                                    }
+                                                                    listA.remove(label)
+                                                                    listA.add(0, label)
+                                                                    actionsRef.set(mapOf("items" to listA.toList()))
+                                                                },
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Image(
+                                                                painterResource(
+                                                                    id = R.drawable.ic_reminder
+                                                                ),
+                                                                contentDescription = null,
+                                                                Modifier
+                                                                    .size(30.dp),
+                                                                contentScale = ContentScale.Crop,
+                                                                colorFilter = ColorFilter.tint(
+                                                                    Color.White
+                                                                )
+                                                            )
+                                                            Spacer(
+                                                                modifier = Modifier
+                                                                    .width(15.dp)
+                                                            )
+                                                            Text(
+                                                                text = "Reminder",
+                                                                fontSize = 20.sp,
+                                                                color = Color.White
+                                                            )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .height(15.dp)
+                                                        )
+                                                    }
+                                                    "Executor" -> {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .padding(
+                                                                    horizontal = 15.dp
+                                                                )
+                                                                .clickable {
+                                                                    scope.launch {
+                                                                        showDialog4.value = false
+                                                                    }
+                                                                    listA.remove(label)
+                                                                    listA.add(0, label)
+                                                                    actionsRef.set(mapOf("items" to listA.toList()))
+                                                                },
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Image(
+                                                                painterResource(
+                                                                    id = R.drawable.ic_executor
+                                                                ),
+                                                                contentDescription = null,
+                                                                Modifier
+                                                                    .size(30.dp),
+                                                                contentScale = ContentScale.Crop,
+                                                                colorFilter = ColorFilter.tint(
+                                                                    Color.White
+                                                                )
+                                                            )
+                                                            Spacer(
+                                                                modifier = Modifier
+                                                                    .width(15.dp)
+                                                            )
+                                                            Text(
+                                                                text = "Executor",
+                                                                fontSize = 20.sp,
+                                                                color = Color.White
+                                                            )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .height(15.dp)
+                                                        )
+                                                    }
+                                                    "Tags" -> {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .padding(
+                                                                    horizontal = 15.dp
+                                                                )
+                                                                .clickable {
+                                                                    scope.launch {
+                                                                        showDialog4.value = false
+                                                                    }
+                                                                    listA.remove(label)
+                                                                    listA.add(0, label)
+                                                                    actionsRef.set(mapOf("items" to listA.toList()))
+                                                                },
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Image(
+                                                                painterResource(
+                                                                    id = R.drawable.ic_tags
+                                                                ),
+                                                                contentDescription = null,
+                                                                Modifier
+                                                                    .size(30.dp),
+                                                                contentScale = ContentScale.Crop,
+                                                                colorFilter = ColorFilter.tint(
+                                                                    Color.White
+                                                                )
+                                                            )
+                                                            Spacer(
+                                                                modifier = Modifier
+                                                                    .width(15.dp)
+                                                            )
+                                                            Text(
+                                                                text = "Tags",
+                                                                fontSize = 20.sp,
+                                                                color = Color.White
+                                                            )
+                                                        }
+                                                        Spacer(
+                                                            modifier = Modifier
+                                                                .height(15.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
                                         }
-                                        Spacer(
-                                            modifier = Modifier
-                                                .height(15.dp)
-                                        )
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
