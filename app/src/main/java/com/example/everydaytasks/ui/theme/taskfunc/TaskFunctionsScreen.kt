@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -61,6 +62,9 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
 import com.example.everydaytasks.ui.theme.SelectedItemColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import kotlin.math.roundToInt
 
 @Composable
@@ -68,6 +72,23 @@ fun TaskFunctionsPage(
     onNavigationToProgressPage: (ProgressScreenDataObject) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val fs = Firebase.firestore
+    val actionsRef = fs.collection("actions")
+        .document("list")
+
+    val actions = remember {
+        mutableStateListOf(
+            "Actions Available",
+            "Date",
+            "Priority",
+            "Reminder",
+            "Executor",
+            "Tags",
+            "Deadline",
+            "Location",
+        )
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -95,6 +116,7 @@ fun TaskFunctionsPage(
                             end = 5.dp
                         )
                         .clickable {
+                            actionsRef.set(mapOf("items" to actions.toList()))
                             onNavigationToProgressPage(
                                 ProgressScreenDataObject()
                             )
@@ -153,7 +175,7 @@ fun TaskFunctionsPage(
                                 "All actions text are shown"
                             else
                                 "All actions text are hidden",
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         color = CaptionTextColor
                     )
                 }
@@ -236,18 +258,22 @@ fun TaskFunctionsPage(
                     .height(35.dp)
             )
 
-            val actions = remember {
-                mutableStateListOf(
-                    "Actions Available",
-                    "Date",
-                    "Priority",
-                    "Reminder",
-                    "Executor",
-                    "Tags",
-                    "Deadline",
-                    "Location",
-                )
+            LaunchedEffect(Unit) {
+                val doc = actionsRef.get().await()
+                if (!doc.exists() || doc.data.isNullOrEmpty()) {
+                    actionsRef.set(mapOf("items" to actions.toList()))
+                }
+                val loadedList = doc.get("items")
+                val list: List<String> = when (loadedList) {
+                    is List<*> -> loadedList.filterIsInstance<String>()
+                    is String -> listOf(loadedList)
+                    else -> actions.toList()
+                }
+                actions.clear()
+                actions.addAll(list)
+
             }
+
             val dividerIndex = remember {
                 mutableIntStateOf(actions.indexOf("Actions Available"))
             }
