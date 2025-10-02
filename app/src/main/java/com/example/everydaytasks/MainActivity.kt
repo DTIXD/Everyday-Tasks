@@ -305,11 +305,14 @@ class MainActivity : ComponentActivity() {
                             snapshot?.toObjects(ProgressScreenDataObject::class.java) ?: emptyList()
                     }
 
-                    val dayAdding = remember {
-                        mutableStateOf("")
-                    }
                     val addForToday = remember {
                         mutableStateOf(true)
+                    }
+
+                    val currentDate = LocalDate.now()
+                    var selectedDate by remember { mutableStateOf(currentDate) }
+                    val taskTime = remember {
+                        mutableStateOf(LocalTime.now())
                     }
 
                     val dateSelection = remember {
@@ -915,7 +918,7 @@ class MainActivity : ComponentActivity() {
                                                                     isCompleted = false,
                                                                     key = key,
                                                                     dayAdded =
-                                                                        if (addForToday.value) dayAdding.value
+                                                                        if (addForToday.value) selectedDate.toString()
                                                                         else today.toString(),
                                                                     daySelected = today.toString(),
                                                                     category =
@@ -925,7 +928,8 @@ class MainActivity : ComponentActivity() {
                                                                     lastAdded = today.minusDays(
                                                                         1
                                                                     ).toString(),
-                                                                    firstAdd = 1
+                                                                    firstAdd = 1,
+                                                                    time = taskTime.value.toString()
                                                                 )
                                                             )
                                                     },
@@ -1507,8 +1511,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    val currentDate = LocalDate.now()
-                    var selectedDate by remember { mutableStateOf(currentDate) }
+
                     var lastCheckedDate by remember { mutableStateOf(currentDate) }
 
                     val lifecycleOwner = LocalLifecycleOwner.current
@@ -3345,6 +3348,9 @@ class MainActivity : ComponentActivity() {
                                                                         ) + " " +
                                                                                 if (selectedDayPart.intValue == 1) "am"
                                                                                 else "pm"
+                                                                    var h = selectedHour.intValue % 12
+                                                                    if (selectedDayPart.intValue != 1) h += 12
+                                                                    taskTime.value = LocalTime.of(h, selectedMinute.intValue)
                                                                 },
                                                             text = "Ok",
                                                             fontSize = 25.sp,
