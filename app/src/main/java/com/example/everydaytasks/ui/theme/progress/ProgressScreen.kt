@@ -39,6 +39,8 @@ import com.example.everydaytasks.ui.theme.BGColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(value = Build.VERSION_CODES.O)
@@ -168,6 +170,12 @@ fun ProgressPage(
                     == progressScreenDataObject.dayAdded
                     && progressScreenDataObject.category
                     == "Today"
+                    && (LocalTime.now().isAfter(
+                        LocalTime.parse(
+                            progressScreenDataObject.time,
+                            DateTimeFormatter.ofPattern("HH:mm")
+                        )
+                    ))
                 ) {
                     Column(
                         modifier = Modifier
