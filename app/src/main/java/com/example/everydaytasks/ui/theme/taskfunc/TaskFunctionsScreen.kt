@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -61,6 +62,9 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
 import com.example.everydaytasks.ui.theme.SelectedItemColor
 import com.example.everydaytasks.ui.theme.progress.ProgressScreenDataObject
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import kotlin.math.roundToInt
 
 @Composable
@@ -68,6 +72,23 @@ fun TaskFunctionsPage(
     onNavigationToProgressPage: (ProgressScreenDataObject) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val fs = Firebase.firestore
+    val actionsRef = fs.collection("actions")
+        .document("list")
+
+    val actions = remember {
+        mutableStateListOf(
+            "Actions Available",
+            "Date",
+            "Priority",
+            "Reminder",
+            "Executor",
+            "Tags",
+            "Deadline",
+            "Location",
+        )
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -95,6 +116,7 @@ fun TaskFunctionsPage(
                             end = 5.dp
                         )
                         .clickable {
+                            actionsRef.set(mapOf("items" to actions.toList()))
                             onNavigationToProgressPage(
                                 ProgressScreenDataObject()
                             )
@@ -153,7 +175,7 @@ fun TaskFunctionsPage(
                                 "All actions text are shown"
                             else
                                 "All actions text are hidden",
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         color = CaptionTextColor
                     )
                 }
@@ -236,20 +258,24 @@ fun TaskFunctionsPage(
                     .height(35.dp)
             )
 
-            val actions = remember {
-                mutableStateListOf(
-                    "Actions Available",
-                    "Date",
-                    "Priority",
-                    "Reminder",
-                    "Executor",
-                    "Tags",
-                    "Deadline",
-                    "Location",
-                )
-            }
             val dividerIndex = remember {
                 mutableIntStateOf(actions.indexOf("Actions Available"))
+            }
+
+            LaunchedEffect(Unit) {
+                val doc = actionsRef.get().await()
+                if (!doc.exists() || doc.data.isNullOrEmpty()) {
+                    actionsRef.set(mapOf("items" to actions.toList()))
+                }
+                val loadedList = doc.get("items")
+                val list: List<String> = when (loadedList) {
+                    is List<*> -> loadedList.filterIsInstance<String>()
+                    is String -> listOf(loadedList)
+                    else -> actions.toList()
+                }
+                actions.clear()
+                actions.addAll(list)
+                dividerIndex.intValue = actions.indexOf("Actions Available")
             }
 
             val draggedItem = remember { mutableStateOf<String?>(null) }
@@ -294,77 +320,51 @@ fun TaskFunctionsPage(
                                 ),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (label != "Actions Available") {
+                            Spacer(
+                                modifier = Modifier
+                                    .width(width = 10.dp)
+                            )
+                            Image(
+                                painter = painterResource(
+                                    id =
+                                        when (label) {
+                                            "Date" -> R.drawable.ic_today
+                                            "Priority" -> R.drawable.ic_priority
+                                            "Reminder" -> R.drawable.ic_reminder
+                                            "Executor" -> R.drawable.ic_executor
+                                            "Tags" -> R.drawable.ic_tags
+                                            "Deadline" -> R.drawable.ic_deadline
+                                            "Actions Available" -> R.drawable.three_dots
+                                            else -> R.drawable.ic_location
+                                        }
+                                ),
+                                contentDescription = null,
+                                Modifier
+                                    .size(size = 20.dp),
+                                contentScale = ContentScale.Crop,
+                                colorFilter = ColorFilter.tint(
+                                    color = Color.White
+                                )
+                            )
+                            if (isOn and (label != "Actions Available")) {
                                 Spacer(
                                     modifier = Modifier
-                                        .width(width = 10.dp)
+                                        .width(8.dp)
                                 )
-                                Image(
-                                    painter = painterResource(
-                                        id =
-                                            when (label) {
-                                                "Date" -> R.drawable.ic_today
-                                                "Priority" -> R.drawable.ic_priority
-                                                "Reminder" -> R.drawable.ic_reminder
-                                                "Executor" -> R.drawable.ic_executor
-                                                "Tags" -> R.drawable.ic_tags
-                                                "Deadline" -> R.drawable.ic_deadline
-                                                else -> R.drawable.ic_location
-                                            }
-                                    ),
-                                    contentDescription = null,
-                                    Modifier
-                                        .size(size = 20.dp),
-                                    contentScale = ContentScale.Crop,
-                                    colorFilter = ColorFilter.tint(
-                                        color = Color.White
-                                    )
-                                )
-                                if (isOn) {
-                                    Spacer(
-                                        modifier = Modifier
-                                            .width(8.dp)
-                                    )
-                                    Text(
-                                        text = label,
-                                        color = Color.White,
-                                        fontSize = 15.sp
-                                    )
-                                }
-                                Spacer(
-                                    modifier = Modifier
-                                        .width(10.dp)
-                                )
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(40.dp)
-                                )
-                            } else {
-                                Spacer(
-                                    modifier = Modifier
-                                        .width(width = 10.dp)
-                                )
-                                Image(
-                                    painter = painterResource(
-                                        id = R.drawable.three_dots
-                                    ),
-                                    contentDescription = null,
-                                    Modifier
-                                        .size(size = 20.dp),
-                                    contentScale = ContentScale.Crop,
-                                    colorFilter = ColorFilter.tint(
-                                        color = Color.White
-                                    )
-                                )
-                                Spacer(
-                                    modifier = Modifier
-                                        .width(10.dp)
-                                )
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(40.dp)
+                                Text(
+                                    text = label,
+                                    color = Color.White,
+                                    fontSize = 15.sp
                                 )
                             }
+                            Spacer(
+                                modifier = Modifier
+                                    .width(10.dp)
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .height(40.dp)
+                            )
                         }
                     }
                 }
@@ -387,9 +387,8 @@ fun TaskFunctionsPage(
             }
 
             all.value = when (dividerIndex.intValue) {
-                1 -> true
                 actions.size - 1 -> false
-                else -> all.value
+                else -> true
             }
 
             Spacer(
@@ -447,174 +446,214 @@ fun TaskFunctionsPage(
                     )
             )
             actions.forEachIndexed { index, label ->
-                if (label != "...") {
-                    val animatedOffset by animateFloatAsState(
-                        targetValue = itemOffsets[label] ?: 0f,
-                        animationSpec = tween(durationMillis = 200),
-                        label = "offsetAnim"
-                    )
+                val animatedOffset by animateFloatAsState(
+                    targetValue = itemOffsets[label] ?: 0f,
+                    animationSpec = tween(durationMillis = 200),
+                    label = "offsetAnim"
+                )
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = 20.dp
-                            )
-                            .then(
-                                if (draggedItem.value == label) {
-                                    Modifier.offset { IntOffset(0, itemOffsets[label]?.roundToInt() ?: 0) }
-                                } else {
-                                    Modifier.offset { IntOffset(0, animatedOffset.roundToInt()) }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 20.dp
+                        )
+                        .then(
+                            if (draggedItem.value == label) {
+                                Modifier.offset {
+                                    IntOffset(
+                                        0,
+                                        itemOffsets[label]?.roundToInt() ?: 0
+                                    )
                                 }
-                            )
-                            .zIndex(if (draggedItem.value == label) 10f else 0f)
-                            .shadow(
-                                elevation = if (draggedItem.value == label) 20.dp else 0.dp,
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .background(
-                                color = BGColor
-                            )
-                            .onGloballyPositioned { coordinates ->
-                                if (draggedItem.value == null) {
-                                    val y = coordinates.positionInParent().y
-                                    val h = coordinates.size.height.toFloat()
-                                    itemBounds[label] = y to h
-                                }
+                            } else {
+                                Modifier.offset { IntOffset(0, animatedOffset.roundToInt()) }
                             }
-                            .pointerInput(label) {
-                                detectDragGestures(
-                                    onDragStart = {
-                                        if (label != "Actions Available") {
-                                            draggedItem.value = label
+                        )
+                        .zIndex(if (draggedItem.value == label) 10f else 0f)
+                        .shadow(
+                            elevation = if (draggedItem.value == label) 20.dp else 0.dp,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .background(
+                            color = BGColor
+                        )
+                        .onGloballyPositioned { coordinates ->
+                            if (draggedItem.value == null) {
+                                val y = coordinates.positionInParent().y
+                                val h = coordinates.size.height.toFloat()
+                                itemBounds[label] = y to h
+                            }
+                        }
+                        .pointerInput(label) {
+                            detectDragGestures(
+                                onDragStart = {
+                                    if (label != "Actions Available") {
+                                        draggedItem.value = label
+                                    }
+                                },
+                                onDrag = { change, dragAmount ->
+                                    if (draggedItem.value != null) {
+                                        change.consume()
+                                        val currentOffset = itemOffsets[label] ?: 0f
+                                        itemOffsets[label] = currentOffset + dragAmount.y
+
+                                        val draggedTop =
+                                            (itemBounds[label]?.first ?: 0f) + (itemOffsets[label]
+                                                ?: 0f)
+                                        val draggedHeight = itemBounds[label]?.second ?: 0f
+                                        val draggedCenter = draggedTop + draggedHeight / 2
+
+                                        val fromIndex = actions.indexOf(label)
+
+                                        itemOffsets.keys.forEach { key ->
+                                            if (key != label) itemOffsets[key] = 0f
                                         }
-                                    },
-                                    onDrag = { change, dragAmount ->
-                                        if (draggedItem.value != null) {
-                                            change.consume()
-                                            val currentOffset = itemOffsets[label] ?: 0f
-                                            itemOffsets[label] = currentOffset + dragAmount.y
 
-                                            val draggedTop = (itemBounds[label]?.first ?: 0f) + (itemOffsets[label] ?: 0f)
-                                            val draggedHeight = itemBounds[label]?.second ?: 0f
-                                            val draggedCenter = draggedTop + draggedHeight / 2
+                                        for (i in fromIndex + 1 until actions.size) {
+                                            val other = actions[i]
+                                            val (y, h) = itemBounds[other] ?: continue
+                                            val otherCenter = y + h / 2f
 
-                                            val fromIndex = actions.indexOf(label)
+                                            if (draggedCenter > otherCenter) {
+                                                itemOffsets[other] = -draggedHeight
+                                            } else break
+                                        }
 
-                                            itemOffsets.keys.forEach { key ->
-                                                if (key != label) itemOffsets[key] = 0f
-                                            }
+                                        for (i in (0 until fromIndex).reversed()) {
+                                            val other = actions[i]
+                                            val (y, h) = itemBounds[other] ?: continue
+                                            val otherCenter = y + h / 2f
 
-                                            for (i in fromIndex + 1 until actions.size) {
-                                                val other = actions[i]
-                                                val (y, h) = itemBounds[other] ?: continue
-                                                val otherCenter = y + h / 2f
+                                            if (draggedCenter < otherCenter) {
+                                                itemOffsets[other] = draggedHeight
+                                            } else break
+                                        }
+                                    }
+                                },
+                                onDragEnd = {
+                                    if (draggedItem.value != null) {
+                                        val fromIndex = actions.indexOf(label)
 
-                                                if (draggedCenter > otherCenter) {
-                                                    itemOffsets[other] = -draggedHeight
-                                                } else break
-                                            }
+                                        val draggedTop =
+                                            (itemBounds[label]?.first ?: 0f) + (itemOffsets[label]
+                                                ?: 0f)
+                                        val draggedHeight = itemBounds[label]?.second ?: 0f
+                                        val draggedCenter = draggedTop + draggedHeight / 2f
 
-                                            for (i in (0 until fromIndex).reversed()) {
-                                                val other = actions[i]
-                                                val (y, h) = itemBounds[other] ?: continue
-                                                val otherCenter = y + h / 2f
+                                        val otherShifted = itemOffsets.any { (key, value) ->
+                                            key != label && value != 0f
+                                        }
+                                        val isDraggingUp = (itemOffsets[label] ?: 0f) < 0f
 
-                                                if (draggedCenter < otherCenter) {
-                                                    itemOffsets[other] = draggedHeight
-                                                } else break
+                                        var targetIndex = 0
+                                        for (i in actions.indices) {
+                                            if (i == fromIndex) continue
+                                            val (y, h) = itemBounds[actions[i]] ?: continue
+                                            val otherCenter = y + h / 2f
+                                            if (draggedCenter > otherCenter) {
+                                                targetIndex =
+                                                    if (!otherShifted || isDraggingUp) i + 1
+                                                    else i
                                             }
                                         }
-                                    },
-                                    onDragEnd = {
-                                        if (draggedItem.value != null) {
-                                            val fromIndex = actions.indexOf(label)
 
-                                            val draggedTop = (itemBounds[label]?.first ?: 0f) + (itemOffsets[label] ?: 0f)
-                                            val draggedHeight = itemBounds[label]?.second ?: 0f
-                                            val draggedCenter = draggedTop + draggedHeight / 2f
-
-                                            val otherShifted = itemOffsets.any { (key, value) ->
-                                                key != label && value != 0f
-                                            }
-                                            val isDraggingUp = (itemOffsets[label] ?: 0f) < 0f
-
-                                            var targetIndex = 0
-                                            for (i in actions.indices) {
-                                                if (i == fromIndex) continue
-                                                val (y, h) = itemBounds[actions[i]] ?: continue
-                                                val otherCenter = y + h / 2f
-                                                if (draggedCenter > otherCenter) {
-                                                    targetIndex =
-                                                        if (!otherShifted || isDraggingUp) i + 1
-                                                        else i
-                                                }
-                                            }
-
-                                            if (targetIndex != fromIndex) {
-                                                actions.add(targetIndex, actions.removeAt(fromIndex))
-                                            }
-
-                                            dividerIndex.intValue = actions.indexOf("Actions Available")
-                                            itemOffsets.keys.forEach { key -> itemOffsets[key] = 0f }
-                                            draggedItem.value = null
+                                        if (targetIndex != fromIndex) {
+                                            actions.add(targetIndex, actions.removeAt(fromIndex))
                                         }
-                                    },
-                                    onDragCancel = {
+
+                                        dividerIndex.intValue = actions.indexOf("Actions Available")
                                         itemOffsets.keys.forEach { key -> itemOffsets[key] = 0f }
                                         draggedItem.value = null
                                     }
-                                )
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (label != "Actions Available") {
+                                },
+                                onDragCancel = {
+                                    itemOffsets.keys.forEach { key -> itemOffsets[key] = 0f }
+                                    draggedItem.value = null
+                                }
+                            )
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (label != "Actions Available") {
+                        Image(
+                            painter = painterResource(
+                                id =
+                                    if (index < dividerIndex.intValue)
+                                        R.drawable.ic_remove_action
+                                    else
+                                        R.drawable.ic_add_action
+                            ),
+                            contentDescription = null,
+                            Modifier
+                                .size(size = 30.dp)
+                                .clickable {
+                                    actions.remove(label)
+                                    if (index < dividerIndex.intValue) {
+                                        actions.add(actions.size, label)
+                                    } else {
+                                        actions.add(0, label)
+                                    }
+                                    dividerIndex.intValue =
+                                        actions.indexOf("Actions Available")
+                                },
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(
+                                color =
+                                    if (index < dividerIndex.intValue)
+                                        SelectedItemColor
+                                    else
+                                        AddActionsColor
+                            )
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(20.dp)
+                        )
+                        Image(
+                            painter = painterResource(
+                                id =
+                                    when (label) {
+                                        "Date" -> R.drawable.ic_today
+                                        "Priority" -> R.drawable.ic_priority
+                                        "Reminder" -> R.drawable.ic_reminder
+                                        "Executor" -> R.drawable.ic_executor
+                                        "Tags" -> R.drawable.ic_tags
+                                        "Deadline" -> R.drawable.ic_deadline
+                                        else -> R.drawable.ic_location
+                                    }
+                            ),
+                            contentDescription = null,
+                            Modifier
+                                .size(size = 20.dp),
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(
+                                color = Color.White
+                            )
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(22.dp)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .height(50.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 20.sp,
+                                color = Color.White
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
                             Image(
                                 painter = painterResource(
-                                    id =
-                                        if (index < dividerIndex.intValue)
-                                            R.drawable.ic_remove_action
-                                        else
-                                            R.drawable.ic_add_action
-                                ),
-                                contentDescription = null,
-                                Modifier
-                                    .size(size = 30.dp)
-                                    .clickable {
-                                        actions.remove(label)
-                                        if (index < dividerIndex.intValue) {
-                                            actions.add(actions.size, label)
-                                        } else {
-                                            actions.add(0, label)
-                                        }
-                                        dividerIndex.intValue =
-                                            actions.indexOf("Actions Available")
-                                    },
-                                contentScale = ContentScale.Crop,
-                                colorFilter = ColorFilter.tint(
-                                    color =
-                                        if (index < dividerIndex.intValue)
-                                            SelectedItemColor
-                                        else
-                                            AddActionsColor
-                                )
-                            )
-                            Spacer(
-                                modifier = Modifier
-                                    .width(20.dp)
-                            )
-                            Image(
-                                painter = painterResource(
-                                    id =
-                                        when (label) {
-                                            "Date" -> R.drawable.ic_today
-                                            "Priority" -> R.drawable.ic_priority
-                                            "Reminder" -> R.drawable.ic_reminder
-                                            "Executor" -> R.drawable.ic_executor
-                                            "Tags" -> R.drawable.ic_tags
-                                            "Deadline" -> R.drawable.ic_deadline
-                                            else -> R.drawable.ic_location
-                                        }
+                                    id = R.drawable.ic_drag
                                 ),
                                 contentDescription = null,
                                 Modifier
@@ -624,55 +663,22 @@ fun TaskFunctionsPage(
                                     color = Color.White
                                 )
                             )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text(
+                                text = "Actions available",
+                                fontSize = 15.sp,
+                                color = Color.White
+                            )
                             Spacer(
                                 modifier = Modifier
-                                    .width(22.dp)
+                                    .height(50.dp)
                             )
-                            Box(
-                                modifier = Modifier
-                                    .height(50.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = label,
-                                    fontSize = 20.sp,
-                                    color = Color.White
-                                )
-                            }
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                Image(
-                                    painter = painterResource(
-                                        id = R.drawable.ic_drag
-                                    ),
-                                    contentDescription = null,
-                                    Modifier
-                                        .size(size = 20.dp),
-                                    contentScale = ContentScale.Crop,
-                                    colorFilter = ColorFilter.tint(
-                                        color = Color.White
-                                    )
-                                )
-                            }
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                Text(
-                                    text = "Actions available",
-                                    fontSize = 15.sp,
-                                    color = Color.White
-                                )
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(50.dp)
-                                )
-                            }
                         }
                     }
                 }

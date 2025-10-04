@@ -39,6 +39,8 @@ import com.example.everydaytasks.ui.theme.BGColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(value = Build.VERSION_CODES.O)
@@ -169,101 +171,211 @@ fun ProgressPage(
                     && progressScreenDataObject.category
                     == "Today"
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Spacer(
-                            modifier = Modifier
-                                .height(10.dp)
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(
-                                    color = IntervalColor
-                                )
-                        ) {}
-                        Box(
+                    if (progressScreenDataObject.time == "") {
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                         ) {
-                            Row(
+                            Spacer(
                                 modifier = Modifier
-                                    .padding(5.dp)
-                                    .padding(
-                                        horizontal = 8.dp
-                                    )
-                            ) {
-                                Image(
-                                    painterResource(
-                                        id =
-                                            if (isCompleted.value) R.drawable.completed
-                                            else R.drawable.notcompleted
-                                    ),
-                                    contentDescription = null,
-                                    Modifier
-                                        .size(35.dp)
-                                        .clickable {
-                                            isCompleted.value = !isCompleted.value
-                                            fs.collection("tasks")
-                                                .document(progressScreenDataObject.key)
-                                                .set(
-                                                    ProgressScreenDataObject(
-                                                        progressScreenDataObject.newTask,
-                                                        isCompleted.value,
-                                                        progressScreenDataObject.key,
-                                                        progressScreenDataObject.dayAdded,
-                                                        progressScreenDataObject.daySelected,
-                                                        progressScreenDataObject.category,
-                                                        progressScreenDataObject.wasAdded,
-                                                        progressScreenDataObject.lastAdded,
-                                                        progressScreenDataObject.firstAdd
-                                                    )
-                                                )
-                                        },
-                                    contentScale = ContentScale.Crop
-                                )
-                                Text(
-                                    text = progressScreenDataObject.newTask,
-                                    modifier = Modifier
-                                        .padding(
-                                            end = 40.dp,
-                                            start = 3.dp
-                                        )
-                                        .clickable {
-                                            isExtended.value = !isExtended.value
-                                        },
-                                    fontSize = 25.sp,
-                                    maxLines =
-                                        if (isExtended.value) 100
-                                        else 1,
-                                    color = Color.White
-                                )
-                            }
+                                    .height(10.dp)
+                            )
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(
-                                        horizontal = 8.dp
-                                    ),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        fs.collection("tasks")
-                                            .document(progressScreenDataObject.key)
-                                            .delete()
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = "",
-                                        tint = Color.White,
-                                        modifier = Modifier
-                                            .size(20.dp)
+                                    .height(1.dp)
+                                    .background(
+                                        color = IntervalColor
                                     )
+                            ) {}
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                        .padding(
+                                            horizontal = 8.dp
+                                        )
+                                ) {
+                                    Image(
+                                        painterResource(
+                                            id =
+                                                if (isCompleted.value) R.drawable.completed
+                                                else R.drawable.notcompleted
+                                        ),
+                                        contentDescription = null,
+                                        Modifier
+                                            .size(35.dp)
+                                            .clickable {
+                                                isCompleted.value = !isCompleted.value
+                                                fs.collection("tasks")
+                                                    .document(progressScreenDataObject.key)
+                                                    .set(
+                                                        ProgressScreenDataObject(
+                                                            progressScreenDataObject.newTask,
+                                                            isCompleted.value,
+                                                            progressScreenDataObject.key,
+                                                            progressScreenDataObject.dayAdded,
+                                                            progressScreenDataObject.daySelected,
+                                                            progressScreenDataObject.category,
+                                                            progressScreenDataObject.wasAdded,
+                                                            progressScreenDataObject.lastAdded,
+                                                            progressScreenDataObject.firstAdd
+                                                        )
+                                                    )
+                                            },
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Text(
+                                        text = progressScreenDataObject.newTask,
+                                        modifier = Modifier
+                                            .padding(
+                                                end = 40.dp,
+                                                start = 3.dp
+                                            )
+                                            .clickable {
+                                                isExtended.value = !isExtended.value
+                                            },
+                                        fontSize = 25.sp,
+                                        maxLines =
+                                            if (isExtended.value) 100
+                                            else 1,
+                                        color = Color.White
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            horizontal = 8.dp
+                                        ),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            fs.collection("tasks")
+                                                .document(progressScreenDataObject.key)
+                                                .delete()
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Delete,
+                                            contentDescription = "",
+                                            tint = Color.White,
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (
+                        LocalTime.now().isAfter(
+                            LocalTime.parse(
+                                progressScreenDataObject.time,
+                                DateTimeFormatter.ofPattern("HH:mm")
+                            )
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Spacer(
+                                modifier = Modifier
+                                    .height(10.dp)
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(
+                                        color = IntervalColor
+                                    )
+                            ) {}
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                        .padding(
+                                            horizontal = 8.dp
+                                        )
+                                ) {
+                                    Image(
+                                        painterResource(
+                                            id =
+                                                if (isCompleted.value) R.drawable.completed
+                                                else R.drawable.notcompleted
+                                        ),
+                                        contentDescription = null,
+                                        Modifier
+                                            .size(35.dp)
+                                            .clickable {
+                                                isCompleted.value = !isCompleted.value
+                                                fs.collection("tasks")
+                                                    .document(progressScreenDataObject.key)
+                                                    .set(
+                                                        ProgressScreenDataObject(
+                                                            progressScreenDataObject.newTask,
+                                                            isCompleted.value,
+                                                            progressScreenDataObject.key,
+                                                            progressScreenDataObject.dayAdded,
+                                                            progressScreenDataObject.daySelected,
+                                                            progressScreenDataObject.category,
+                                                            progressScreenDataObject.wasAdded,
+                                                            progressScreenDataObject.lastAdded,
+                                                            progressScreenDataObject.firstAdd
+                                                        )
+                                                    )
+                                            },
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Text(
+                                        text = progressScreenDataObject.newTask,
+                                        modifier = Modifier
+                                            .padding(
+                                                end = 40.dp,
+                                                start = 3.dp
+                                            )
+                                            .clickable {
+                                                isExtended.value = !isExtended.value
+                                            },
+                                        fontSize = 25.sp,
+                                        maxLines =
+                                            if (isExtended.value) 100
+                                            else 1,
+                                        color = Color.White
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            horizontal = 8.dp
+                                        ),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            fs.collection("tasks")
+                                                .document(progressScreenDataObject.key)
+                                                .delete()
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Delete,
+                                            contentDescription = "",
+                                            tint = Color.White,
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
