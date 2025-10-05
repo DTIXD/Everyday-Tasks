@@ -127,6 +127,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.AddingToneColor
@@ -378,17 +379,17 @@ class MainActivity : ComponentActivity() {
                                     BasicTextField(
                                         value = newTask,
                                         onValueChange = { newTask = it },
-                                        singleLine = true,
                                         textStyle = TextStyle(color = Color.Transparent, fontSize = 18.sp),
                                         cursorBrush = SolidColor(Color.White),
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .heightIn(min = 50.dp)
+                                            .fillMaxWidth(.95f)
+                                            .heightIn(min = 50.dp, max = 300.dp)
                                             .verticalScroll(scrollState)
-                                            .padding(8.dp),
+                                            .padding(vertical = 8.dp),
                                         decorationBox = { innerTextField ->
                                             Box(
                                                 modifier = Modifier
+                                                    .fillMaxWidth()
                                                     .background(Color.Transparent)
                                                     .padding(4.dp)
                                             ) {
@@ -396,7 +397,7 @@ class MainActivity : ComponentActivity() {
                                                     Text("NewTask", color = Color.Gray, fontSize = 18.sp)
                                                 }
 
-                                                val regex = Regex("@\\S+")
+                                                val regex = Regex("@\\w+")
                                                 val annotatedString = buildAnnotatedString {
                                                     var lastIndex = 0
                                                     for (match in regex.findAll(newTask)) {
@@ -413,14 +414,14 @@ class MainActivity : ComponentActivity() {
                                                     match.value to InlineTextContent(
                                                         Placeholder(
                                                             width = (match.value.length * 9).sp,
-                                                            height = 24.sp,
+                                                            height = 30.sp,
                                                             placeholderVerticalAlign = PlaceholderVerticalAlign.Center
                                                         )
                                                     ) {
                                                         Box(
                                                             modifier = Modifier
                                                                 .background(TagsColor, RoundedCornerShape(6.dp))
-                                                                .padding(horizontal = 4.dp, vertical = 2.dp)
+                                                                .padding(horizontal = 2.dp, vertical = 2.dp)
                                                         ) {
                                                             Text(
                                                                 text = match.value,
@@ -433,7 +434,14 @@ class MainActivity : ComponentActivity() {
                                                 Text(
                                                     text = annotatedString,
                                                     inlineContent = inlineContents,
-                                                    style = TextStyle(color = Color.White, fontSize = 18.sp)
+                                                    style = TextStyle(
+                                                        color = Color.White,
+                                                        fontSize = 18.sp
+                                                    ),
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    softWrap = true,
+                                                    overflow = TextOverflow.Clip,
+                                                    maxLines = Int.MAX_VALUE
                                                 )
                                                 innerTextField()
                                             }
