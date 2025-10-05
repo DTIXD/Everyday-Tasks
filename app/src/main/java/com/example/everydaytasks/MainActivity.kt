@@ -32,6 +32,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
@@ -62,6 +63,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.everydaytasks.ui.theme.BGColor
+import androidx.compose.foundation.verticalScroll
 import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.bottommenu.BottomMenu
 import com.example.everydaytasks.ui.theme.date.DatePage
@@ -91,7 +93,11 @@ import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.GreyButtonBGColor
 import com.example.everydaytasks.ui.theme.TodayColor
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -115,11 +121,16 @@ import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.AddingToneColor
+import com.example.everydaytasks.ui.theme.TagsColor
 import com.example.everydaytasks.ui.theme.TomorrowColor
 import com.example.everydaytasks.ui.theme.WarningBorderColor
 import com.example.everydaytasks.ui.theme.WarningColor
@@ -268,9 +279,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
-                    val newTask = remember {
-                        mutableStateOf("")
-                    }
+                    var newTask by remember { mutableStateOf("") }
 
                     val fs = Firebase.firestore
                     val list = remember {
@@ -364,28 +373,70 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                 ) {
-                                    TextField(
-                                        value = newTask.value,
-                                        onValueChange = {
-                                            newTask.value = it
-                                        },
-                                        shape = RoundedCornerShape(7.dp),
-                                        colors = TextFieldDefaults.colors(
-                                            unfocusedTextColor = Color.White,
-                                            focusedTextColor = Color.White,
-                                            unfocusedContainerColor = BGColor,
-                                            focusedContainerColor = BGColor,
-                                            unfocusedIndicatorColor = Color.Transparent,
-                                            focusedIndicatorColor = Color.Transparent,
-                                        ),
+                                    val scrollState = rememberScrollState()
+
+                                    BasicTextField(
+                                        value = newTask,
+                                        onValueChange = { newTask = it },
+                                        singleLine = true,
+                                        textStyle = TextStyle(color = Color.Transparent, fontSize = 18.sp),
+                                        cursorBrush = SolidColor(Color.White),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(50.dp),
-                                        label = {
-                                            Text(
-                                                text = "Task",
-                                                color = CaptionTextColor
-                                            )
+                                            .heightIn(min = 50.dp)
+                                            .verticalScroll(scrollState)
+                                            .padding(8.dp),
+                                        decorationBox = { innerTextField ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .background(Color.Transparent)
+                                                    .padding(4.dp)
+                                            ) {
+                                                if (newTask.isEmpty()) {
+                                                    Text("NewTask", color = Color.Gray, fontSize = 18.sp)
+                                                }
+
+                                                val regex = Regex("@\\S+")
+                                                val annotatedString = buildAnnotatedString {
+                                                    var lastIndex = 0
+                                                    for (match in regex.findAll(newTask)) {
+                                                        append(newTask.substring(lastIndex, match.range.first))
+                                                        appendInlineContent(match.value, match.value)
+                                                        lastIndex = match.range.last + 1
+                                                    }
+                                                    if (lastIndex < newTask.length) {
+                                                        append(newTask.substring(lastIndex))
+                                                    }
+                                                }
+
+                                                val inlineContents = regex.findAll(newTask).associate { match ->
+                                                    match.value to InlineTextContent(
+                                                        Placeholder(
+                                                            width = (match.value.length * 9).sp,
+                                                            height = 24.sp,
+                                                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                                                        )
+                                                    ) {
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .background(TagsColor, RoundedCornerShape(6.dp))
+                                                                .padding(horizontal = 4.dp, vertical = 2.dp)
+                                                        ) {
+                                                            Text(
+                                                                text = match.value,
+                                                                color = Color.White,
+                                                                fontSize = 18.sp
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                                Text(
+                                                    text = annotatedString,
+                                                    inlineContent = inlineContents,
+                                                    style = TextStyle(color = Color.White, fontSize = 18.sp)
+                                                )
+                                                innerTextField()
+                                            }
                                         }
                                     )
                                     LazyRow(
@@ -688,10 +739,7 @@ class MainActivity : ComponentActivity() {
                                                                     color = BorderColor
                                                                 )
                                                                 .clickable {
-                                                                    scope.launch {
-                                                                        sheet1State.value = false
-                                                                        sheet3State.value = true
-                                                                    }
+                                                                    newTask += "@"
                                                                 },
                                                             verticalAlignment = Alignment.CenterVertically
                                                         ) {
@@ -915,7 +963,7 @@ class MainActivity : ComponentActivity() {
                                                         fs.collection("tasks")
                                                             .document(key).set(
                                                                 ProgressScreenDataObject(
-                                                                    newTask = newTask.value,
+                                                                    newTask = newTask,
                                                                     isCompleted = false,
                                                                     key = key,
                                                                     dayAdded =
