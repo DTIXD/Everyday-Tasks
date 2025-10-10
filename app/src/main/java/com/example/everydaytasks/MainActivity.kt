@@ -32,7 +32,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
@@ -95,9 +94,7 @@ import com.example.everydaytasks.ui.theme.TodayColor
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -105,7 +102,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
@@ -122,16 +122,16 @@ import kotlin.math.sin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.AddingToneColor
-import com.example.everydaytasks.ui.theme.TagsColor
 import com.example.everydaytasks.ui.theme.TomorrowColor
 import com.example.everydaytasks.ui.theme.WarningBorderColor
 import com.example.everydaytasks.ui.theme.WarningColor
@@ -374,79 +374,115 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                 ) {
-                                    val scrollState = rememberScrollState()
+                                    var annotatedParts by remember { mutableStateOf(setOf<String>()) }
+                                    var cursorAfterAt by remember { mutableStateOf(false) }
+                                    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
 
-                                    BasicTextField(
-                                        value = newTask,
-                                        onValueChange = { newTask = it },
-                                        textStyle = TextStyle(color = Color.Transparent, fontSize = 18.sp),
-                                        cursorBrush = SolidColor(Color.White),
+                                    val regex = Regex("@\\w+")
+
+                                    Box(
                                         modifier = Modifier
-                                            .fillMaxWidth(.95f)
-                                            .heightIn(min = 50.dp, max = 300.dp)
-                                            .verticalScroll(scrollState)
-                                            .padding(vertical = 8.dp),
-                                        decorationBox = { innerTextField ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .background(Color.Transparent)
-                                                    .padding(4.dp)
-                                            ) {
-                                                if (newTask.isEmpty()) {
-                                                    Text("NewTask", color = Color.Gray, fontSize = 18.sp)
-                                                }
+                                            .fillMaxWidth()
+                                            .verticalScroll(rememberScrollState())
+                                            .padding(8.dp)
+                                    ) {
+                                        if (newTask.isEmpty()) {
+                                            Text("NewTask", color = Color.Gray, fontSize = 18.sp)
+                                        }
 
-                                                val regex = Regex("@\\w+")
-                                                val annotatedString = buildAnnotatedString {
-                                                    var lastIndex = 0
-                                                    for (match in regex.findAll(newTask)) {
-                                                        append(newTask.substring(lastIndex, match.range.first))
-                                                        appendInlineContent(match.value, match.value)
-                                                        lastIndex = match.range.last + 1
-                                                    }
-                                                    if (lastIndex < newTask.length) {
-                                                        append(newTask.substring(lastIndex))
-                                                    }
+                                        val annotatedString = buildAnnotatedString {
+                                            var lastIndex = 0
+                                            for (match in regex.findAll(newTask)) {
+                                                append(newTask.substring(lastIndex, match.range.first))
+                                                val word = match.value
+                                                val isAnnotated = annotatedParts.contains(word)
+                                                withStyle(
+                                                    style = SpanStyle(
+                                                        color = Color.White,
+                                                        background = if (isAnnotated) Color.Transparent else Color.Transparent
+                                                    )
+                                                ) {
+                                                    append(word)
                                                 }
+                                                lastIndex = match.range.last + 1
+                                            }
+                                            if (lastIndex < newTask.length) append(newTask.substring(lastIndex))
+                                        }
 
-                                                val inlineContents = regex.findAll(newTask).associate { match ->
-                                                    match.value to InlineTextContent(
-                                                        Placeholder(
-                                                            width = (match.value.length * 9).sp,
-                                                            height = 30.sp,
-                                                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                                                        )
-                                                    ) {
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .background(TagsColor, RoundedCornerShape(6.dp))
-                                                                .padding(horizontal = 2.dp, vertical = 2.dp)
-                                                        ) {
-                                                            Text(
-                                                                text = match.value,
-                                                                color = Color.White,
-                                                                fontSize = 18.sp
-                                                            )
+                                        Text(
+                                            text = annotatedString,
+                                            fontSize = 18.sp,
+                                            color = Color.White,
+                                            lineHeight = 24.sp,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .drawBehind {
+                                                    val layout = textLayoutResult ?: return@drawBehind
+                                                    annotatedParts.forEach { word ->
+                                                        val startIndex = newTask.indexOf(word)
+                                                        if (startIndex != -1) {
+                                                            val endIndex = startIndex + word.length
+                                                            val boxes = (startIndex until endIndex).map { layout.getBoundingBox(it) }
+
+                                                            if (boxes.isNotEmpty()) {
+                                                                val top = boxes.minOf { it.top }
+                                                                val bottom = boxes.maxOf { it.bottom }
+                                                                val left = boxes.minOf { it.left }
+                                                                val right = boxes.maxOf { it.right }
+
+                                                                drawRoundRect(
+                                                                    color = Color.Red,
+                                                                    topLeft = Offset(left - 4.dp.toPx(), top - 2.dp.toPx()),
+                                                                    size = Size(
+                                                                        width = (right - left) + 8.dp.toPx(),
+                                                                        height = (bottom - top) + 4.dp.toPx()
+                                                                    ),
+                                                                    cornerRadius = CornerRadius(8.dp.toPx())
+                                                                )
+                                                            }
                                                         }
                                                     }
+                                                },
+                                            onTextLayout = { textLayoutResult = it },
+                                            softWrap = true,
+                                            overflow = TextOverflow.Clip,
+                                            maxLines = Int.MAX_VALUE
+                                        )
+
+                                        BasicTextField(
+                                            value = newTask,
+                                            onValueChange = { text ->
+                                                newTask = text
+                                                cursorAfterAt = regex.findAll(text).any { match ->
+                                                    match.range.last + 1 == text.length
                                                 }
-                                                Text(
-                                                    text = annotatedString,
-                                                    inlineContent = inlineContents,
-                                                    style = TextStyle(
-                                                        color = Color.White,
-                                                        fontSize = 18.sp
-                                                    ),
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    softWrap = true,
-                                                    overflow = TextOverflow.Clip,
-                                                    maxLines = Int.MAX_VALUE
-                                                )
-                                                innerTextField()
+                                            },
+                                            textStyle = TextStyle(color = Color.Transparent, fontSize = 18.sp),
+                                            cursorBrush = SolidColor(Color.White),
+                                            modifier = Modifier
+                                                .matchParentSize()
+                                                .background(Color.Transparent)
+                                        )
+
+                                        if (cursorAfterAt) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .align(Alignment.BottomEnd)
+                                                    .padding(8.dp)
+                                                    .clip(RoundedCornerShape(50))
+                                                    .background(Color.Red)
+                                                    .clickable {
+                                                        val match = regex.findAll(newTask).lastOrNull()
+                                                        match?.let { annotatedParts = annotatedParts + it.value }
+                                                        cursorAfterAt = false
+                                                    }
+                                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                                            ) {
+                                                Text("Annotate", color = Color.White)
                                             }
                                         }
-                                    )
+                                    }
+
                                     LazyRow(
                                         modifier = Modifier
                                             .fillMaxWidth()
