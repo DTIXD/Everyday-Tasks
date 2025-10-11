@@ -103,6 +103,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -132,6 +133,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.AddingToneColor
+import com.example.everydaytasks.ui.theme.TagsBGColor
+import com.example.everydaytasks.ui.theme.TagsColor
 import com.example.everydaytasks.ui.theme.TomorrowColor
 import com.example.everydaytasks.ui.theme.WarningBorderColor
 import com.example.everydaytasks.ui.theme.WarningColor
@@ -332,6 +335,9 @@ class MainActivity : ComponentActivity() {
                     val showDialog4 = remember {
                         mutableStateOf(false)
                     }
+                    val showDialog5 = remember {
+                        mutableStateOf(false)
+                    }
 
                     val selectedPriority = remember {
                         mutableIntStateOf(0)
@@ -347,12 +353,16 @@ class MainActivity : ComponentActivity() {
                     val taskTag = remember {
                         mutableStateOf("")
                     }
+                    var annotatedParts by remember { mutableStateOf(setOf<String>()) }
+                    var tagName by remember { mutableStateOf("") }
+                    val regex = Regex("@\\w+")
 
                     if (sheet1State.value) {
                         ModalBottomSheet(
                             onDismissRequest = {
                                 scope.launch {
                                     sheet1State.value = false
+                                    newTask = ""
                                 }
                             },
                             sheetState = rememberModalBottomSheetState(
@@ -374,11 +384,7 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                 ) {
-                                    var annotatedParts by remember { mutableStateOf(setOf<String>()) }
-                                    var cursorAfterAt by remember { mutableStateOf(false) }
                                     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-
-                                    val regex = Regex("@\\w+")
 
                                     Box(
                                         modifier = Modifier
@@ -413,7 +419,7 @@ class MainActivity : ComponentActivity() {
                                             text = annotatedString,
                                             fontSize = 18.sp,
                                             color = Color.White,
-                                            lineHeight = 24.sp,
+                                            lineHeight = 26.sp,
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .drawBehind {
@@ -422,23 +428,22 @@ class MainActivity : ComponentActivity() {
                                                         val startIndex = newTask.indexOf(word)
                                                         if (startIndex != -1) {
                                                             val endIndex = startIndex + word.length
-                                                            val boxes = (startIndex until endIndex).map { layout.getBoundingBox(it) }
+                                                            val boxes = (startIndex until endIndex).map {
+                                                                layout.getBoundingBox(it)
+                                                            }
 
                                                             if (boxes.isNotEmpty()) {
-                                                                val top = boxes.minOf { it.top }
-                                                                val bottom = boxes.maxOf { it.bottom }
-                                                                val left = boxes.minOf { it.left }
-                                                                val right = boxes.maxOf { it.right }
-
-                                                                drawRoundRect(
-                                                                    color = Color.Red,
-                                                                    topLeft = Offset(left - 4.dp.toPx(), top - 2.dp.toPx()),
-                                                                    size = Size(
-                                                                        width = (right - left) + 8.dp.toPx(),
-                                                                        height = (bottom - top) + 4.dp.toPx()
-                                                                    ),
-                                                                    cornerRadius = CornerRadius(8.dp.toPx())
-                                                                )
+                                                                boxes.forEach {
+                                                                    drawRoundRect(
+                                                                        color = TagsColor,
+                                                                        topLeft = Offset(it.left - 5.dp.toPx(), it.top - 2.dp.toPx()),
+                                                                        size = Size(
+                                                                            width = (it.right - it.left) + 10.dp.toPx(),
+                                                                            height = (it.bottom - it.top) + 4.dp.toPx()
+                                                                        ),
+                                                                        cornerRadius = CornerRadius(8.dp.toPx())
+                                                                    )
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -453,8 +458,13 @@ class MainActivity : ComponentActivity() {
                                             value = newTask,
                                             onValueChange = { text ->
                                                 newTask = text
-                                                cursorAfterAt = regex.findAll(text).any { match ->
+                                                val match = regex.findAll(newTask).firstOrNull {match ->
                                                     match.range.last + 1 == text.length
+                                                }
+
+                                                if (match != null) {
+                                                    showDialog5.value = true
+                                                    tagName = match.value.removePrefix("@")
                                                 }
                                             },
                                             textStyle = TextStyle(color = Color.Transparent, fontSize = 18.sp),
@@ -463,24 +473,6 @@ class MainActivity : ComponentActivity() {
                                                 .matchParentSize()
                                                 .background(Color.Transparent)
                                         )
-
-                                        if (cursorAfterAt) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .align(Alignment.BottomEnd)
-                                                    .padding(8.dp)
-                                                    .clip(RoundedCornerShape(50))
-                                                    .background(Color.Red)
-                                                    .clickable {
-                                                        val match = regex.findAll(newTask).lastOrNull()
-                                                        match?.let { annotatedParts = annotatedParts + it.value }
-                                                        cursorAfterAt = false
-                                                    }
-                                                    .padding(horizontal = 12.dp, vertical = 8.dp)
-                                            ) {
-                                                Text("Annotate", color = Color.White)
-                                            }
-                                        }
                                     }
 
                                     LazyRow(
@@ -1593,6 +1585,25 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
                                 }
+                            }
+                        }
+                        if (showDialog5.value) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .clip(RoundedCornerShape(16))
+                                    .width(350.dp)
+                                    .offset(y = 600.dp)
+                                    .shadow(elevation = 10.dp, shape = RoundedCornerShape(16.dp))
+                                    .background(TagsBGColor)
+                                    .clickable {
+                                        val match = regex.findAll(newTask).lastOrNull()
+                                        match?.let { annotatedParts = annotatedParts + it.value }
+                                        showDialog5.value = false
+                                    }
+                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                            ) {
+                                Text("Add tag '$tagName'", color = Color.White)
                             }
                         }
                     }
