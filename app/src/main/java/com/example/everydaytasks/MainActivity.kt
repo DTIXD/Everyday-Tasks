@@ -1588,22 +1588,36 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         if (showDialog5.value) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .clip(RoundedCornerShape(16))
-                                    .width(350.dp)
-                                    .offset(y = 600.dp)
-                                    .shadow(elevation = 10.dp, shape = RoundedCornerShape(16.dp))
-                                    .background(TagsBGColor)
-                                    .clickable {
-                                        val match = regex.findAll(newTask).lastOrNull()
-                                        match?.let { annotatedParts = annotatedParts + it.value }
-                                        showDialog5.value = false
-                                    }
-                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                            Popup(
+                                alignment = Alignment.Center,
+                                onDismissRequest = {
+                                    showDialog5.value = false
+                                },
+                                properties = PopupProperties(
+                                    focusable = false
+                                )
                             ) {
-                                Text("Add tag '$tagName'", color = Color.White)
+                                Box(
+                                    modifier = Modifier
+                                        .padding(top = 300.dp)
+                                        .clip(RoundedCornerShape(12))
+                                        .width(350.dp)
+                                        .shadow(
+                                            elevation = 10.dp,
+                                            shape = RoundedCornerShape(12.dp)
+                                        )
+                                        .background(TagsBGColor)
+                                        .clickable {
+                                            val match = regex.findAll(newTask).lastOrNull()
+                                            match?.let {
+                                                annotatedParts = annotatedParts + it.value
+                                            }
+                                            showDialog5.value = false
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 12.dp)
+                                ) {
+                                    Text("Add tag '$tagName'", color = Color.White)
+                                }
                             }
                         }
                     }
