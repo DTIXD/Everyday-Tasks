@@ -132,6 +132,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.everydaytasks.ui.theme.AddingToneColor
 import com.example.everydaytasks.ui.theme.TagsBGColor
 import com.example.everydaytasks.ui.theme.TagsColor
@@ -146,6 +148,17 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.text.replaceFirstChar
+import android.Manifest
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Paint
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.NotificationCompat
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import androidx.compose.runtime.Composable
 
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -154,6 +167,15 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannel(this)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
@@ -1612,11 +1634,35 @@ class MainActivity : ComponentActivity() {
                                             match?.let {
                                                 annotatedParts = annotatedParts + it.value
                                             }
+                                            taskTag.value = tagName
                                             showDialog5.value = false
                                         }
-                                        .padding(horizontal = 12.dp, vertical = 12.dp)
                                 ) {
-                                    Text("Add tag '$tagName'", color = Color.White)
+                                    Spacer(
+                                        modifier = Modifier
+                                            .width(20.dp)
+                                    )
+                                    Image(
+                                        painterResource(
+                                            id = R.drawable.ic_tags
+                                        ),
+                                        contentDescription = null,
+                                        Modifier
+                                            .size(30.dp),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Spacer(
+                                        modifier = Modifier
+                                            .width(20.dp)
+                                    )
+                                    Text(
+                                        text = "Add tag '$tagName'",
+                                        color = Color.White
+                                    )
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(60.dp)
+                                    )
                                 }
                             }
                         }
@@ -3324,16 +3370,14 @@ class MainActivity : ComponentActivity() {
                                                                                 center = center
                                                                             )
                                                                             val paint =
-                                                                                android.graphics
-                                                                                    .Paint().apply {
+                                                                                Paint().apply {
                                                                                         color =
                                                                                             android.graphics
                                                                                                 .Color.WHITE
                                                                                         textSize =
                                                                                             40f
                                                                                         textAlign =
-                                                                                            android.graphics
-                                                                                                .Paint.Align.CENTER
+                                                                                            Paint.Align.CENTER
                                                                                         isAntiAlias =
                                                                                             true
                                                                                     }
@@ -3664,6 +3708,7 @@ class MainActivity : ComponentActivity() {
                                                 fontSize = 20.sp,
                                                 color = Color.White
                                             )
+                                            NotificationScreen()
                                         }
                                         Spacer(
                                             modifier = Modifier
@@ -3755,5 +3800,70 @@ class MainActivity : ComponentActivity() {
 
         window.navigationBarColor = Color(0xFF262626).toArgb()
 
+    }
+
+    private fun createNotificationChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "MyApp Notifications"
+            val descriptionText = "General notifications for the app"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel("my_channel_id", name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+}
+
+@Composable
+fun NotificationScreen() {
+    val context = LocalContext.current
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Button(
+            onClick = {
+                showNotification(
+                    context = context,
+                    title = "New Task Created",
+                    message = "You’ve added a new task to your list!"
+                )
+            },
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+        ) {
+            Text("Send Notification")
+        }
+    }
+}
+
+fun showNotification(context: Context, title: String, message: String) {
+    val intent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    }
+    val pendingIntent: PendingIntent = PendingIntent.getActivity(
+        context, 0, intent,
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+    )
+
+    val builder = NotificationCompat.Builder(context, "my_channel_id")
+        .setSmallIcon(android.R.drawable.ic_dialog_info)
+        .setContentTitle(title)
+        .setContentText(message)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setContentIntent(pendingIntent)
+        .setAutoCancel(true)
+
+    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+        == PackageManager.PERMISSION_GRANTED
+    ) {
+        with(NotificationManagerCompat.from(context)) {
+            notify(System.currentTimeMillis().toInt(), builder.build())
+        }
     }
 }
