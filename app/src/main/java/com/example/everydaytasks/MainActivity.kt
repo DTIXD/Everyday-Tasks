@@ -149,6 +149,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.text.replaceFirstChar
 import android.Manifest
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -158,7 +159,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import androidx.compose.runtime.Composable
+import android.content.BroadcastReceiver
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import java.util.Calendar
 
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -167,7 +171,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createNotificationChannel(this)
+        createNotificationChannel()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
@@ -176,11 +180,30 @@ class MainActivity : ComponentActivity() {
                 0
             )
         }
+        val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (!isGranted) {
+                    println("Notification permission denied.")
+                }
+            }
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
         enableEdgeToEdge()
         setContent {
+            val context = LocalContext.current
+            LaunchedEffect(Unit) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            }
+
             val navController = rememberNavController()
 
             val isBottomMenuVisible = remember {
@@ -3708,7 +3731,6 @@ class MainActivity : ComponentActivity() {
                                                 fontSize = 20.sp,
                                                 color = Color.White
                                             )
-                                            NotificationScreen()
                                         }
                                         Spacer(
                                             modifier = Modifier
@@ -3747,6 +3769,27 @@ class MainActivity : ComponentActivity() {
                                                 fontSize = 20.sp,
                                                 color = Color.White
                                             )
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 15.dp)
+                                        )
+
+                                        Row{
+                                            Text(
+                                                "Notification Demo",
+                                                style = MaterialTheme.typography.titleLarge
+                                            )
+
+                                            Spacer(Modifier.height(20.dp))
+
+                                            Spacer(Modifier.height(20.dp))
+
+                                            Button(onClick = {
+                                                scheduleNotification(context, 11, 25)
+                                            }) {
+                                                Text("Schedule Notification 10 min before")
+                                            }
                                         }
                                         Spacer(
                                             modifier = Modifier
@@ -3802,68 +3845,85 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    private fun createNotificationChannel(context: Context) {
+    private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "MyApp Notifications"
-            val descriptionText = "General notifications for the app"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel("my_channel_id", name, importance).apply {
-                description = descriptionText
+            val channel = NotificationChannel(
+                "tasks_channel",
+                "Task Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Channel for upcoming task reminders"
             }
-            val notificationManager: NotificationManager =
-                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
     }
 }
 
-@Composable
-fun NotificationScreen() {
-    val context = LocalContext.current
+class NotificationReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val title = intent.getStringExtra("title") ?: "Task Reminder"
+        val message = intent.getStringExtra("message") ?: "You have a task soon!"
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Button(
-            onClick = {
-                showNotification(
-                    context = context,
-                    title = "New Task Created",
-                    message = "You’ve added a new task to your list!"
-                )
-            },
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Text("Send Notification")
+            println(" Skipped showing notification: missing permission")
+            return
+        }
+
+        val builder = NotificationCompat.Builder(context, "tasks_channel")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        with(NotificationManagerCompat.from(context)) {
+            try {
+                notify(System.currentTimeMillis().toInt(), builder.build())
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
         }
     }
 }
 
-fun showNotification(context: Context, title: String, message: String) {
-    val intent = Intent(context, MainActivity::class.java).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+fun scheduleNotification(context: Context, hour: Int, minute: Int) {
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    val now = Calendar.getInstance()
+    val triggerTime = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, hour)
+        set(Calendar.MINUTE, minute - 10)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+
+        if (before(now)) add(Calendar.DAY_OF_MONTH, 1)
     }
-    val pendingIntent: PendingIntent = PendingIntent.getActivity(
-        context, 0, intent,
-        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+
+    val intent = Intent(context, NotificationReceiver::class.java).apply {
+        putExtra("title", "Upcoming Task")
+        putExtra("message", "You have a task at %02d:%02d".format(hour, minute))
+    }
+
+    val pendingIntent = PendingIntent.getBroadcast(
+        context,
+        hour * 100 + minute,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    val builder = NotificationCompat.Builder(context, "my_channel_id")
-        .setSmallIcon(android.R.drawable.ic_dialog_info)
-        .setContentTitle(title)
-        .setContentText(message)
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        .setContentIntent(pendingIntent)
-        .setAutoCancel(true)
-
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
-        == PackageManager.PERMISSION_GRANTED
-    ) {
-        with(NotificationManagerCompat.from(context)) {
-            notify(System.currentTimeMillis().toInt(), builder.build())
-        }
+    try {
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            triggerTime.timeInMillis,
+            pendingIntent
+        )
+        println("Alarm scheduled for: ${triggerTime.time}")
+    } catch (e: SecurityException) {
+        e.printStackTrace()
     }
 }
