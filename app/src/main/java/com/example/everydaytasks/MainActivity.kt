@@ -3834,7 +3834,7 @@ class MainActivity : ComponentActivity() {
                         Popup(
                             alignment = Alignment.Center,
                             onDismissRequest = {
-                                showDialog3.value = false
+                                showDialog6.value = false
                             },
                             properties = PopupProperties(
                                 focusable = true
@@ -3850,44 +3850,165 @@ class MainActivity : ComponentActivity() {
                                         RoundedCornerShape(15.dp)
                                     )
                                     .background(
-                                        color = BottomMenuColor
+                                        color = BGColor
                                     )
                                     .border(
                                         width = 2.dp,
                                         color = BorderColor,
                                         shape = RoundedCornerShape(15.dp)
                                     )
-
                             ) {
-                                TextField(
-                                    value = notificationInterval.value,
-                                    onValueChange = {
-                                        notificationInterval.value = it
-                                    },
-                                    shape = RoundedCornerShape(7.dp),
+                                val selectedNotificationTimeContent = remember {
+                                    mutableIntStateOf(0)
+                                }
+                                Column(
                                     modifier = Modifier
-                                        .fillMaxWidth(.90f)
-                                        .height(50.dp),
-                                    label = {
-                                        Text(
-                                            text = "Repeat",
-                                            color = TextFieldLabelColor
+                                        .fillMaxWidth()
+                                        .padding(
+                                            vertical = 12.dp,
+                                            horizontal = 18.dp
                                         )
-                                    }
-                                )
-                                Spacer(
-                                    modifier = Modifier
-                                        .width(10.dp)
-                                )
-                                Button(
-                                    onClick = {
-                                        val minutes = notificationInterval.value.toIntOrNull()
-                                        if (minutes != null && minutes > 0) {
-                                            scheduleRepeatingNotification(context, minutes)
-                                        }
-                                    },
                                 ) {
-                                    Text("Apply")
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        TextField(
+                                            value = notificationInterval.value,
+                                            onValueChange = {
+                                                notificationInterval.value = it
+                                            },
+                                            shape = RoundedCornerShape(7.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth(.60f)
+                                                .height(90.dp),
+                                            label = {
+                                                Text(
+                                                    text = "Repeat",
+                                                    color = TextFieldLabelColor
+                                                )
+                                            }
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .width(10.dp)
+                                        )
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(90.dp)
+                                                .clip(
+                                                    RoundedCornerShape(10.dp)
+                                                )
+                                                .border(
+                                                    width = 2.dp,
+                                                    color = BottomMenuColor,
+                                                    shape = RoundedCornerShape(
+                                                        10.dp
+                                                    )
+                                                )
+                                                .background(
+                                                    color = BottomMenuColor
+                                                ),
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(.98f)
+                                                    .height(30.dp)
+                                                    .clip(
+                                                        RoundedCornerShape(
+                                                            topStart = 10.dp,
+                                                            topEnd = 10.dp
+                                                        )
+                                                    )
+                                                    .background(
+                                                        color =
+                                                            if (selectedNotificationTimeContent.intValue == 0) AddingToneColor
+                                                            else BottomMenuColor
+                                                    )
+                                                    .clickable {
+                                                        selectedNotificationTimeContent.intValue = 0
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "Min",
+                                                    color = Color.White,
+                                                    fontSize = 10.sp
+                                                )
+                                            }
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(.98f)
+                                                    .height(30.dp)
+                                                    .background(
+                                                        color =
+                                                            if (selectedNotificationTimeContent.intValue == 1) AddingToneColor
+                                                            else BottomMenuColor
+                                                    )
+                                                    .clickable {
+                                                        selectedNotificationTimeContent.intValue = 1
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "Hr",
+                                                    color = Color.White,
+                                                    fontSize = 10.sp
+                                                )
+                                            }
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(.98f)
+                                                    .height(30.dp)
+                                                    .clip(
+                                                        RoundedCornerShape(
+                                                            bottomStart = 10.dp,
+                                                            bottomEnd = 10.dp
+                                                        )
+                                                    )
+                                                    .background(
+                                                        color =
+                                                            if (selectedNotificationTimeContent.intValue == 2) AddingToneColor
+                                                            else BottomMenuColor
+                                                    )
+                                                    .clickable {
+                                                        selectedNotificationTimeContent.intValue = 2
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "Day",
+                                                    color = Color.White,
+                                                    fontSize = 10.sp
+                                                )
+                                            }
+                                        }
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(10.dp)
+                                    )
+                                    Button(
+                                        onClick = {
+                                            var minutes = notificationInterval.value.toInt()
+
+                                            if (selectedNotificationTimeContent.intValue == 1) {
+                                                minutes = minutes * 60
+                                            } else if (selectedNotificationTimeContent.intValue == 2) {
+                                                minutes = minutes * 60 * 24
+                                            }
+
+                                            if (minutes > 0) {
+                                                scheduleRepeatingNotification(context, minutes)
+                                            }
+                                        },
+                                    ) {
+                                        Text("Apply")
+                                    }
                                 }
                             }
                         }
