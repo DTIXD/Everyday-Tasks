@@ -103,7 +103,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -132,7 +131,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.everydaytasks.ui.theme.AddingToneColor
 import com.example.everydaytasks.ui.theme.TagsBGColor
@@ -155,14 +153,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Paint
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import java.util.Calendar
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import com.example.everydaytasks.ui.theme.TextFieldLabelColor
 
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -171,39 +168,14 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createNotificationChannel()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                0
-            )
-        }
-        val requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (!isGranted) {
-                    println("Notification permission denied.")
-                }
-            }
+        createNotificationChannel()
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
 
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
-            LaunchedEffect(Unit) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    if (ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.POST_NOTIFICATIONS
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
-            }
-
             val navController = rememberNavController()
 
             val isBottomMenuVisible = remember {
@@ -381,6 +353,9 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf(false)
                     }
                     val showDialog5 = remember {
+                        mutableStateOf(false)
+                    }
+                    val showDialog6 = remember {
                         mutableStateOf(false)
                     }
 
@@ -1645,13 +1620,14 @@ class MainActivity : ComponentActivity() {
                                 Box(
                                     modifier = Modifier
                                         .padding(top = 300.dp)
-                                        .clip(RoundedCornerShape(12))
+                                        .clip(RoundedCornerShape(10))
                                         .width(350.dp)
-                                        .shadow(
-                                            elevation = 10.dp,
-                                            shape = RoundedCornerShape(12.dp)
-                                        )
                                         .background(TagsBGColor)
+                                        .border(
+                                            width = 2.dp,
+                                            color = BorderColor,
+                                            shape = RoundedCornerShape(10.dp)
+                                        )
                                         .clickable {
                                             val match = regex.findAll(newTask).lastOrNull()
                                             match?.let {
@@ -3552,6 +3528,10 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+                    val notificationInterval = remember{
+                        mutableStateOf("")
+                    }
+
                     if (sheet3State.value) {
                         ModalBottomSheet(
                             onDismissRequest = {
@@ -3774,22 +3754,35 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .height(height = 15.dp)
                                         )
-
-                                        Row{
-                                            Text(
-                                                "Notification Demo",
-                                                style = MaterialTheme.typography.titleLarge
+                                        Row(
+                                            modifier = Modifier
+                                                .clickable{
+                                                    showDialog6.value = true
+                                                }
+                                                .padding(
+                                                    horizontal = 15.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painter = painterResource(
+                                                    id = R.drawable.ic_repeat
+                                                ),
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(size = 30.dp),
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = ColorFilter.tint(SelectedItemColor)
                                             )
-
-                                            Spacer(Modifier.height(20.dp))
-
-                                            Spacer(Modifier.height(20.dp))
-
-                                            Button(onClick = {
-                                                scheduleNotification(context, 11, 25)
-                                            }) {
-                                                Text("Schedule Notification 10 min before")
-                                            }
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(width = 20.dp)
+                                            )
+                                            Text(
+                                                text = "Set repeating notifications",
+                                                fontSize = 20.sp,
+                                                color = Color.White
+                                            )
                                         }
                                         Spacer(
                                             modifier = Modifier
@@ -3837,6 +3830,68 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+                    if (showDialog6.value) {
+                        Popup(
+                            alignment = Alignment.Center,
+                            onDismissRequest = {
+                                showDialog3.value = false
+                            },
+                            properties = PopupProperties(
+                                focusable = true
+                            )
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(
+                                        top = 100.dp
+                                    )
+                                    .width(400.dp)
+                                    .clip(
+                                        RoundedCornerShape(15.dp)
+                                    )
+                                    .background(
+                                        color = BottomMenuColor
+                                    )
+                                    .border(
+                                        width = 2.dp,
+                                        color = BorderColor,
+                                        shape = RoundedCornerShape(15.dp)
+                                    )
+
+                            ) {
+                                TextField(
+                                    value = notificationInterval.value,
+                                    onValueChange = {
+                                        notificationInterval.value = it
+                                    },
+                                    shape = RoundedCornerShape(7.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth(.90f)
+                                        .height(50.dp),
+                                    label = {
+                                        Text(
+                                            text = "Repeat",
+                                            color = TextFieldLabelColor
+                                        )
+                                    }
+                                )
+                                Spacer(
+                                    modifier = Modifier
+                                        .width(10.dp)
+                                )
+                                Button(
+                                    onClick = {
+                                        val minutes = notificationInterval.value.toIntOrNull()
+                                        if (minutes != null && minutes > 0) {
+                                            scheduleRepeatingNotification(context, minutes)
+                                        }
+                                    },
+                                ) {
+                                    Text("Apply")
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -3848,82 +3903,70 @@ class MainActivity : ComponentActivity() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "tasks_channel",
-                "Task Notifications",
+                "minute_channel",
+                "Minute Notifications",
                 NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Channel for upcoming task reminders"
-            }
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun scheduleRepeatingNotification(context: Context, minutes: Int) {
+        val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, NotificationReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val intervalMillis = minutes * 60 * 1000L
+        val triggerAtMillis = System.currentTimeMillis() + intervalMillis
+
+        try {
+            alarmManager.setRepeating(
+                AlarmManager.RTC_WAKEUP,
+                triggerAtMillis,
+                intervalMillis,
+                pendingIntent
+            )
+        } catch (e: SecurityException) {
+            e.printStackTrace()
         }
     }
 }
 
 class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val title = intent.getStringExtra("title") ?: "Task Reminder"
-        val message = intent.getStringExtra("message") ?: "You have a task soon!"
+        val channelId = "minute_channel"
+        val notificationId = System.currentTimeMillis().toInt()
 
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            println(" Skipped showing notification: missing permission")
-            return
-        }
-
-        val builder = NotificationCompat.Builder(context, "tasks_channel")
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle(title)
-            .setContentText(message)
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(android.R.drawable.ic_popup_reminder)
+            .setContentTitle("Minute Alert")
+            .setContentText("This is your periodic notification.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            .build()
 
-        with(NotificationManagerCompat.from(context)) {
-            try {
-                notify(System.currentTimeMillis().toInt(), builder.build())
-            } catch (e: SecurityException) {
-                e.printStackTrace()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
             }
         }
-    }
-}
 
-fun scheduleNotification(context: Context, hour: Int, minute: Int) {
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-    val now = Calendar.getInstance()
-    val triggerTime = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, hour)
-        set(Calendar.MINUTE, minute - 10)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-
-        if (before(now)) add(Calendar.DAY_OF_MONTH, 1)
-    }
-
-    val intent = Intent(context, NotificationReceiver::class.java).apply {
-        putExtra("title", "Upcoming Task")
-        putExtra("message", "You have a task at %02d:%02d".format(hour, minute))
-    }
-
-    val pendingIntent = PendingIntent.getBroadcast(
-        context,
-        hour * 100 + minute,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-
-    try {
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            triggerTime.timeInMillis,
-            pendingIntent
-        )
-        println("Alarm scheduled for: ${triggerTime.time}")
-    } catch (e: SecurityException) {
-        e.printStackTrace()
+        try {
+            with(NotificationManagerCompat.from(context)) {
+                notify(notificationId, notification)
+            }
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
     }
 }
