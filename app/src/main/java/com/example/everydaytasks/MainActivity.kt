@@ -356,6 +356,9 @@ class MainActivity : ComponentActivity() {
                     val showDialog6 = remember {
                         mutableStateOf(false)
                     }
+                    val showDialog7 = remember {
+                        mutableStateOf(false)
+                    }
 
                     val selectedPriority = remember {
                         mutableIntStateOf(0)
@@ -847,10 +850,7 @@ class MainActivity : ComponentActivity() {
                                                                     color = BorderColor
                                                                 )
                                                                 .clickable {
-                                                                    scope.launch {
-                                                                        sheet1State.value = false
-                                                                        sheet3State.value = true
-                                                                    }
+                                                                    showDialog7.value = true
                                                                 },
                                                             verticalAlignment = Alignment.CenterVertically
                                                         ) {
@@ -1605,6 +1605,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
+
                         if (showDialog5.value) {
                             Popup(
                                 alignment = Alignment.Center,
@@ -1660,6 +1661,707 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .height(60.dp)
                                     )
+                                }
+                            }
+                        }
+                        val selectedDimension = remember {
+                            mutableIntStateOf(1)
+                        }
+                        val selectedDayPart = remember {
+                            mutableIntStateOf(
+                                if (
+                                    LocalTime.now().format(
+                                        DateTimeFormatter.ofPattern("a")
+                                    ) == "AM"
+                                ) 1
+                                else 2
+                            )
+                        }
+                        val selectedHour = remember {
+                            mutableIntStateOf(LocalTime.now().hour % 12)
+                        }
+                        val selectedMinute = remember {
+                            mutableIntStateOf(LocalTime.now().minute)
+                        }
+                        val keyboard = remember {
+                            mutableStateOf(false)
+                        }
+
+                        if (showDialog7.value) {
+                            Popup(
+                                alignment = Alignment.Center,
+                                onDismissRequest = {
+                                    showDialog7.value = false
+                                },
+                                properties = PopupProperties(
+                                    focusable = true
+                                )
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            horizontal = 20.dp
+                                        )
+                                        .clip(
+                                            RoundedCornerShape(10.dp)
+                                        )
+                                        .border(
+                                            width = 2.dp,
+                                            color = BorderColor,
+                                            shape = RoundedCornerShape(10.dp)
+                                        )
+                                        .background(
+                                            color = BGColor
+                                        )
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    ) {
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(10.dp)
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 20.dp
+                                                ),
+                                            text = "Choose your time",
+                                            color = CaptionTextColor,
+                                            fontSize = 15.sp
+                                        )
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(10.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    horizontal = 40.dp
+                                                ),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Column {
+                                                if (!keyboard.value) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .height(80.dp)
+                                                            .width(100.dp)
+                                                            .clip(
+                                                                RoundedCornerShape(10.dp)
+                                                            )
+                                                            .background(
+                                                                color =
+                                                                    if (selectedDimension.intValue == 1) AddingToneColor
+                                                                    else BottomMenuColor
+                                                            )
+                                                            .border(
+                                                                width = 2.dp,
+                                                                color = BottomMenuColor,
+                                                                shape = RoundedCornerShape(
+                                                                    10.dp
+                                                                )
+                                                            )
+                                                            .clickable {
+                                                                selectedDimension.intValue =
+                                                                    1
+                                                            },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Text(
+                                                            text = String.format(
+                                                                "%02d",
+                                                                selectedHour.intValue
+                                                            ),
+                                                            color = Color.White,
+                                                            fontSize = 50.sp
+                                                        )
+                                                    }
+                                                } else {
+                                                    TextField(
+                                                        value = selectedHour.intValue.toString(),
+                                                        onValueChange = { newValue ->
+                                                            newValue.toIntOrNull()
+                                                                ?.let { number ->
+                                                                    if (number in 1..12) {
+                                                                        selectedHour.intValue =
+                                                                            number
+                                                                    }
+                                                                }
+                                                        },
+                                                        textStyle = TextStyle(
+                                                            color = Color.White,
+                                                            fontSize = 50.sp,
+                                                            textAlign = TextAlign.Center
+                                                        ),
+                                                        shape = RoundedCornerShape(10.dp),
+                                                        colors = TextFieldDefaults.colors(
+                                                            unfocusedContainerColor = BottomMenuColor,
+                                                            focusedContainerColor = AddingToneColor,
+                                                            unfocusedIndicatorColor = Color.Transparent,
+                                                            focusedIndicatorColor = Color.Transparent,
+                                                        ),
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .height(80.dp)
+                                                            .border(
+                                                                width = 2.dp,
+                                                                color = BottomMenuColor,
+                                                                shape = RoundedCornerShape(
+                                                                    10.dp
+                                                                )
+                                                            ),
+                                                        singleLine = true,
+                                                        keyboardOptions = KeyboardOptions(
+                                                            keyboardType = KeyboardType.Number
+                                                        )
+                                                    )
+                                                }
+                                                if (keyboard.value) {
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(5.dp)
+                                                    )
+                                                }
+                                                if (keyboard.value) {
+                                                    Text(
+                                                        text = "Hours",
+                                                        color = CaptionTextColor,
+                                                        fontSize = 15.sp
+                                                    )
+                                                }
+                                            }
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(5.dp)
+                                            )
+                                            Column {
+                                                Text(
+                                                    text = ":",
+                                                    color = Color.White,
+                                                    fontSize = 50.sp
+                                                )
+                                                if (keyboard.value) {
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(5.dp)
+                                                    )
+                                                }
+                                                if (keyboard.value) {
+                                                    Text(
+                                                        text = " ",
+                                                        color = CaptionTextColor,
+                                                        fontSize = 15.sp
+                                                    )
+                                                }
+                                            }
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(5.dp)
+                                            )
+                                            Column {
+                                                if (!keyboard.value) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .height(80.dp)
+                                                            .width(100.dp)
+                                                            .clip(
+                                                                RoundedCornerShape(10.dp)
+                                                            )
+                                                            .background(
+                                                                color =
+                                                                    if (selectedDimension.intValue == 2) AddingToneColor
+                                                                    else BottomMenuColor
+                                                            )
+                                                            .border(
+                                                                width = 2.dp,
+                                                                color = BottomMenuColor,
+                                                                shape = RoundedCornerShape(
+                                                                    10.dp
+                                                                )
+                                                            )
+                                                            .clickable {
+                                                                selectedDimension.intValue =
+                                                                    2
+                                                            },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Text(
+                                                            text = String.format(
+                                                                "%02d",
+                                                                selectedMinute.intValue
+                                                            ),
+                                                            color = Color.White,
+                                                            fontSize = 50.sp
+                                                        )
+                                                    }
+                                                } else {
+                                                    TextField(
+                                                        value = selectedMinute.intValue.toString(),
+                                                        onValueChange = { newValue ->
+                                                            newValue.toIntOrNull()
+                                                                ?.let { number ->
+                                                                    if (number in 0..59) {
+                                                                        selectedMinute.intValue =
+                                                                            number
+                                                                    }
+                                                                }
+                                                        },
+                                                        textStyle = TextStyle(
+                                                            color = Color.White,
+                                                            fontSize = 50.sp,
+                                                            textAlign = TextAlign.Center
+                                                        ),
+                                                        shape = RoundedCornerShape(10.dp),
+                                                        colors = TextFieldDefaults.colors(
+                                                            unfocusedContainerColor = BottomMenuColor,
+                                                            focusedContainerColor = AddingToneColor,
+                                                            unfocusedIndicatorColor = Color.Transparent,
+                                                            focusedIndicatorColor = Color.Transparent,
+                                                        ),
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .height(80.dp)
+                                                            .border(
+                                                                width = 2.dp,
+                                                                color = BottomMenuColor,
+                                                                shape = RoundedCornerShape(
+                                                                    10.dp
+                                                                )
+                                                            ),
+                                                        singleLine = true,
+                                                        keyboardOptions = KeyboardOptions(
+                                                            keyboardType = KeyboardType.Number
+                                                        )
+                                                    )
+                                                }
+                                                if (keyboard.value) {
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(5.dp)
+                                                    )
+                                                }
+                                                if (keyboard.value) {
+                                                    Text(
+                                                        text = "Minutes",
+                                                        color = CaptionTextColor,
+                                                        fontSize = 15.sp
+                                                    )
+                                                }
+                                            }
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(10.dp)
+                                            )
+                                            Column {
+                                                Column(
+                                                    modifier = Modifier
+                                                        .height(80.dp)
+                                                        .clip(
+                                                            RoundedCornerShape(10.dp)
+                                                        )
+                                                        .border(
+                                                            width = 2.dp,
+                                                            color = BottomMenuColor,
+                                                            shape = RoundedCornerShape(
+                                                                10.dp
+                                                            )
+                                                        )
+                                                        .background(
+                                                            color = BottomMenuColor
+                                                        ),
+                                                    verticalArrangement = Arrangement.Center,
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxHeight(.5f)
+                                                            .fillMaxWidth(.98f)
+                                                            .clip(
+                                                                RoundedCornerShape(
+                                                                    topStart = 10.dp,
+                                                                    topEnd = 10.dp
+                                                                )
+                                                            )
+                                                            .background(
+                                                                color =
+                                                                    if (selectedDayPart.intValue == 1) AddingToneColor
+                                                                    else BottomMenuColor
+                                                            )
+                                                            .clickable {
+                                                                selectedDayPart.intValue =
+                                                                    1
+                                                            },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Text(
+                                                            text = "AM",
+                                                            color = Color.White,
+                                                            fontSize = 20.sp
+                                                        )
+                                                    }
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth(.98f)
+                                                            .fillMaxHeight()
+                                                            .clip(
+                                                                RoundedCornerShape(
+                                                                    bottomStart = 10.dp,
+                                                                    bottomEnd = 10.dp
+                                                                )
+                                                            )
+                                                            .background(
+                                                                color =
+                                                                    if (selectedDayPart.intValue == 2) AddingToneColor
+                                                                    else BottomMenuColor
+                                                            )
+                                                            .clickable {
+                                                                selectedDayPart.intValue =
+                                                                    2
+                                                            },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Text(
+                                                            text = "PM",
+                                                            color = Color.White,
+                                                            fontSize = 20.sp
+                                                        )
+                                                    }
+                                                }
+                                                if (keyboard.value) {
+                                                    Spacer(
+                                                        modifier = Modifier
+                                                            .height(5.dp)
+                                                    )
+                                                }
+                                                if (keyboard.value) {
+                                                    Text(
+                                                        text = " ",
+                                                        color = CaptionTextColor,
+                                                        fontSize = 15.sp
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(25.dp)
+                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(
+                                                    horizontal = 20.dp
+                                                )
+                                        ) {
+                                            if (!keyboard.value) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth(),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(250.dp)
+                                                            .clip(
+                                                                CircleShape
+                                                            )
+                                                            .background(
+                                                                BottomMenuColor
+                                                            )
+                                                            .border(
+                                                                2.dp,
+                                                                BottomMenuColor,
+                                                                CircleShape
+                                                            ),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Canvas(
+                                                            modifier = Modifier
+                                                                .fillMaxSize()
+                                                                .pointerInput(Unit) {
+                                                                    detectDragGestures { change, _ ->
+                                                                        val center =
+                                                                            Offset(
+                                                                                size.width / 2f,
+                                                                                size.height / 2f
+                                                                            )
+                                                                        val dx =
+                                                                            change.position.x - center.x
+                                                                        val dy =
+                                                                            change.position.y - center.y
+                                                                        val angleRad =
+                                                                            atan2(
+                                                                                dy,
+                                                                                dx
+                                                                            )
+                                                                        var angleDeg =
+                                                                            Math.toDegrees(
+                                                                                angleRad.toDouble()
+                                                                            ).toFloat()
+
+                                                                        angleDeg =
+                                                                            (angleDeg + 90 + 360) % 360
+
+                                                                        if (selectedDimension.intValue == 1) {
+                                                                            val clickedHour =
+                                                                                ((angleDeg / 30f).roundToInt() % 12).let {
+                                                                                    if (it == 0) 12 else it
+                                                                                }
+                                                                            selectedHour.intValue =
+                                                                                clickedHour
+                                                                        } else {
+                                                                            val clickedMinute =
+                                                                                ((angleDeg / 6f).roundToInt() % 60)
+                                                                            selectedMinute.intValue =
+                                                                                clickedMinute
+                                                                        }
+                                                                    }
+                                                                }
+                                                                .pointerInput(Unit) {
+                                                                    detectTapGestures { offset ->
+                                                                        val center =
+                                                                            Offset(
+                                                                                size.width / 2f,
+                                                                                size.height / 2f
+                                                                            )
+                                                                        val dx =
+                                                                            offset.x - center.x
+                                                                        val dy =
+                                                                            offset.y - center.y
+                                                                        val angleRad =
+                                                                            atan2(
+                                                                                dy,
+                                                                                dx
+                                                                            )
+                                                                        var angleDeg =
+                                                                            Math.toDegrees(
+                                                                                angleRad.toDouble()
+                                                                            ).toFloat()
+
+                                                                        angleDeg =
+                                                                            (angleDeg + 90 + 360) % 360
+
+                                                                        if (selectedDimension.intValue == 1) {
+                                                                            val clickedHour =
+                                                                                ((angleDeg / 30f).roundToInt() % 12).let {
+                                                                                    if (it == 0) 12 else it
+                                                                                }
+                                                                            selectedHour.intValue =
+                                                                                clickedHour
+                                                                        } else {
+                                                                            val clickedMinute =
+                                                                                ((angleDeg / 6f).roundToInt() % 60)
+                                                                            selectedMinute.intValue =
+                                                                                clickedMinute
+                                                                        }
+                                                                    }
+                                                                }
+                                                        ) {
+                                                            val center = size.center
+                                                            val radius =
+                                                                size.minDimension / 2
+
+                                                            drawCircle(
+                                                                color = BottomMenuColor,
+                                                                radius = radius,
+                                                                center = center,
+                                                                style = Stroke(4f)
+                                                            )
+
+                                                            drawIntoCanvas { canvas ->
+                                                                val angleDegrees =
+                                                                    if (selectedDimension.intValue == 1)
+                                                                        (selectedHour.intValue % 12) * 30 - 90
+                                                                    else
+                                                                        (selectedMinute.intValue % 60) * 6 - 90
+                                                                val angleRad =
+                                                                    Math.toRadians(
+                                                                        angleDegrees.toDouble()
+                                                                    )
+                                                                val handLength =
+                                                                    radius * .8f
+                                                                val endX =
+                                                                    center.x + cos(
+                                                                        angleRad
+                                                                    ).toFloat() * handLength
+                                                                val endY =
+                                                                    center.y + sin(
+                                                                        angleRad
+                                                                    ).toFloat() * handLength
+
+                                                                drawLine(
+                                                                    color = SelectedItemColor,
+                                                                    start = center,
+                                                                    end = Offset(
+                                                                        endX,
+                                                                        endY
+                                                                    ),
+                                                                    strokeWidth = 6f
+                                                                )
+
+                                                                drawCircle(
+                                                                    color = SelectedItemColor,
+                                                                    radius = 55f,
+                                                                    center = Offset(
+                                                                        endX,
+                                                                        endY
+                                                                    )
+                                                                )
+
+                                                                drawCircle(
+                                                                    color = SelectedItemColor,
+                                                                    radius = 16f,
+                                                                    center = center
+                                                                )
+                                                                val paint =
+                                                                    Paint().apply {
+                                                                        color =
+                                                                            android.graphics
+                                                                                .Color.WHITE
+                                                                        textSize =
+                                                                            40f
+                                                                        textAlign =
+                                                                            Paint.Align.CENTER
+                                                                        isAntiAlias =
+                                                                            true
+                                                                    }
+                                                                if (selectedDimension.intValue == 1) {
+                                                                    for (number in 1..12) {
+                                                                        val angle =
+                                                                            Math.toRadians(
+                                                                                ((number * 30) - 90)
+                                                                                    .toDouble()
+                                                                            )
+                                                                        val textRadius =
+                                                                            radius * 0.8f
+                                                                        val x =
+                                                                            center.x + cos(
+                                                                                angle
+                                                                            ).toFloat() * textRadius
+                                                                        val y =
+                                                                            center.y + sin(
+                                                                                angle
+                                                                            ).toFloat() * textRadius + (paint.textSize / 3)
+                                                                        canvas.nativeCanvas
+                                                                            .drawText(
+                                                                                number.toString(),
+                                                                                x,
+                                                                                y,
+                                                                                paint
+                                                                            )
+                                                                    }
+                                                                } else {
+                                                                    for (number in 0..55 step 5) {
+                                                                        val angle =
+                                                                            Math.toRadians(
+                                                                                ((number * 6) - 90)
+                                                                                    .toDouble()
+                                                                            )
+                                                                        val textRadius =
+                                                                            radius * 0.8f
+                                                                        val x =
+                                                                            center.x + cos(
+                                                                                angle
+                                                                            ).toFloat() * textRadius
+                                                                        val y =
+                                                                            center.y + sin(
+                                                                                angle
+                                                                            ).toFloat() * textRadius + (paint.textSize / 3)
+                                                                        canvas.nativeCanvas
+                                                                            .drawText(
+                                                                                number.toString(),
+                                                                                x,
+                                                                                y,
+                                                                                paint
+                                                                            )
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            Box(
+                                                contentAlignment = Alignment.BottomStart
+                                            ) {
+                                                Image(
+                                                    painter = painterResource(
+                                                        id =
+                                                            if (keyboard.value)
+                                                                R.drawable.ic_reminder
+                                                            else
+                                                                R.drawable.ic_keyboard
+                                                    ),
+                                                    contentDescription = null,
+                                                    Modifier
+                                                        .size(size = 30.dp)
+                                                        .clickable {
+                                                            keyboard.value =
+                                                                !keyboard.value
+                                                        },
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                            }
+                                        }
+                                        Spacer(
+                                            modifier = Modifier
+                                                .height(height = 20.dp)
+                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(height = 1.dp)
+                                                .background(
+                                                    color = IntervalColor
+                                                )
+                                        ) {}
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    horizontal = 20.dp
+                                                ),
+                                            horizontalArrangement = Arrangement.End,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .height(height = 83.dp)
+                                            )
+                                            Text(
+                                                modifier = Modifier
+                                                    .clickable {
+                                                        showDialog7.value = false
+                                                    },
+                                                text = "Cancel",
+                                                fontSize = 25.sp,
+                                                color = SelectedItemColor
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(width = 32.dp)
+                                            )
+                                            Text(
+                                                modifier = Modifier
+                                                    .clickable {
+                                                        showDialog7.value = false
+                                                        var h =
+                                                            selectedHour.intValue % 12
+                                                        if (selectedDayPart.intValue != 1) h += 12
+                                                        taskTime.value = LocalTime.of(
+                                                            h,
+                                                            selectedMinute.intValue
+                                                        )
+                                                    },
+                                                text = "Ok",
+                                                fontSize = 25.sp,
+                                                color = SelectedItemColor
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -2580,6 +3282,7 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .height(15.dp)
                                     )
+
                                     if (showDialog1.value) {
                                         Popup(
                                             alignment = Alignment.Center,
@@ -3368,16 +4071,16 @@ class MainActivity : ComponentActivity() {
                                                                             )
                                                                             val paint =
                                                                                 Paint().apply {
-                                                                                        color =
-                                                                                            android.graphics
-                                                                                                .Color.WHITE
-                                                                                        textSize =
-                                                                                            40f
-                                                                                        textAlign =
-                                                                                            Paint.Align.CENTER
-                                                                                        isAntiAlias =
-                                                                                            true
-                                                                                    }
+                                                                                    color =
+                                                                                        android.graphics
+                                                                                            .Color.WHITE
+                                                                                    textSize =
+                                                                                        40f
+                                                                                    textAlign =
+                                                                                        Paint.Align.CENTER
+                                                                                    isAntiAlias =
+                                                                                        true
+                                                                                }
                                                                             if (selectedDimension.intValue == 1) {
                                                                                 for (number in 1..12) {
                                                                                     val angle =
@@ -3509,9 +4212,13 @@ class MainActivity : ComponentActivity() {
                                                                         ) + " " +
                                                                                 if (selectedDayPart.intValue == 1) "am"
                                                                                 else "pm"
-                                                                    var h = selectedHour.intValue % 12
+                                                                    var h =
+                                                                        selectedHour.intValue % 12
                                                                     if (selectedDayPart.intValue != 1) h += 12
-                                                                    taskTime.value = LocalTime.of(h, selectedMinute.intValue)
+                                                                    taskTime.value = LocalTime.of(
+                                                                        h,
+                                                                        selectedMinute.intValue
+                                                                    )
                                                                 },
                                                             text = "Ok",
                                                             fontSize = 25.sp,
@@ -3526,7 +4233,8 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    val notificationInterval = remember{
+
+                    val notificationInterval = remember {
                         mutableStateOf("")
                     }
 
@@ -3548,7 +4256,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                             ) {
-                                Column{
+                                Column {
                                     Spacer(
                                         modifier = Modifier
                                             .height(height = 15.dp)
@@ -3720,11 +4428,7 @@ class MainActivity : ComponentActivity() {
                                                     horizontal = 15.dp
                                                 )
                                                 .clickable {
-                                                    scope.launch {
-                                                        selectedReminder.intValue = 3
-                                                        sheet3State.value = false
-                                                        sheet1State.value = true
-                                                    }
+
                                                 },
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
@@ -3754,7 +4458,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                         Row(
                                             modifier = Modifier
-                                                .clickable{
+                                                .clickable {
                                                     showDialog6.value = true
                                                 }
                                                 .padding(
@@ -3798,7 +4502,7 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .height(height = 15.dp)
                                         )
-                                        Row (
+                                        Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(
@@ -3934,7 +4638,8 @@ class MainActivity : ComponentActivity() {
                                                             else BottomMenuColor
                                                     )
                                                     .clickable {
-                                                        selectedNotificationTimeContent.intValue = 0
+                                                        selectedNotificationTimeContent.intValue =
+                                                            0
                                                     },
                                                 contentAlignment = Alignment.Center
                                             ) {
@@ -3954,7 +4659,8 @@ class MainActivity : ComponentActivity() {
                                                             else BottomMenuColor
                                                     )
                                                     .clickable {
-                                                        selectedNotificationTimeContent.intValue = 1
+                                                        selectedNotificationTimeContent.intValue =
+                                                            1
                                                     },
                                                 contentAlignment = Alignment.Center
                                             ) {
@@ -3980,7 +4686,8 @@ class MainActivity : ComponentActivity() {
                                                             else BottomMenuColor
                                                     )
                                                     .clickable {
-                                                        selectedNotificationTimeContent.intValue = 2
+                                                        selectedNotificationTimeContent.intValue =
+                                                            2
                                                     },
                                                 contentAlignment = Alignment.Center
                                             ) {
@@ -4012,7 +4719,8 @@ class MainActivity : ComponentActivity() {
                                                     color = ButtonBGColor
                                                 )
                                                 .clickable {
-                                                    var minutes = notificationInterval.value.toInt()
+                                                    var minutes =
+                                                        notificationInterval.value.toInt()
 
                                                     if (selectedNotificationTimeContent.intValue == 1) {
                                                         minutes = minutes * 60
@@ -4092,7 +4800,7 @@ class NotificationReceiver : BroadcastReceiver() {
         val notificationId = System.currentTimeMillis().toInt()
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_popup_reminder)
+            .setSmallIcon(android.R.drawable.ic_menu_info_details)
             .setContentTitle("Minute Alert")
             .setContentText("This is your periodic notification.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)

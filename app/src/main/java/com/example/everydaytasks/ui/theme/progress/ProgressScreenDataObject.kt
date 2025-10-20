@@ -19,5 +19,7 @@ data class ProgressScreenDataObject @RequiresApi(Build.VERSION_CODES.O) construc
     val firstAdd: Int = 1,
     val time: String = "",
     val priority: Int = 0,
-    val tag: String = ""
+    val tag: String = "",
+    val deadlineDay: String = "",
+    val deadlineTime: String = ""
 )
