@@ -159,8 +159,6 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
-import com.example.everydaytasks.ui.theme.TextFieldLabelColor
-
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -3880,13 +3878,19 @@ class MainActivity : ComponentActivity() {
                                                 notificationInterval.value = it
                                             },
                                             shape = RoundedCornerShape(7.dp),
+                                            colors = TextFieldDefaults.colors(
+                                                unfocusedContainerColor = BottomMenuColor,
+                                                focusedContainerColor = BottomMenuColor,
+                                                unfocusedIndicatorColor = Color.Transparent,
+                                                focusedIndicatorColor = Color.Transparent,
+                                            ),
                                             modifier = Modifier
-                                                .fillMaxWidth(.60f)
-                                                .height(90.dp),
+                                                .fillMaxWidth(.80f)
+                                                .height(60.dp),
                                             label = {
                                                 Text(
                                                     text = "Repeat",
-                                                    color = TextFieldLabelColor
+                                                    color = CaptionTextColor
                                                 )
                                             }
                                         )
@@ -3897,7 +3901,7 @@ class MainActivity : ComponentActivity() {
                                         Column(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .height(90.dp)
+                                                .height(60.dp)
                                                 .clip(
                                                     RoundedCornerShape(10.dp)
                                                 )
@@ -3917,7 +3921,7 @@ class MainActivity : ComponentActivity() {
                                             Box(
                                                 modifier = Modifier
                                                     .fillMaxWidth(.98f)
-                                                    .height(30.dp)
+                                                    .height(20.dp)
                                                     .clip(
                                                         RoundedCornerShape(
                                                             topStart = 10.dp,
@@ -3943,7 +3947,7 @@ class MainActivity : ComponentActivity() {
                                             Box(
                                                 modifier = Modifier
                                                     .fillMaxWidth(.98f)
-                                                    .height(30.dp)
+                                                    .height(20.dp)
                                                     .background(
                                                         color =
                                                             if (selectedNotificationTimeContent.intValue == 1) AddingToneColor
@@ -3963,7 +3967,7 @@ class MainActivity : ComponentActivity() {
                                             Box(
                                                 modifier = Modifier
                                                     .fillMaxWidth(.98f)
-                                                    .height(30.dp)
+                                                    .height(20.dp)
                                                     .clip(
                                                         RoundedCornerShape(
                                                             bottomStart = 10.dp,
@@ -3992,22 +3996,45 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .height(10.dp)
                                     )
-                                    Button(
-                                        onClick = {
-                                            var minutes = notificationInterval.value.toInt()
-
-                                            if (selectedNotificationTimeContent.intValue == 1) {
-                                                minutes = minutes * 60
-                                            } else if (selectedNotificationTimeContent.intValue == 2) {
-                                                minutes = minutes * 60 * 24
-                                            }
-
-                                            if (minutes > 0) {
-                                                scheduleRepeatingNotification(context, minutes)
-                                            }
-                                        },
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
                                     ) {
-                                        Text("Apply")
+                                        Box(
+                                            modifier = Modifier
+                                                .width(75.dp)
+                                                .height(45.dp)
+                                                .clip(
+                                                    RoundedCornerShape(10.dp)
+                                                )
+                                                .background(
+                                                    color = ButtonBGColor
+                                                )
+                                                .clickable {
+                                                    var minutes = notificationInterval.value.toInt()
+
+                                                    if (selectedNotificationTimeContent.intValue == 1) {
+                                                        minutes = minutes * 60
+                                                    } else if (selectedNotificationTimeContent.intValue == 2) {
+                                                        minutes = minutes * 60 * 24
+                                                    }
+
+                                                    if (minutes > 0) {
+                                                        scheduleRepeatingNotification(
+                                                            context,
+                                                            minutes
+                                                        )
+                                                    }
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                "Apply",
+                                                fontSize = 15.sp,
+                                                color = Color.White
+                                            )
+                                        }
                                     }
                                 }
                             }
