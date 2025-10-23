@@ -378,6 +378,13 @@ class MainActivity : ComponentActivity() {
                     var tagName by remember { mutableStateOf("") }
                     val regex = Regex("@\\w+")
 
+                    val deadlineFlag = remember {
+                        mutableStateOf(false)
+                    }
+                    val taskDeadline = remember {
+                        mutableStateOf(LocalTime.now())
+                    }
+
                     if (sheet1State.value) {
                         ModalBottomSheet(
                             onDismissRequest = {
@@ -1032,9 +1039,10 @@ class MainActivity : ComponentActivity() {
                                                                         1
                                                                     ).toString(),
                                                                     firstAdd = 1,
-                                                                    time = taskTime.value.toString(),
+                                                                    time = taskTime.value.toString().take(5),
                                                                     priority = selectedPriority.intValue,
-                                                                    tag = taskTag.value
+                                                                    tag = taskTag.value,
+                                                                    deadlineTime = taskDeadline.value.toString().take(5)
                                                                 )
                                                             )
                                                     },
@@ -1719,6 +1727,37 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .fillMaxWidth()
                                     ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth(.98f)
+                                                .background(
+                                                    color = BottomMenuColor
+                                                ),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(.49f),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "Time",
+                                                    color = CaptionTextColor,
+                                                    fontSize = 32.sp
+                                                )
+                                            }
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth(.49f),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "Day",
+                                                    color = CaptionTextColor,
+                                                    fontSize = 32.sp
+                                                )
+                                            }
+                                        }
                                         Spacer(
                                             modifier = Modifier
                                                 .height(10.dp)
@@ -2348,10 +2387,11 @@ class MainActivity : ComponentActivity() {
                                                 modifier = Modifier
                                                     .clickable {
                                                         showDialog7.value = false
+                                                        deadlineFlag.value = true
                                                         var h =
                                                             selectedHour.intValue % 12
                                                         if (selectedDayPart.intValue != 1) h += 12
-                                                        taskTime.value = LocalTime.of(
+                                                        taskDeadline.value = LocalTime.of(
                                                             h,
                                                             selectedMinute.intValue
                                                         )
@@ -4274,7 +4314,7 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .height(height = 15.dp)
                                     )
-                                    if (!timeFlag.value) {
+                                    if (!deadlineFlag.value) {
                                         Box(
                                             modifier = Modifier
                                                 .padding(

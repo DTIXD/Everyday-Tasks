@@ -1,5 +1,7 @@
 package com.example.everydaytasks.ui.theme.login
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,6 +42,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.auth.ktx.auth
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LoginPage(
     onNavigationToProgressPage: (ProgressScreenDataObject) -> Unit
