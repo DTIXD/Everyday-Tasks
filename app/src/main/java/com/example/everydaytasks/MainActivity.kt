@@ -1694,6 +1694,9 @@ class MainActivity : ComponentActivity() {
                         val keyboard = remember {
                             mutableStateOf(false)
                         }
+                        val deadlineParameter = remember {
+                            mutableIntStateOf(1)
+                        }
 
                         if (showDialog7.value) {
                             Popup(
@@ -1729,7 +1732,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         Row(
                                             modifier = Modifier
-                                                .fillMaxWidth(.98f)
+                                                .fillMaxWidth()
                                                 .background(
                                                     color = BottomMenuColor
                                                 ),
@@ -1737,7 +1740,17 @@ class MainActivity : ComponentActivity() {
                                         ) {
                                             Box(
                                                 modifier = Modifier
-                                                    .fillMaxWidth(.49f),
+                                                    .fillMaxWidth(.49f)
+                                                    .background(
+                                                        color =
+                                                            if (deadlineParameter.intValue == 1)
+                                                                SelectedItemColor
+                                                            else
+                                                                Color.Transparent
+                                                    )
+                                                    .clickable {
+                                                        deadlineParameter.intValue = 1
+                                                    },
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Text(
@@ -1748,7 +1761,17 @@ class MainActivity : ComponentActivity() {
                                             }
                                             Box(
                                                 modifier = Modifier
-                                                    .fillMaxWidth(.49f),
+                                                    .fillMaxWidth(.97f)
+                                                    .background(
+                                                        color =
+                                                            if (deadlineParameter.intValue == 2)
+                                                                SelectedItemColor
+                                                            else
+                                                                Color.Transparent
+                                                    )
+                                                    .clickable {
+                                                        deadlineParameter.intValue = 2
+                                                    },
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Text(
