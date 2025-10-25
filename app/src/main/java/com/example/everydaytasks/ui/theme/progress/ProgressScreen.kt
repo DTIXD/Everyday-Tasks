@@ -168,6 +168,8 @@ fun ProgressPage(
                 if (
                     progressScreenDataObject.daySelected
                     == progressScreenDataObject.dayAdded
+                    && progressScreenDataObject.deadlineDay
+                    >= today.toString()
                     && progressScreenDataObject.category
                     == "Today"
                 ) {
