@@ -30,12 +30,16 @@ import com.example.everydaytasks.R
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import com.example.everydaytasks.ui.theme.BGColor
+import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
 import java.time.LocalDate
@@ -71,7 +75,6 @@ fun ProgressPage(
             .background(
                 color = BGColor
             )
-
     ) {
         Column(
             modifier = Modifier
@@ -79,17 +82,57 @@ fun ProgressPage(
                     horizontal = 8.dp
                 )
         ) {
-            Text(
+            Row(
                 modifier = Modifier
-                    .padding(
-                        top = 25.dp,
-                        start = 5.dp,
-                        end = 5.dp
-                    ),
-                text = "Today",
-                color = Color.White,
-                fontSize = 25.sp,
-            )
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(
+                                top = 25.dp,
+                                start = 5.dp,
+                                end = 5.dp
+                            ),
+                        text = "Today",
+                        color = Color.White,
+                        fontSize = 25.sp,
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(
+                                top = 25.dp,
+                                start = 5.dp,
+                                end = 5.dp
+                            )
+                            .background(
+                                color = BottomMenuColor
+                            )
+                            .clip(
+                                RoundedCornerShape(16.dp)
+                            )
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(
+                                    vertical = 5.dp,
+                                    horizontal = 7.dp
+                                ),
+                            text = "H",
+                            color = Color.White,
+                            fontSize = 15.sp,
+                        )
+                    }
+                }
+            }
             Text(
                 modifier = Modifier
                     .padding(
