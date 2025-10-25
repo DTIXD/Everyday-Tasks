@@ -1044,7 +1044,8 @@ class MainActivity : ComponentActivity() {
                                                                     priority = selectedPriority.intValue,
                                                                     tag = taskTag.value,
                                                                     deadlineTime = taskDeadline.value.toString().take(5),
-                                                                    deadlineDay = selectedDeadlineDate.toString()
+                                                                    deadlineDay = selectedDeadlineDate.toString(),
+                                                                    today = LocalDate.now().toString()
                                                                 )
                                                             )
                                                     },
