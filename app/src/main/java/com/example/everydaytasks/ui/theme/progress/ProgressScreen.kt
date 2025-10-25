@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +39,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.BGColor
+import com.example.everydaytasks.ui.theme.BorderColor
 import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
@@ -67,6 +71,9 @@ fun ProgressPage(
 
     val today = remember {
         LocalDate.now()
+    }
+    val showDialog1 = remember {
+        mutableStateOf(false)
     }
 
     Column(
@@ -113,12 +120,15 @@ fun ProgressPage(
                                 start = 5.dp,
                                 end = 5.dp
                             )
-                            .background(
-                                color = BottomMenuColor
-                            )
                             .clip(
                                 RoundedCornerShape(16.dp)
                             )
+                            .background(
+                                color = BottomMenuColor
+                            )
+                            .clickable {
+                                showDialog1.value = true
+                            }
                     ) {
                         Text(
                             modifier = Modifier
@@ -374,6 +384,126 @@ fun ProgressPage(
                                 progressScreenDataObject.firstAdd
                             )
                         )
+                }
+            }
+        }
+    }
+    if (showDialog1.value) {
+        Popup(
+            alignment = Alignment.Center,
+            onDismissRequest = {
+                showDialog1.value = false
+            },
+            properties = PopupProperties(
+                focusable = true
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(
+                        RoundedCornerShape(10.dp)
+                    )
+                    .border(
+                        width = 2.dp,
+                        color = BorderColor,
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    .background(
+                        color = BGColor
+                    )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 8.dp
+                        )
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(
+                                top = 25.dp,
+                                start = 5.dp,
+                                end = 5.dp
+                            ),
+                        text = "Completed tasks",
+                        color = Color.White,
+                        fontSize = 25.sp,
+                    )
+                    Spacer(
+                        modifier = Modifier
+                            .height(10.dp)
+                    )
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        items(list.value) { progressScreenDataObject ->
+                            val isExtended = remember {
+                                mutableStateOf(false)
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .height(10.dp)
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(1.dp)
+                                        .background(
+                                            color = IntervalColor
+                                        )
+                                ) {}
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(5.dp)
+                                            .padding(
+                                                horizontal = 8.dp
+                                            )
+                                    ) {
+                                        Text(
+                                            text = progressScreenDataObject.newTask,
+                                            modifier = Modifier
+                                                .padding(
+                                                    end = 40.dp,
+                                                    start = 3.dp
+                                                )
+                                                .clickable {
+                                                    isExtended.value = !isExtended.value
+                                                },
+                                            fontSize = 25.sp,
+                                            maxLines =
+                                                if (isExtended.value) 100
+                                                else 1,
+                                            color = Color.White
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                horizontal = 8.dp
+                                            ),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        Text(
+                                            text = progressScreenDataObject.dayAdded,
+                                            color = CaptionTextColor,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
