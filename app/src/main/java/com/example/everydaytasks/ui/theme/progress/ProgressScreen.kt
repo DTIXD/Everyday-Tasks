@@ -218,11 +218,18 @@ fun ProgressPage(
                             )
                         )
                 }
+                var deadlineDay =
+                    if (progressScreenDataObject.deadlineDay == "")
+                        today.plusDays(1)
+                    else
+                        progressScreenDataObject.deadlineDay
+
+                deadlineDay = deadlineDay.toString()
+
                 if (
                     today.toString() >=
                     progressScreenDataObject.dayAdded
-                    && progressScreenDataObject.deadlineDay
-                    >= today.toString()
+                    && deadlineDay >= today.toString()
                     && progressScreenDataObject.category
                     == "Today"
                 ) {
@@ -442,63 +449,65 @@ fun ProgressPage(
                             val isExtended = remember {
                                 mutableStateOf(false)
                             }
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(10.dp)
-                                )
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(1.dp)
-                                        .background(
-                                            color = IntervalColor
-                                        )
-                                ) {}
-                                Box(
+                            if (progressScreenDataObject.isCompleted) {
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                 ) {
-                                    Row(
+                                    Spacer(
                                         modifier = Modifier
-                                            .padding(5.dp)
-                                            .padding(
-                                                horizontal = 8.dp
-                                            )
-                                    ) {
-                                        Text(
-                                            text = progressScreenDataObject.newTask,
-                                            modifier = Modifier
-                                                .padding(
-                                                    end = 40.dp,
-                                                    start = 3.dp
-                                                )
-                                                .clickable {
-                                                    isExtended.value = !isExtended.value
-                                                },
-                                            fontSize = 25.sp,
-                                            maxLines =
-                                                if (isExtended.value) 100
-                                                else 1,
-                                            color = Color.White
-                                        )
-                                    }
+                                            .height(10.dp)
+                                    )
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(
-                                                horizontal = 8.dp
-                                            ),
-                                        horizontalArrangement = Arrangement.End
+                                            .height(1.dp)
+                                            .background(
+                                                color = IntervalColor
+                                            )
+                                    ) {}
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
                                     ) {
-                                        Text(
-                                            text = progressScreenDataObject.dayAdded,
-                                            color = CaptionTextColor,
-                                            fontSize = 12.sp
-                                        )
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(5.dp)
+                                                .padding(
+                                                    horizontal = 8.dp
+                                                )
+                                        ) {
+                                            Text(
+                                                text = progressScreenDataObject.newTask,
+                                                modifier = Modifier
+                                                    .padding(
+                                                        end = 40.dp,
+                                                        start = 3.dp
+                                                    )
+                                                    .clickable {
+                                                        isExtended.value = !isExtended.value
+                                                    },
+                                                fontSize = 25.sp,
+                                                maxLines =
+                                                    if (isExtended.value) 100
+                                                    else 1,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(
+                                                    horizontal = 8.dp
+                                                ),
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            Text(
+                                                text = progressScreenDataObject.dayAdded,
+                                                color = CaptionTextColor,
+                                                fontSize = 12.sp
+                                            )
+                                        }
                                     }
                                 }
                             }

@@ -368,7 +368,9 @@ class MainActivity : ComponentActivity() {
                     }
                     val currentDate = LocalDate.now()
                     var selectedDate by remember { mutableStateOf(currentDate) }
+
                     var selectedDeadlineDate by remember { mutableStateOf(currentDate)}
+
                     val taskTime = remember {
                         mutableStateOf(LocalTime.now())
                     }
@@ -1043,8 +1045,16 @@ class MainActivity : ComponentActivity() {
                                                                     time = taskTime.value.toString().take(5),
                                                                     priority = selectedPriority.intValue,
                                                                     tag = taskTag.value,
-                                                                    deadlineTime = taskDeadline.value.toString().take(5),
-                                                                    deadlineDay = selectedDeadlineDate.toString(),
+                                                                    deadlineTime =
+                                                                        if (deadlineFlag.value)
+                                                                            taskDeadline.value.toString().take(5)
+                                                                        else
+                                                                            "",
+                                                                    deadlineDay =
+                                                                        if (deadlineFlag.value)
+                                                                            selectedDeadlineDate.toString()
+                                                                        else
+                                                                            "",
                                                                     today = LocalDate.now().toString()
                                                                 )
                                                             )
