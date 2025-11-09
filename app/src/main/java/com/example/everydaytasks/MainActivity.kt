@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
@@ -101,7 +100,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -157,6 +155,8 @@ import androidx.core.app.NotificationCompat
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 @Suppress("DEPRECATION")
@@ -2465,7 +2465,6 @@ class MainActivity : ComponentActivity() {
                                                 Text(
                                                     modifier = Modifier
                                                         .clickable {
-                                                            showDialog7.value = false
                                                             deadlineFlag.value = true
                                                             var h =
                                                                 selectedHour.intValue % 12
@@ -2474,8 +2473,9 @@ class MainActivity : ComponentActivity() {
                                                                 h,
                                                                 selectedMinute.intValue
                                                             )
+                                                            deadlineParameter.intValue = 2
                                                         },
-                                                    text = "Ok",
+                                                    text = "Next",
                                                     fontSize = 25.sp,
                                                     color = SelectedItemColor
                                                 )
@@ -2511,8 +2511,8 @@ class MainActivity : ComponentActivity() {
                                             }
                                             val calendarHeight by animateDpAsState(
                                                 targetValue =
-                                                    if (scrollOffset > 0) 200.dp
-                                                    else 100.dp,
+                                                    if (scrollOffset > 0) 300.dp
+                                                    else 150.dp,
                                                 label = "CalendarHeightAnimation"
                                             )
 
@@ -2595,6 +2595,58 @@ class MainActivity : ComponentActivity() {
                                                     }
                                                 }
                                             }
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .height(20.dp)
+                                            )
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(height = 1.dp)
+                                                    .background(
+                                                        color = IntervalColor
+                                                    )
+                                            ) {}
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .height(20.dp)
+                                            )
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(
+                                                        horizontal = 20.dp
+                                                    ),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.End
+                                            ) {
+                                                Text(
+                                                    modifier = Modifier
+                                                        .clickable {
+                                                            showDialog7.value = false
+                                                        },
+                                                    text = "Cancel",
+                                                    fontSize = 25.sp,
+                                                    color = SelectedItemColor
+                                                )
+                                                Spacer(
+                                                    modifier = Modifier
+                                                        .width(width = 32.dp)
+                                                )
+                                                Text(
+                                                    modifier = Modifier
+                                                        .clickable {
+
+                                                        },
+                                                    text = "Ok",
+                                                    fontSize = 25.sp,
+                                                    color = SelectedItemColor
+                                                )
+                                            }
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .height(20.dp)
+                                            )
                                         }
                                     }
                                 }

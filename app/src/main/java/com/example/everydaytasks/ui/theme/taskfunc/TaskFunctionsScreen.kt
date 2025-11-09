@@ -1,5 +1,7 @@
 package com.example.everydaytasks.ui.theme.taskfunc
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -67,6 +69,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import kotlin.math.roundToInt
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TaskFunctionsPage(
     onNavigationToProgressPage: (ProgressScreenDataObject) -> Unit,

@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,19 +33,23 @@ import com.google.firebase.ktx.Firebase
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.example.everydaytasks.ui.theme.BGColor
-import com.example.everydaytasks.ui.theme.BorderColor
 import com.example.everydaytasks.ui.theme.BottomMenuColor
 import com.example.everydaytasks.ui.theme.CaptionTextColor
 import com.example.everydaytasks.ui.theme.IntervalColor
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -56,6 +60,7 @@ import java.time.format.DateTimeFormatter
 fun ProgressPage(
     modifier: Modifier = Modifier
 ) {
+    val scope = rememberCoroutineScope()
     val fs = Firebase.firestore
     val list = remember {
         mutableStateOf(
@@ -91,7 +96,8 @@ fun ProgressPage(
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
                     horizontalArrangement = Arrangement.Start
@@ -127,7 +133,9 @@ fun ProgressPage(
                                 color = BottomMenuColor
                             )
                             .clickable {
-                                showDialog1.value = true
+                                scope.launch {
+                                    showDialog1.value = true
+                                }
                             }
                     ) {
                         Text(
@@ -135,10 +143,17 @@ fun ProgressPage(
                                 .padding(
                                     vertical = 5.dp,
                                     horizontal = 7.dp
+                                )
+                                .padding(
+                                    vertical = 5.dp,
+                                    horizontal = 5.dp
                                 ),
                             text = "H",
                             color = Color.White,
                             fontSize = 15.sp,
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                     }
                 }
@@ -408,14 +423,6 @@ fun ProgressPage(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(
-                        RoundedCornerShape(10.dp)
-                    )
-                    .border(
-                        width = 2.dp,
-                        color = BorderColor,
-                        shape = RoundedCornerShape(10.dp)
-                    )
                     .background(
                         color = BGColor
                     )
@@ -426,17 +433,37 @@ fun ProgressPage(
                             horizontal = 8.dp
                         )
                 ) {
-                    Text(
+                    Row(
                         modifier = Modifier
+                            .fillMaxWidth()
                             .padding(
                                 top = 25.dp,
                                 start = 5.dp,
                                 end = 5.dp
                             ),
-                        text = "Completed tasks",
-                        color = Color.White,
-                        fontSize = 25.sp,
-                    )
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .clickable {
+                                    scope.launch {
+                                        showDialog1.value = false
+                                    }
+                                },
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Add",
+                            tint = Color.White
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(25.dp)
+                        )
+                        Text(
+                            text = "Completed tasks",
+                            color = Color.White,
+                            fontSize = 25.sp,
+                        )
+                    }
                     Spacer(
                         modifier = Modifier
                             .height(10.dp)
