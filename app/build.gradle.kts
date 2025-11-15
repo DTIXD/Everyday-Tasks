@@ -44,6 +44,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.lifecycle.process)
+
     implementation(libs.kizitonwose.calendar)
 
     implementation(libs.androidx.navigation.compose)

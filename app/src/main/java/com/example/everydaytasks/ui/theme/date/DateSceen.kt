@@ -66,41 +66,6 @@ fun DatePage(
 
     val currentDate = LocalDate.now()
     var selectedDate by remember { mutableStateOf(currentDate) }
-    var lastCheckedDate by remember { mutableStateOf(currentDate) }
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                val now = LocalDate.now()
-                if (now != lastCheckedDate) {
-                    selectedDate = now
-                    lastCheckedDate = now
-                }
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            val nowMillis = System.currentTimeMillis()
-            val midnightMillis = LocalDate.now()
-                .plusDays(1)
-                .atStartOfDay(ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli()
-            val delayMillis = midnightMillis - nowMillis
-
-            delay(delayMillis)
-
-            selectedDate = LocalDate.now()
-        }
-    }
 
     Box(
         modifier = modifier

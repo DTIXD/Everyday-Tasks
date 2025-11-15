@@ -146,6 +146,7 @@ import java.time.temporal.ChronoUnit
 import kotlin.text.replaceFirstChar
 import android.Manifest
 import android.app.AlarmManager
+import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -159,6 +160,31 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
+
+object AppState {
+    @RequiresApi(Build.VERSION_CODES.O)
+    var selectedDate: LocalDate = LocalDate.now()
+}
+
+class AppLifecycleListener : DefaultLifecycleObserver {
+    @SuppressLint("NewApi")
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        AppState.selectedDate = LocalDate.now()
+    }
+}
+class MyApp : Application() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onCreate() {
+        super.onCreate()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(AppLifecycleListener())
+    }
+}
+
+
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -367,7 +393,6 @@ class MainActivity : ComponentActivity() {
                         mutableIntStateOf(0)
                     }
                     val currentDate = LocalDate.now()
-                    var selectedDate by remember { mutableStateOf(currentDate) }
 
                     var selectedDeadlineDate by remember { mutableStateOf(currentDate)}
 
@@ -384,6 +409,13 @@ class MainActivity : ComponentActivity() {
                     val deadlineFlag = remember {
                         mutableStateOf(false)
                     }
+                    val repeatFlag = remember {
+                        mutableStateOf(false)
+                    }
+                    val repeatSelected = remember {
+                        mutableStateOf("Repeat")
+                    }
+
                     val taskDeadline = remember {
                         mutableStateOf(LocalTime.now())
                     }
@@ -1031,11 +1063,14 @@ class MainActivity : ComponentActivity() {
                                                                     isCompleted = false,
                                                                     key = key,
                                                                     dayAdded =
-                                                                        if (addForToday.value) selectedDate.toString()
+                                                                        if (addForToday.value) AppState.selectedDate.toString()
                                                                         else today.toString(),
                                                                     daySelected = today.toString(),
                                                                     category =
-                                                                        if (addForToday.value) "Today"
+                                                                        if (
+                                                                            addForToday.value
+                                                                            && repeatSelected.value != "Every day"
+                                                                        ) "Today"
                                                                         else "EveryDay",
                                                                     wasAdded = addForToday.value,
                                                                     lastAdded = today.minusDays(
@@ -2636,7 +2671,7 @@ class MainActivity : ComponentActivity() {
                                                 Text(
                                                     modifier = Modifier
                                                         .clickable {
-
+                                                            showDialog7.value = false
                                                         },
                                                     text = "Ok",
                                                     fontSize = 25.sp,
@@ -2656,6 +2691,9 @@ class MainActivity : ComponentActivity() {
                     val timeFlag = remember {
                         mutableStateOf(false)
                     }
+                    val timeSelected = remember {
+                        mutableStateOf("Add time")
+                    }
 
                     var selectedYearMonth by remember {
                         mutableStateOf(
@@ -2663,42 +2701,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-
-                    var lastCheckedDate by remember { mutableStateOf(currentDate) }
-
-                    val lifecycleOwner = LocalLifecycleOwner.current
-                    DisposableEffect(lifecycleOwner) {
-                        val observer = LifecycleEventObserver { _, event ->
-                            if (event == Lifecycle.Event.ON_RESUME) {
-                                val now = LocalDate.now()
-                                if (now != lastCheckedDate) {
-                                    selectedDate = now
-                                    lastCheckedDate = now
-                                }
-                            }
-                        }
-
-                        lifecycleOwner.lifecycle.addObserver(observer)
-                        onDispose {
-                            lifecycleOwner.lifecycle.removeObserver(observer)
-                        }
-                    }
-
-                    LaunchedEffect(Unit) {
-                        while (true) {
-                            val nowMillis = System.currentTimeMillis()
-                            val midnightMillis = LocalDate.now()
-                                .plusDays(1)
-                                .atStartOfDay(ZoneId.systemDefault())
-                                .toInstant()
-                                .toEpochMilli()
-                            val delayMillis = midnightMillis - nowMillis
-
-                            delay(delayMillis)
-
-                            selectedDate = LocalDate.now()
-                        }
-                    }
                     if (sheet2State.value) {
                         ModalBottomSheet(
                             onDismissRequest = {
@@ -2993,9 +2995,9 @@ class MainActivity : ComponentActivity() {
                                             .clickable {
                                                 scope.launch {
                                                     dateSelectionText.value = "${
-                                                        selectedDate.dayOfMonth
+                                                        AppState.selectedDate.dayOfMonth
                                                     } ${
-                                                        selectedDate.month.name.take(3).lowercase()
+                                                        AppState.selectedDate.month.name.take(3).lowercase()
                                                             .replaceFirstChar { c ->
                                                                 c.uppercase()
                                                             }
@@ -3246,13 +3248,13 @@ class MainActivity : ComponentActivity() {
                                                         )
                                                         .background(
                                                             when {
-                                                                dayDate == selectedDate -> SelectedItemColor
+                                                                dayDate == AppState.selectedDate -> SelectedItemColor
                                                                 else -> BGColor
                                                             }
                                                         )
                                                         .clickable(enabled = day != null) {
                                                             day?.let {
-                                                                selectedDate = it
+                                                                AppState.selectedDate = it
                                                             }
                                                         },
                                                     contentAlignment = Alignment.Center
@@ -3272,7 +3274,7 @@ class MainActivity : ComponentActivity() {
                                                                         },
                                                                     fontSize = 10.sp,
                                                                     color =
-                                                                        if (dayDate == selectedDate) CaptionTextColor
+                                                                        if (dayDate == AppState.selectedDate) CaptionTextColor
                                                                         else SelectedItemColor
                                                                 )
                                                             }
@@ -3300,17 +3302,6 @@ class MainActivity : ComponentActivity() {
                                         mutableStateOf(false)
                                     }
                                     val showDialog2 = remember {
-                                        mutableStateOf(false)
-                                    }
-
-                                    val timeSelected = remember {
-                                        mutableStateOf("Add time")
-                                    }
-
-                                    val repeatSelected = remember {
-                                        mutableStateOf("Repeat")
-                                    }
-                                    val repeatFlag = remember {
                                         mutableStateOf(false)
                                     }
 
@@ -3523,33 +3514,33 @@ class MainActivity : ComponentActivity() {
                                             .clickable {
                                                 scope.launch {
                                                     dateSelectionText.value =
-                                                        if (selectedDate == today) "Today"
-                                                        else if (selectedDate.minusDays(1) == today) "Tomorrow"
+                                                        if (AppState.selectedDate == today) "Today"
+                                                        else if (AppState.selectedDate.minusDays(1) == today) "Tomorrow"
                                                         else if (ChronoUnit.DAYS.between(
                                                                 today,
-                                                                selectedDate
+                                                                AppState.selectedDate
                                                             ) > 6
                                                         )
                                                             "${
-                                                                selectedDate.dayOfMonth
+                                                                AppState.selectedDate.dayOfMonth
                                                             } ${
-                                                                selectedDate.month.name.take(3)
+                                                                AppState.selectedDate.month.name.take(3)
                                                                     .lowercase()
                                                                     .replaceFirstChar { c ->
                                                                         c.uppercase()
                                                                     }
                                                             }."
-                                                        else selectedDate.dayOfWeek.name
+                                                        else AppState.selectedDate.dayOfWeek.name
                                                             .lowercase()
                                                             .replaceFirstChar { c ->
                                                                 c.uppercase()
                                                             }
                                                     dateSelection.intValue =
-                                                        if (selectedDate == today) 1
-                                                        else if (selectedDate.minusDays(1) == today) 2
+                                                        if (AppState.selectedDate == today) 1
+                                                        else if (AppState.selectedDate.minusDays(1) == today) 2
                                                         else if (ChronoUnit.DAYS.between(
                                                                 today,
-                                                                selectedDate
+                                                                AppState.selectedDate
                                                             ) > 6
                                                         ) 3
                                                         else 4
